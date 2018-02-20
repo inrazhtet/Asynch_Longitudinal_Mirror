@@ -1,0 +1,235 @@
+---
+title: "01_Linear_Interpolation"
+author: "Zarni Htet (zh938@nyu.edu)"
+output:
+  pdf_document: default
+  html_notebook: default
+---
+
+###Linear Interpolation
+
+This Markdown is filling the missing data for BMI and media exposure at asynchronous time points using linear interpolation. The project is supervised by Professor Marc Scott and Professor Daphna Harel. The data is from the Belle Lab at the Bellevue Hospital. More details of the project scope in the repository under lit folder.
+
+#### R Libraries
+
+This code block has all the needed R libraries
+
+```{r}
+#For the dta raw files
+library(foreign)
+#For importing different types of data set without specification
+library(rio)
+#For processing long form data
+library(dplyr)
+
+```
+
+#### Uploading Raw data
+
+In this code chunk, we are uploading raw .dta data and converting to it a csv. This will then be saved to a processing data folder to protect the integrity of the raw data.
+
+```{r}
+#The BMI data extract
+bmi <- read.dta("../../data/raw/MASextract1.dta")
+#The Media data extract
+media <- read.dta("../../data/raw/MASextract2.dta")
+#Writing the BMI data to processing file
+write.csv(bmi, "../../data/processing/bmi.csv")
+#Writing the media data to processing file
+write.csv(media, "../../data/processing/media.csv")
+```
+
+#### Loading the Data back from Processing Folder
+
+This code chunk is loading the working version of the data extra to be used throughout the document.
+
+```{r}
+#processing bmi data
+p_bmi <- import("../../data/processing/bmi.csv")
+p_media <- import("../../data/processing/media.csv")
+```
+
+#### Data Exploration
+
+This code chunks examine the two data sets. In particular, the focus here is on the key variables and the time intervals they are recorded. At the end of each code block for each data set, there is a short summary of what the data consists of.
+
+#####The BMI data set overview
+
+```{r}
+head(p_bmi)
+tail(p_bmi)
+dim(p_bmi) #10326, 4
+#check the number of unique subjects
+length(unique(p_bmi$ID_)) #667 
+length(unique(p_bmi$AgeMos)) #1951
+```
+
+Each subject has different time points. For subject 1, months may be 0, 0.5, 1.0 while subject 2 has months in 0, 0.7, 1.2 etc.
+
+
+This is to explore the number of time intervals each subject has. 
+
+```{r}
+#This uses dplyr to group by each subject and count their instances. This effectively counts the number of time points each of them have.
+bmi_timed <- p_bmi %>% 
+  group_by(ID_) %>%
+  summarize(n = n())
+print(bmi_timed)
+```
+
+We will do a quick barplot to see the distribution of time points for each subject has
+
+```{r}
+#Using the table function and barplot to draw the distribution of time. 
+barplot(table(bmi$ID_), main = "Time Count Distribution \n for Each Subject for BMI")
+```
+
+Check the Minimum/Maximum time intervals. This is to see if we have to explore edge cases later down the road for Last Value Carried forward at the end for each subject
+
+```{r}
+min(bmi_timed$n) #1
+max(bmi_timed$n) #39
+```
+
+At least 1 subject has only 1 time interval for BMI.
+
+##### Media exposure data set overview
+
+```{r}
+head(p_media)
+tail(p_media)
+dim(p_media) #1639, 5
+#check the number of unique subjects
+length(unique(p_media$ID_)) #542 
+length(unique(p_media$AgeMos)) #745
+```
+
+Like the BMI from before, each subject has different count of time as well as time intervals where the data is collected.
+
+```{r}
+#Using the table function and barplot to draw the distribution of time. 
+barplot(table(bmi$ID_), main = "Time Count Distribution \n for Each Subject for Media Exposure")
+```
+
+
+#####Next Steps?
+
+Should all the X variables have similar time? 
+Are we only matching it subject to subject but not acros subjects with the media exposure?
+
+####Merging the two data sets
+
+
+#####Check the number of ID matches between the two files
+
+The two ids to merge across the data sets are not of equal length. We will use the smaller one as base and see how much more are missing.
+
+```{r}
+#Writing in the Media Exposure Smaller one first to fill in
+matched_index <- match(p_media$ID_, p_bmi$ID_)
+#Checking the number of non matches using is.na
+non_matches <- sum(is.na(matched_index))
+print(non_matches) #16
+#Checking total matches by substracting from maximum unique ID of smaller set to the missing ones
+total_matches <- length(unique(p_media$ID_)) - non_matches
+print(total_matches) #526
+#This is not perfect total number. The best way is to match it to match the IDs by innerjoin and capture the NA values
+```
+
+#####Join the two tables to fill in missing Xs and missing Ys for Each Subject
+
+```{r}
+#Believe this will be use of InnerJoin of ID_s? Confirm!
+#Goal is to have each column of X and Y filled with each of the missing counterparts.
+```
+
+#####Base Linear Interpolation Function
+
+The linear interpolation equation to be used in the base function is below. The $y_{0}$ and $y_{1}$ would be either BMI or Media exposure variable. The $x_{0}$ and $x_{1}$ would be the time variable.
+
+The $y$ variable is the missing value we are looking for at time $x$. For BMI variable, the $x$ corresponds to time from Media exposure that is missing between the $x_{0}$ and the $x_{1}$ intervals. The converse can be said of the Media Exposure variable to BMI as well. 
+
+Source: Linear Interpolation, Wikipedia
+$$
+y = y_{0} + (x - x_{0}) \frac{y_{1}- y_{0}}{x_{1} - x_{0}}
+$$
+
+
+Use ApproxFun:
+https://stat.ethz.ch/R-manual/R-devel/library/stats/html/approxfun.html
+
+OR
+
+Base Function below.
+
+```{r}
+#Should the base function be under a source file?
+#Objective of Function is to take in y1,y0,x1,x0 with x value to spit out y.
+
+#Question: if there are more than 1 x value between x1 and x0, we still use the same interval x1 and x0 without adjusting?
+```
+
+Filling using Base Function above Function
+
+```{r}
+#Parameters, X and Y values of each subject with missing NAs for the Y values
+
+#Within function
+## skip the first time point
+## from the second time point and onwards
+### if a missing NA is encountered for Y, go to the non-missing X and Y pair and the next one before. 
+### Calculate the time points in between.
+
+#This could be much easily done if I use indexes of missing and non-missing.
+##Have an index vector with the two X and Ys.
+## Missing indexes can be two types
+### It could be an index of count 1 and multiple
+### For either case, pick the x0 and y0 and fill it up
+```
+
+Applying for Last Value Carried Forward Function
+
+```{r}
+#Apply Last Value Carried Forward/Backward for the values
+```
+
+Applying to all the subjects function
+```{r}
+
+```
+
+Execution of the Functions
+
+```{r}
+#All BMI subjects
+```
+
+```{r}
+#All Media Exposure subjects
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
