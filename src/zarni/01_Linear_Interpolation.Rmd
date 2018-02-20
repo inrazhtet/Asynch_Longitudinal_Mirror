@@ -213,8 +213,14 @@ print(total_matches) #423
 
 This is where we join by the patient ID to only those subjects that exist in both datasets. Therefore, we will only be using innerjoin. We will also be expanding BMI time points for where Media exposure exists and vice versa.
 
-```{r}
+*Step 1: Figure out all the IDs that match
+*Step 2: Extract only those IDs from each table
+*Step 3: For each ID, expand by the row number by the total number of unique time intervals.
+*Step 4: For BMI, add in those missing time intervals, (sort in order) and expand for each subject ID.
+*Step 5: For Media, add in those missing time intervals,(sort in order) and expand for each subject ID.
 
+```{r}
+p_bmi_media <- p_bmi %>% inner_join(p_media, by =c("ID_" = "ID_"))
 
 ```
 
