@@ -158,16 +158,132 @@ $$
 Use ApproxFun:
 https://stat.ethz.ch/R-manual/R-devel/library/stats/html/approxfun.html
 
-OR
+##### START: Testing Out Linear Interpolation approx/approxfun
 
-Base Function below.
+Both approx and approxfun looks fairly similar.
+There are a couple of **key parameters** to consider
+* x,y => input vectors
+* xout => we specify which indexes we want to interpolate    values for
+* yleft => this is specifying the last value to be carried to the left or backward if x values are less than min(x) 
+
+* yright => this is specifying the last value to be carried to the right or forward if x values are more than max(x)
+
+* rule => Two options. 1 is to get NA for yleft, yright case. 2 is to output yleft, yright cases
+
+######Test Case 1
+
+This is a simple case of some missing Ys with X values.
+A manual calculation is done below to verify the answer.
+
+Simulated data 1
+```{r}
+x_1 <- c(1,2,3,4,5,6)
+y_1 <- c(3,NA,5,NA,NA,10)
+xout_1 <- which(is.na(y_1)) #which returns the indexes where y_1 vector has NA values
+```
+
+Specifying y_left and y_right
+
+This code chunk will tackle the case of last carried left/backward and last carried right/forward. The goal is to find the furthest left y index that is not NA and save the value. The same goes for the furthest right.
 
 ```{r}
-#Should the base function be under a source file?
-#Objective of Function is to take in y1,y0,x1,x0 with x value to spit out y.
-
-#Question: if there are more than 1 x value between x1 and x0, we still use the same interval x1 and x0 without adjusting?
+y_nmis_1 <- which(!is.na(y_1)) #indexes of non-missing y values
+y_min_1 <- y_1[min(y_nmis_1)] #get the value from the furtherest left index of y 
+y_max_1 <- y_1[max(y_nmis_1)] #get the value from the furthest right index of y
 ```
+
+Applying the function
+
+This code chunk applies the function
+
+```{r}
+out_1 <- approx(x_1, y_1, xout = xout_1,  method = "linear", yleft = y_min_1, yright = y_max_1, rule = 2)
+```
+
+Interpolated results
+```{r}
+print(out_1$y)
+```
+
+Manual calculation to confirm it.
+
+Notetoself: In the future, helper functions should be in a separate source file. Seek permission from MS/DH.
+
+Base interpolation helper function
+
+```{r}
+#Note: Come back and write more comments later.
+
+#The function takes in two pairs of point and the point you want to interpolate
+lin_interpol <- function(y0,y1,x0,x1,x){
+  y <- y0 + (x-x0) * ((y1-y0)/(x1-x0))
+  return(y)
+}
+```
+
+Manually outputting the three NA values from above
+
+```{r}
+res_1_1 <- lin_interpol(3,5,1,3,2)
+print(res_1_1)
+res_2_1 <- lin_interpol(5,10,3,6,4)
+print(res_2_1)
+res_3_1 <- lin_interpol(5,10,3,6,5)
+print(res_3_1)
+```
+
+All the results matches up. We only have a case of Last Value Carried forward and backward to test
+
+######Test Case 2
+
+Simulated data 2
+
+We are testing the case of last value carried forward with 1 value missing on the left and 2 values missing on the right
+```{r}
+x_2 <- c(1,2,3,4,5,6)
+y_2 <- c(NA,3,5,10,NA,NA)
+xout_2 <- which(is.na(y_2)) #which returns the indexes where y_1 vector has NA values
+```
+
+Same as above (Comments to merge or fill in later)
+
+```{r}
+y_nmis_2 <- which(!is.na(y_2)) #indexes of non-missing y values
+y_min_2 <- y_2[min(y_nmis_2)] #get the value from the furtherest left index of y 
+y_max_2 <- y_2[max(y_nmis_2)] #get the value from the furthest right index of y
+```
+
+This code chunk applies the function
+
+```{r}
+out_2 <- approx(x_2, y_2, xout = xout_2,  method = "linear", yleft = y_min_2, yright = y_max_2, rule = 2)
+```
+
+Interpolated results
+```{r}
+print(out_2$y)
+```
+Perfect. Left value carried forward and right value carried forward works like a charm.
+
+##### END: Testing Out Linear Interpolation approx/approxfun
+
+##### Applying approx to Curated Data Set
+
+```{r}
+
+
+
+```
+
+
+
+
+
+
+
+
+
+##### To Be Archived as R function is working as it should
 
 Filling using Base Function above Function
 
