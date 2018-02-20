@@ -62,6 +62,8 @@ dim(p_bmi) #10326, 4
 #check the number of unique subjects
 length(unique(p_bmi$ID_)) #667 
 length(unique(p_bmi$AgeMos)) #1951
+print(sum(is.na(p_bmi$ID_))) #0 no values are missing here
+print(sum(is.na(p_bmi$AgeMos))) #0 no values are missing here
 ```
 
 Each subject has different time points. For subject 1, months may be 0, 0.5, 1.0 while subject 2 has months in 0, 0.7, 1.2 etc.
@@ -73,7 +75,7 @@ This is to explore the number of time intervals each subject has.
 #This uses dplyr to group by each subject and count their instances. This effectively counts the number of time points each of them have.
 bmi_timed <- p_bmi %>% 
   group_by(ID_) %>%
-  summarize(n = n())
+  summarize(n = n()) 
 print(bmi_timed)
 ```
 
@@ -102,6 +104,18 @@ dim(p_media) #1639, 5
 #check the number of unique subjects
 length(unique(p_media$ID_)) #542 
 length(unique(p_media$AgeMos)) #745
+print(sum(is.na(p_media$ID_))) #0
+print(sum(is.na(p_media$AgeMos))) #0
+```
+
+This is to explore the number of time intervals each subject has. 
+
+```{r}
+#This uses dplyr to group by each subject and count their instances. This effectively counts the number of time points each of them have.
+media_timed <- p_media %>% 
+  group_by(ID_) %>%
+  summarize(n = n()) 
+print(media_timed)
 ```
 
 Like the BMI from before, each subject has different count of time as well as time intervals where the data is collected.
@@ -111,14 +125,73 @@ Like the BMI from before, each subject has different count of time as well as ti
 barplot(table(bmi$ID_), main = "Time Count Distribution \n for Each Subject for Media Exposure")
 ```
 
+#####Cleaning data
 
-#####Next Steps?
+In this section, I will attempt to discover the subjects that only have 1 data point for the BMI data set or the Media exposure data set. These will have to be removed from the working data set as Linear interpolation cannot happen unless we have more than 1 data point. Those subjects will be noted down and saved in a separate file.
 
-Should all the X variables have similar time? 
-Are we only matching it subject to subject but not acros subjects with the media exposure?
+
+###### BMI cleaning
+
+Figuring out the 1 data point subjects and saving it them to an output file.
+
+```{r}
+#Recalling the count by ID dataset from above for BMI.
+head(bmi_timed)
+#Getting the indexes for which n = 1
+#An assumption has been that for each row, there is no missing corresponding time value or bmi value. This assumption holds because of the missingness checks above.
+bmi_exclude <- bmi_timed[bmi_timed$n==1,]
+print(bmi_exclude)
+write.csv(bmi_exclude, "../../data/final/bmisubjects_withonedatap.csv")
+```
+
+There are 3 subjects with 1 data point and has been saved to an output file.
+
+Removing the 3 subjects from the processing BMI file by their ID.
+
+```{r}
+dim(p_bmi)#checking the dimensions of p_bmi before removing
+p_bmi <- p_bmi[!(p_bmi$ID_ %in% bmi_exclude$ID_), ] #removing by a logical vector where we want all the subject IDs except those from the exclusion criteria
+dim(p_bmi)
+```
+
+###### Media exposure cleaning
+
+Figuring out the 1 data point subjects and saving it them to an output file.
+
+```{r}
+#Recalling the count by ID dataset from above for Media exposure.
+head(media_timed)
+#Getting the indexes for which n = 1
+#An assumption has been that for each row, there is no missing corresponding time value or media value. This assumption holds because of the missingness checks above.
+media_exclude <- media_timed[media_timed$n==1,]
+print(media_exclude)
+write.csv(media_exclude, "../../data/final/mediasubjects_withonedatap.csv")
+```
+
+There are 100 subjects in media exposure file that only has 1 data point. 
+
+Removing the 100 subjects from the processing BMI file by their ID.
+
+```{r}
+dim(p_media)#checking the dimensions of p_bmi before removing
+p_media <- p_media[!(p_media$ID_ %in% media_exclude$ID_), ] #removing by a logical vector where we want all the subject IDs except those from the exclusion criteria
+dim(p_media)
+```
+##### Output 
+
+This is to build redundancy of data sets should code be accidentally changed etc. The data will be saved in the final data folder.
+
+Output
+
+*bmi_clean_1 has removed 3 subjects with 1 data point
+*media_clean_1 has removed 100 subjects with 1 data point
+
+```{r}
+#write.csv(p_bmi,"../../data/final/bmi_clean_1.csv")
+#write.csv(p_media, "../../data/final/media_clean_1.csv")
+```
 
 ####Merging the two data sets
-
 
 #####Check the number of ID matches between the two files
 
@@ -129,18 +202,20 @@ The two ids to merge across the data sets are not of equal length. We will use t
 matched_index <- match(p_media$ID_, p_bmi$ID_)
 #Checking the number of non matches using is.na
 non_matches <- sum(is.na(matched_index))
-print(non_matches) #16
+print(non_matches) #19
 #Checking total matches by substracting from maximum unique ID of smaller set to the missing ones
 total_matches <- length(unique(p_media$ID_)) - non_matches
-print(total_matches) #526
+print(total_matches) #423
 #This is not perfect total number. The best way is to match it to match the IDs by innerjoin and capture the NA values
 ```
 
 #####Join the two tables to fill in missing Xs and missing Ys for Each Subject
 
+This is where we join by the patient ID to only those subjects that exist in both datasets. Therefore, we will only be using innerjoin. We will also be expanding BMI time points for where Media exposure exists and vice versa.
+
 ```{r}
-#Believe this will be use of InnerJoin of ID_s? Confirm!
-#Goal is to have each column of X and Y filled with each of the missing counterparts.
+
+
 ```
 
 #####Base Linear Interpolation Function
