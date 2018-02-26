@@ -10,6 +10,7 @@ x = cbind(x, NA)
 w = rbind(x, y)
 
 # Put in order by ID
+# ZH: BRILLIANT!
 w = w[order(w[,1]),]
 
 # Split by ID
@@ -22,7 +23,10 @@ ordered = lapply(new_s, function(x) x[order(x[,2]),])
 ### FILL IN STEP HERE WHERE YOU INTERPOLATE FOR EACH ID
 ## Here you need to write a function that you will lapply to "ordered" that interpolates all the values. The hard part is your data is much more complex than mine is. This is where I want you to focus your time. 
 
+
 # Merge data back together
+# ZH: Look to see if there is a function that can merge back data without 
+# for loops!
 data = ordered[[1]]
 for(i in 2:length(ordered))
 	data = rbind(data, ordered[[i]])
