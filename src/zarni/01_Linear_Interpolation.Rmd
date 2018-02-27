@@ -402,8 +402,18 @@ d_replace <- function(df, robj, rcol){
 ```{r}
 #The split data is put in and then, the time column: 2, the BMI column: 3 and the media column 4 are applied the interpolation function
 c_data_interp <- lapply(c_data_split, mdz_interpolate, par=c(2,3,4))
-
 ```
+
+*Step 10: Collapse the Split Data Into 1 Data Frame*
+
+```{r}
+#Use dplyr bind_rows to recompose the split data together
+#http://dplyr.tidyverse.org/reference/bind.html
+c_data_interp_bind <- bind_rows(c_data_interp)
+write.csv(c_data_interp_bind, "../../data/final/final_interp_data.csv")
+```
+
+
 
 
 
