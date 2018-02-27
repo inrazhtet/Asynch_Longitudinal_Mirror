@@ -131,7 +131,9 @@ barplot(table(bmi$ID_), main = "Time Count Distribution \n for Each Subject for 
 
 In this section, I will attempt to discover the subjects that only have 1 data point for the BMI data set or the Media exposure data set. **[EDIT]**These will have to be removed from the working data set as Linear interpolation cannot happen unless we have more than 1 data point. Those subjects will be noted down and saved in a separate file.**[EDIT]**
 
-**[UPDATE]** The singletons will **NOT** be removed from the file. Instead, LOCF and LOCB will be applied. This will be done once, the interpolation function has been tested.
+**[UPDATE_1]** The singletons will **NOT** be removed from the file. Instead, LOCF and LOCB will be applied. This will be done once, the interpolation function has been tested.
+
+**[UPDATE_2]** The singletons *MUST* be removed from the file or be expanded. The approx function cannot handle a case where there is only 1 single point. Addendum markdown has been added to explore the Singleton case. The question is to which time points does the singleton value has to be applied to. It must have a corresponding subject ID match from media at least to get another valid time point.
 
 
 ###### BMI cleaning
@@ -203,6 +205,8 @@ The two ids to merge across the data sets are not of equal length. We will use t
 
 **[EDIT]** Need to document how many matches are in each data set and both data sets. **[EDIT]**
 
+**[UPDATE_1]** This matching issue has been handled in 01_Addendum.Rmd file.
+
 ```{r}
 #Writing in the Media Exposure Smaller one first to fill in
 matched_index <- match(p_media$ID_, p_bmi$ID_)
@@ -217,14 +221,7 @@ print(total_matches) #423
 
 #####Join the two tables to fill in missing Xs and missing Ys for Each Subject
 
-This is where we join by the patient ID to only those subjects that exist in both datasets. 
-
-*Step 1: Find all the Common IDs that match
-*Step 2: Extract only those IDs from each table
-*Step 3: For each ID, expand by the row number by the total number of unique time intervals.
-*Step 4: For BMI, add in those missing time intervals, (sort in order) and expand for each subject ID.
-*Step 5: For Media, add in those missing time intervals,(sort in order) and expand for each subject ID.
-
+There are 10 steps in this section. At the end, we come out with an entirely interpolated data set. An Appendix section goes through the concept of Linear Interpolation as well as testing the Approx function that has been used extensively in this section. Other tests of the custom function that is written has been removed. Should it need to be in the Appendix, we can easily provide.
 
 *Step 1: Finding the Common ID*
 
@@ -412,10 +409,6 @@ c_data_interp <- lapply(c_data_split, mdz_interpolate, par=c(2,3,4))
 c_data_interp_bind <- bind_rows(c_data_interp)
 write.csv(c_data_interp_bind, "../../data/final/final_interp_data.csv")
 ```
-
-
-
-
 
 
 ### APPENDIX:

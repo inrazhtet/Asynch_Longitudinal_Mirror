@@ -1,0 +1,55 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+In this File, we are dealing with the *Singleton* Time points and the Reporting of Matching and Non-Matching Subject IDs from the *BMI* and *Media* data sets.
+
+#### R Libraries
+
+This code block has all the needed R libraries
+
+```{r}
+#For the dta raw files
+library(foreign)
+#For importing different types of data set without specification
+library(rio)
+#For processing long form data
+library(dplyr)
+#GTools library for ordering numeric variables
+library(gtools)
+```
+
+
+#### Uploading Raw Singleton data
+
+In this code chunk, we are uploading the excluded singleton data from BMI and Media to see if there are any matches between them.
+
+```{r}
+bmi_singleton <- import("../../data/final/bmisubjects_withonedatap.csv")
+media_singleton <- import("../../data/final/mediasubjects_withonedatap.csv")
+```
+
+#### Matching the Singletons
+
+```{r}
+#Checking how many command IDs are between Singleton BMI and Singleton Media
+
+common_ID <- intersect(bmi_singleton$ID_, media_singleton$ID_)
+print(common_ID)
+
+#A single singleton subject ID of 626 matches!
+```
+
+#### Uploading Raw Data to explore Subject ID matches and mismatches
+
+```{r}
+
+
+```
+
+
+
+
+
+
