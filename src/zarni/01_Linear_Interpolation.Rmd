@@ -392,10 +392,8 @@ A manual calculation is done below to verify the answer.
 ```{r}
 #The function will take in a data frame as well as an input vector that specifies which column indexes of the data frame are of interest for the interpolation
 mdz_interpolate <- function(df, par){
-  
   #Saving the data frame in a local variable
   x <- df
-  print(x)
   #Pulling out the index for X vector
   x_1 <- par[1]
   #Pulling out the index for Y Vector 1
@@ -403,18 +401,17 @@ mdz_interpolate <- function(df, par){
   #Pulling out the index for Y Vector 2
   #y_2 <- par[3]
   #Pulling out x and y vectors for the interpolation
-  xx <- x[,x_1] # X vector
-  yy_1 <- x[,y_1] # Y vector 1
+  xx <- as.numeric(unlist(x[,x_1])) # X vector
+  yy_1 <- as.numeric(unlist(x[,y_1])) # Y vector 1
   #yy_2 <- x[,y_2] # Y vector 2
-
   #Specifying indexes where we had fill the missing NA
   xout_1 <- which(is.na(yy_1))
-  browser()
   #Specifying the minimum and maximum values for Last Value Carried Backward/Forward
   y_nmis_1 <- which(!is.na(yy_1))# Get all the non missing y values
-  y_min_1 <- yy_1[min(y_nmis_1)] # Get the value from the furthest left index of Y
-  y_max_1 <- yy_1[max(y_nmis_1)] # Get the value from the furthest right index ofY
-  
+  #browser()
+  y_min_1 <- yy_1[min(y_nmis_1)]# Get the value from the furthest left index of Y
+  y_max_1 <- yy_1[max(y_nmis_1)]# Get the value from the furthest right index ofY
+  #browser()
   #Apply this to the interpolation function (Explanations of the function are in Appendix section)
   out_1 <- approx(xx, yy_1, xout = xout_1,  method = "linear", yleft = y_min_1, yright = y_max_1, rule = 2)
   return(out_1)
