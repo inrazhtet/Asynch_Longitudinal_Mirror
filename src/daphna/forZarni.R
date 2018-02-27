@@ -17,8 +17,11 @@ w = w[order(w[,1]),]
 s = split(w, w[,1])
 new_s = lapply(s, function(x) matrix(x, ncol = 4, byrow = F))
 
+new_s$`1`
+
 # Order within ID
 ordered = lapply(new_s, function(x) x[order(x[,2]),])
+ordered$`1`
 
 ### FILL IN STEP HERE WHERE YOU INTERPOLATE FOR EACH ID
 ## Here you need to write a function that you will lapply to "ordered" that interpolates all the values. The hard part is your data is much more complex than mine is. This is where I want you to focus your time. 
