@@ -326,7 +326,7 @@ interpolation function to each of the Subject ID
 ```{r}
 #Split the data by subject ID
 c_data_split <- split(c_data_arr_mer, c_data_arr_mer[,1])
-c_data_interp <- lapply(c_data_split, mdz_interpolate, par=c(2,3))
+c_data_interp <- lapply(c_data_split, mdz_interpolate, par=c(2,3,4))
 
 ```
 
@@ -400,29 +400,42 @@ A manual calculation is done below to verify the answer.
 mdz_interpolate <- function(df, par){
   #Saving the data frame in a local variable
   x <- df
-  #Pulling out the index for X vector
+  #Pulling out the index for X vector (In our case Time)
   x_1 <- par[1]
-  #Pulling out the index for Y Vector 1
+  #Pulling out the index for Y Vector 1 (In our case BMI)
   y_1 <- par[2]
+  #Pulling out the index for Y Vector 2 (In our case Media)
+  y_2 <- par[3]
   #Pulling out x and y vectors for the interpolation
   #They are in data frame format.You have to unlist and make it a numeric vector.
   xx <- as.numeric(unlist(x[,x_1])) # X vector
   yy_1 <- as.numeric(unlist(x[,y_1])) # Y vector 1
-  #Specifying indexes where we had to fill with the missing NA
+  yy_2 <- as.numeric(unlist(x[,y_2])) # Y vector 2
+  #Specifying indexes where we had to fill with the missing NA for y Vector 1
   xout_1 <- which(is.na(yy_1))
+  #specifying indexes where we had to fill with the missing NA for y Vector 2
+  xout_2 <- which(is.na(yy_2))
   #Specifying the minimum and maximum values for Last Value Carried Backward/Forward
   #Get the non-missing indexes first
   y_nmis_1 <- which(!is.na(yy_1))
+  y_nmis_2 <- which(!is.na(yy_2))
   #Get the value from the furthest left index of Y (LOCB)
   y_min_1 <- yy_1[min(y_nmis_1)]
+  y_min_2 <- yy_2[min(y_nmis_2)]
   #Get the value from the furthest right index of Y (LOCF)
   y_max_1 <- yy_1[max(y_nmis_1)]
+  y_max_2 <- yy_2[max(y_nmis_2)]
   #Apply this to the interpolation function (Explanations of the function are in Appendix section)
+  #The interpolation for the first vector
   out_1 <- approx(xx, yy_1, xout = xout_1,  method = "linear", yleft = y_min_1, yright = y_max_1, rule = 2)
-  
-  outframe <- d_replace(x, out_1, 3)
-  
-  return(outframe)
+  #The interpolation for the second vector
+  out_2 <- approx(xx, yy_2, xout = xout_2, method = "linear", yleft = y_min_2, yright = y_max_2, rule = 2)
+  #The missing values replaced data frame 1 of replaced Vector 1
+  outframe_1 <- d_replace(x, out_1, 3)
+  #The missing values replaced data frame 2 of replaced Vector 2
+  outframe_2 <- d_replace(x, out_2, 4)
+  outframe_1[,4] <- outframe_2[,4]
+  return(outframe_1)
 }
 ```
 
