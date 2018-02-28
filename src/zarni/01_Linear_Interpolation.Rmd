@@ -320,7 +320,7 @@ my.max <- function(x) ifelse(!all(is.na(x)),max(x, na.rm = T), NA)
 c_data_arr_mer <- c_data_arr %>% group_by(ID,Months) %>% summarise_each(funs(my.max))
 #View(c_data_arr_mer)
 #This is merged and cleaned data with the NAs
-write.csv(c_data_arr_mer, "../../data/processing/merged_arranged_data.csv")
+write.csv(c_data_arr_mer, "../../data/final/merged_arranged_data.csv")
 ```
 
 
