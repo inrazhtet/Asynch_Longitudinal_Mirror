@@ -158,6 +158,9 @@ Removing the 3 subjects from the processing BMI file by their ID.
 dim(p_bmi)#checking the dimensions of p_bmi before removing
 p_bmi <- p_bmi[!(p_bmi$ID_ %in% bmi_exclude$ID_), ] #removing by a logical vector where we want all the subject IDs except those from the exclusion criteria
 dim(p_bmi)
+#This is the Singleton File of BMI 
+p_bmi_singleton <- p_bmi[(p_bmi$ID_ %in% bmi_exclude$ID_),]
+write.csv(p_bmi_singleton, "../../data/processing/bmi_subject_singleton.csv")
 ```
 
 ###### Media exposure cleaning
@@ -182,6 +185,11 @@ Removing the 100 subjects from the processing BMI file by their ID.
 dim(p_media)#checking the dimensions of p_bmi before removing
 p_media <- p_media[!(p_media$ID_ %in% media_exclude$ID_), ] #removing by a logical vector where we want all the subject IDs except those from the exclusion criteria
 dim(p_media)
+
+#This is the media Singleton Output
+p_media_singleton <- p_media[(p_media$ID_ %in% media_exclude$ID_),]
+write.csv(p_media_singleton, "../../data/processing/media_subject_singleton.csv")
+
 ```
 ##### Output 
 

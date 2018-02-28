@@ -217,17 +217,125 @@ print(common_ID)
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
+<p><em>NOTE</em> The subjectID 626 has 0 months in BMI and ~36 months in MEDIA. Otherwise, all other subjectID has only 1 single value and has no corresponding matches across both files <em>NOTE</em></p>
+</div>
+<div id="exploring-the-singleton-data-files" class="section level4">
+<h4>Exploring the Singleton Data Files</h4>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuaGVhZChibWlfc2luZ2xldG9uX2RhdGEpXG5gYGAifQ== -->
+<pre class="r"><code>head(bmi_singleton_data)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbImRhdGEuZnJhbWUiXSwibmNvbCI6NSwibnJvdyI6M30sInJkZiI6Ikg0c0lBQUFBQUFBQUF3dHlpVERpaXVCaVlHQmdZbUJtWm1SZ1lnWXlXWmlBQkNNREN3TW5pSzVnWUdBV0JqSllnVmdBaUptaEVpd21ocFlHTUxhRm9ia3BqRzFwYkd4Q29scGVzRm9HUmhHZ085U0F1QWdoaGdMNFFHTDJEN2RkbmYvLy8vLzlQLytuT2pBd0NPNy9zYzl6Ly8vL3I5QWN6cHFYbUp0YURIVUlLMVNRS2N3UWc4WHM2UklQWmJJNXBxZjY1aGZEWEZmbDVPdUpaaXBuVVg2NUhzeGtrQk9aR2lCT1kwYTNQamtuc1JobVBVeVFLeVd4SkZFdnJRaW9IOGo3aDZhRlBiK2dKRE0vRDZpSkNUbkE0VEZSaENiQVg1b0hja21LYm5KR2FWNjJyaUhJQXJBMEJQTkNhV1lrTml2RVNxYi9hT0hDbHBxWG5wbVhDbk43VG1KU2FnNlV3d2YwTWRqRGVnVkZtWGtsTUo4QVJZdjFTdkpMRW1IcXVKTHpjMkFpWUw4eC9BTUFRZ04rM2w0Q0FBQT0ifQ== -->
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["V1"],"name":[1],"type":["chr"],"align":["left"]},{"label":["V1"],"name":[2],"type":["chr"],"align":["left"]},{"label":["ID_"],"name":[3],"type":["int"],"align":["right"]},{"label":["AgeMos"],"name":[4],"type":["int"],"align":["right"]},{"label":["zBMI"],"name":[5],"type":["dbl"],"align":["right"]}],"data":[{"1":"4190","2":"4190","3":"276","4":"0","5":"0.5535687","_rn_":"1"},{"1":"8175","2":"8175","3":"550","4":"0","5":"-1.6248524","_rn_":"2"},{"1":"9334","2":"9334","3":"626","4":"0","5":"-1.5464571","_rn_":"3"}],"options":{"columns":{"min":{},"max":[10],"total":[5]},"rows":{"min":[10],"max":[10],"total":[3]},"pages":{}}}
+  </script>
+</div>
+<!-- rnb-frame-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuaGVhZChtZWRpYV9zaW5nbGV0b25fZGF0YSlcbmBgYCJ9 -->
+<pre class="r"><code>head(media_singleton_data)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbImRhdGEuZnJhbWUiXSwibmNvbCI6NiwibnJvdyI6Nn0sInJkZiI6Ikg0c0lBQUFBQUFBQUE2MVNQVS9ETUJCMUhWclVDQW9DeXRlRUdCQkNFSnBBZ1EwVHVqQ3dNS0J1VldnRERhUk9TVkxCaVBnQlNBek1iUHdOWUdCaWhaR1BrVC9BVUJVSTU5UU9OS3hFdXR5N2R6N2YzWk8zQ2tWTkxzb0lJWXdrS1lHd0JMQUx3eStCdWxDYStXT0VwRUVBS2JEKzBQUEVNZ2Q0U1NCSlZSZCs0R0lFRi9NQ2FqbjEvNjdwNVZPeG1iTmdVMkRUWUN5bmcyVllua3grbGliZ0RGbTV1N29NZ25jeS9QVHdDZ2t5cXVpRThXTmp0d0Y4Wkh4L2ZoVjhWRGR5bG9md2cyU3JteWNJSmNsdzlmd2xDRDZqT0tXc002M0kwTDErL2J0T2ErclFyNGZNdGk1dUVCb25PWHBhQ29KbUZHZGF6K0F4bVhsY0FQNHRKbmVTR2pYVGkybUV0OVUvU05vb2xEaE1yZTJabTQ3SG8zNmIxc3lLWmZnV1hGUTNxYy81QWUvUTlXT1p6dDVwMXpsU1JIOG1Mb1pGVVZ2a3ppSEx0dUdKSVFVcFZ3emZVSFpkcUlmb0sxYlM3ZFI5eTZGUWhObGpTc2FLRTI2TTZHdFFOa2xscmx4dDBJTTVqVFVJMDIzcjVUN1ZpVmxMSFBDcmtrSWVrKzVaMUJTejI4YU9hZk1nQXh1SEN5dDExNHFVa29IMUZOL3hEWEZPTGp1MllNTGQwTmMzek91Zi9Eb0RBQUE9In0= -->
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["V1"],"name":[1],"type":["chr"],"align":["left"]},{"label":["V1"],"name":[2],"type":["chr"],"align":["left"]},{"label":["ID_"],"name":[3],"type":["int"],"align":["right"]},{"label":["AgeMos"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["lnmediatimespent"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["sqrtmediatimespent"],"name":[6],"type":["dbl"],"align":["right"]}],"data":[{"1":"7","2":"7","3":"3","4":"9.494866","5":"5.888878","6":"18.973665","_rn_":"1"},{"1":"67","2":"67","3":"21","4":"24.772074","5":"5.351858","6":"14.491377","_rn_":"2"},{"1":"113","2":"113","3":"38","4":"5.716632","5":"5.602119","6":"16.431677","_rn_":"3"},{"1":"114","2":"114","3":"40","4":"6.045175","5":"5.351858","6":"14.491377","_rn_":"4"},{"1":"145","2":"145","3":"49","4":"6.275154","5":"2.772589","6":"3.872983","_rn_":"5"},{"1":"201","2":"201","3":"66","4":"6.603696","5":"5.198497","6":"13.416408","_rn_":"6"}],"options":{"columns":{"min":{},"max":[10],"total":[6]},"rows":{"min":[10],"max":[10],"total":[6]},"pages":{}}}
+  </script>
+</div>
+<!-- rnb-frame-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
 </div>
 <div id="uploading-raw-data-to-explore-subject-id-matches-and-mismatches" class="section level4">
 <h4>Uploading Raw Data to explore Subject ID matches and mismatches</h4>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuI3Byb2Nlc3NpbmcgYm1pIGRhdGFcbnBfYm1pIDwtIGltcG9ydChcIi4uLy4uL2RhdGEvcHJvY2Vzc2luZy9ibWkuY3N2XCIpXG5wX21lZGlhIDwtIGltcG9ydChcIi4uLy4uL2RhdGEvcHJvY2Vzc2luZy9tZWRpYS5jc3ZcIilcbmBgYCJ9 -->
+<pre class="r"><code>#processing bmi data
+p_bmi &lt;- import(&quot;../../data/processing/bmi.csv&quot;)
+p_media &lt;- import(&quot;../../data/processing/media.csv&quot;)</code></pre>
+<!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
+</div>
+<div id="total-number-of-matches-and-match-ids-including-singletons" class="section level4">
+<h4>Total number of matches (and match IDs) including Singletons</h4>
+<p>Figuring out the sharedIDs between two data tables and saving them</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudG90YWxfbWF0Y2hlcyA8LSBhcy5kYXRhLmZyYW1lKGludGVyc2VjdChwX2JtaSRJRF8sIHBfbWVkaWEkSURfKSlcbmNvbG5hbWVzKHRvdGFsX21hdGNoZXMpIDwtIGMoXCJtYXRjaElEc1wiKVxud3JpdGUuY3N2KHRvdGFsX21hdGNoZXMsIFwiLi4vLi4vZGF0YS9maW5hbC90b3RhbG1hdGNoZXMuY3N2XCIpXG5gYGAifQ== -->
+<pre class="r"><code>total_matches &lt;- as.data.frame(intersect(p_bmi$ID_, p_media$ID_))
+colnames(total_matches) &lt;- c(&quot;matchIDs&quot;)
+write.csv(total_matches, &quot;../../data/final/totalmatches.csv&quot;)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>Printing out summary numbers</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucHJpbnQobGVuZ3RoKHRvdGFsX21hdGNoZXMkbWF0Y2hJRHMpKVxuXG5gYGAifQ== -->
+<pre class="r"><code>print(length(total_matches$matchIDs))
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDUzN1xuIn0= -->
+<pre><code>[1] 537</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="all-the-subjectids-in-bmi-that-does-not-match-with-media" class="section level4">
+<h4>All the subjectIDs in BMI that does NOT match with media</h4>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuI1VzaW5nIHRoZSBkcGx5ciBzZXQgZGlmZiBmdW5jdGlvbiB0byBmaW5kIHRoZSBJRHMgaW4gdGhlIGZpcnN0IHBhcmFtZXRlciB0aGF0IGRvZXMgTk9UIGV4aXN0IGluIHRoZSBzZWNvbmQgcGFyYW1ldGVyLlxuYm1pX2RpZmYgPC0gYXMuZGF0YS5mcmFtZShzZXRkaWZmKHBfYm1pJElEXywgcF9tZWRpYSRJRF8pKVxuY29sbmFtZXMoYm1pX2RpZmYpIDwtIGMoXCJibWlfbm9ubWF0Y2hlc1wiKVxud3JpdGUuY3N2KGJtaV9kaWZmLFwiLi4vLi4vZGF0YS9maW5hbC9ibWlfbm9tbWF0Y2hlcy5jc3ZcIilcbmBgYCJ9 -->
+<pre class="r"><code>#Using the dplyr set diff function to find the IDs in the first parameter that does NOT exist in the second parameter.
+bmi_diff &lt;- as.data.frame(setdiff(p_bmi$ID_, p_media$ID_))
+colnames(bmi_diff) &lt;- c(&quot;bmi_nonmatches&quot;)
+write.csv(bmi_diff,&quot;../../data/final/bmi_nommatches.csv&quot;)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>Printing out summary numbers</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucHJpbnQobGVuZ3RoKGJtaV9kaWZmJGJtaV9ub25tYXRjaGVzKSkgIzUzNyBtYXRjaGVzXG5gYGAifQ== -->
+<pre class="r"><code>print(length(bmi_diff$bmi_nonmatches)) #537 matches</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDEzMFxuIn0= -->
+<pre><code>[1] 130</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="all-the-subjectids-in-media-that-does-not-match-with-bmi" class="section level4">
+<h4>All the subjectIDs in MEDIA that does NOT match with BMI</h4>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuI1VzaW5nIHRoZSBkcGx5ciBzZXQgZGlmZiBmdW5jdGlvbiB0byBmaW5kIHRoZSBJRHMgaW4gdGhlIGZpcnN0IHBhcmFtZXRlciB0aGF0IGRvZXMgTk9UIGV4aXN0IGluIHRoZSBzZWNvbmQgcGFyYW1ldGVyLlxubWVkaWFfZGlmZiA8LSBhcy5kYXRhLmZyYW1lKHNldGRpZmYocF9tZWRpYSRJRF8sIHBfYm1pJElEXykpXG5jb2xuYW1lcyhtZWRpYV9kaWZmKSA8LSBjKFwibWVkaWFfbm9ubWF0Y2hlc1wiKVxud3JpdGUuY3N2KG1lZGlhX2RpZmYsXCIuLi8uLi9kYXRhL2ZpbmFsL21lZGlhX25vbW1hdGNoZXMuY3N2XCIpXG5gYGAifQ== -->
+<pre class="r"><code>#Using the dplyr set diff function to find the IDs in the first parameter that does NOT exist in the second parameter.
+media_diff &lt;- as.data.frame(setdiff(p_media$ID_, p_bmi$ID_))
+colnames(media_diff) &lt;- c(&quot;media_nonmatches&quot;)
+write.csv(media_diff,&quot;../../data/final/media_nommatches.csv&quot;)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>Printing out summary numbers</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucHJpbnQobGVuZ3RoKG1lZGlhX2RpZmYkYm1pX25vbm1hdGNoZXMpKSAjMCBub25tYXRjaGVzXG5gYGAifQ== -->
+<pre class="r"><code>print(length(media_diff$bmi_nonmatches)) #0 nonmatches</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>In conclusion, everything in <em>Media</em> matches everything in BMI until Singletons have been removed. To doubly check:</p>
 <!-- rnb-text-end -->
 </div>
 
-<div id="rmd-source-code">LS0tCnRpdGxlOiAiUiBOb3RlYm9vayIKb3V0cHV0OiBodG1sX25vdGVib29rCi0tLQoKSW4gdGhpcyBGaWxlLCB3ZSBhcmUgZGVhbGluZyB3aXRoIHRoZSAqU2luZ2xldG9uKiBUaW1lIHBvaW50cyBhbmQgdGhlIFJlcG9ydGluZyBvZiBNYXRjaGluZyBhbmQgTm9uLU1hdGNoaW5nIFN1YmplY3QgSURzIGZyb20gdGhlICpCTUkqIGFuZCAqTWVkaWEqIGRhdGEgc2V0cy4KCiMjIyMgUiBMaWJyYXJpZXMKClRoaXMgY29kZSBibG9jayBoYXMgYWxsIHRoZSBuZWVkZWQgUiBsaWJyYXJpZXMKCmBgYHtyfQojRm9yIHRoZSBkdGEgcmF3IGZpbGVzCmxpYnJhcnkoZm9yZWlnbikKI0ZvciBpbXBvcnRpbmcgZGlmZmVyZW50IHR5cGVzIG9mIGRhdGEgc2V0IHdpdGhvdXQgc3BlY2lmaWNhdGlvbgpsaWJyYXJ5KHJpbykKI0ZvciBwcm9jZXNzaW5nIGxvbmcgZm9ybSBkYXRhCmxpYnJhcnkoZHBseXIpCiNHVG9vbHMgbGlicmFyeSBmb3Igb3JkZXJpbmcgbnVtZXJpYyB2YXJpYWJsZXMKbGlicmFyeShndG9vbHMpCmBgYAoKCiMjIyMgVXBsb2FkaW5nIFJhdyBTaW5nbGV0b24gZGF0YQoKSW4gdGhpcyBjb2RlIGNodW5rLCB3ZSBhcmUgdXBsb2FkaW5nIHRoZSBleGNsdWRlZCBzaW5nbGV0b24gZGF0YSBmcm9tIEJNSSBhbmQgTWVkaWEgdG8gc2VlIGlmIHRoZXJlIGFyZSBhbnkgbWF0Y2hlcyBiZXR3ZWVuIHRoZW0uCgpgYGB7cn0KYm1pX3NpbmdsZXRvbiA8LSBpbXBvcnQoIi4uLy4uL2RhdGEvZmluYWwvYm1pc3ViamVjdHNfd2l0aG9uZWRhdGFwLmNzdiIpCm1lZGlhX3NpbmdsZXRvbiA8LSBpbXBvcnQoIi4uLy4uL2RhdGEvZmluYWwvbWVkaWFzdWJqZWN0c193aXRob25lZGF0YXAuY3N2IikKYGBgCgojIyMjIE1hdGNoaW5nIHRoZSBTaW5nbGV0b25zCgpgYGB7cn0KI0NoZWNraW5nIGhvdyBtYW55IGNvbW1hbmQgSURzIGFyZSBiZXR3ZWVuIFNpbmdsZXRvbiBCTUkgYW5kIFNpbmdsZXRvbiBNZWRpYQoKY29tbW9uX0lEIDwtIGludGVyc2VjdChibWlfc2luZ2xldG9uJElEXywgbWVkaWFfc2luZ2xldG9uJElEXykKcHJpbnQoY29tbW9uX0lEKQoKI0Egc2luZ2xlIHNpbmdsZXRvbiBzdWJqZWN0IElEIG9mIDYyNiBtYXRjaGVzIQpgYGAKCiMjIyMgVXBsb2FkaW5nIFJhdyBEYXRhIHRvIGV4cGxvcmUgU3ViamVjdCBJRCBtYXRjaGVzIGFuZCBtaXNtYXRjaGVzCgpgYGB7cn0KCgpgYGAKCgoKCgoK</div>
+<div id="rmd-source-code">LS0tCnRpdGxlOiAiUiBOb3RlYm9vayIKb3V0cHV0OiBodG1sX25vdGVib29rCi0tLQoKSW4gdGhpcyBGaWxlLCB3ZSBhcmUgZGVhbGluZyB3aXRoIHRoZSAqU2luZ2xldG9uKiBUaW1lIHBvaW50cyBhbmQgdGhlIFJlcG9ydGluZyBvZiBNYXRjaGluZyBhbmQgTm9uLU1hdGNoaW5nIFN1YmplY3QgSURzIGZyb20gdGhlICpCTUkqIGFuZCAqTWVkaWEqIGRhdGEgc2V0cy4KCiMjIyMgUiBMaWJyYXJpZXMKClRoaXMgY29kZSBibG9jayBoYXMgYWxsIHRoZSBuZWVkZWQgUiBsaWJyYXJpZXMKCmBgYHtyfQojRm9yIHRoZSBkdGEgcmF3IGZpbGVzCmxpYnJhcnkoZm9yZWlnbikKI0ZvciBpbXBvcnRpbmcgZGlmZmVyZW50IHR5cGVzIG9mIGRhdGEgc2V0IHdpdGhvdXQgc3BlY2lmaWNhdGlvbgpsaWJyYXJ5KHJpbykKI0ZvciBwcm9jZXNzaW5nIGxvbmcgZm9ybSBkYXRhCmxpYnJhcnkoZHBseXIpCiNHVG9vbHMgbGlicmFyeSBmb3Igb3JkZXJpbmcgbnVtZXJpYyB2YXJpYWJsZXMKbGlicmFyeShndG9vbHMpCmBgYAoKCiMjIyMgVXBsb2FkaW5nIFJhdyBTaW5nbGV0b24gZGF0YQoKSW4gdGhpcyBjb2RlIGNodW5rLCB3ZSBhcmUgdXBsb2FkaW5nIHRoZSBleGNsdWRlZCBzaW5nbGV0b24gZGF0YSBmcm9tIEJNSSBhbmQgTWVkaWEgdG8gc2VlIGlmIHRoZXJlIGFyZSBhbnkgbWF0Y2hlcyBiZXR3ZWVuIHRoZW0uCgpgYGB7cn0KI1RoZSBmaXJzdCB0d28gZmlsZXMgYXJlIEpVU1Qgc2luZ2xldG9uIHN1YmplY3QgSURzCmJtaV9zaW5nbGV0b24gPC0gaW1wb3J0KCIuLi8uLi9kYXRhL2ZpbmFsL2JtaXN1YmplY3RzX3dpdGhvbmVkYXRhcC5jc3YiKQptZWRpYV9zaW5nbGV0b24gPC0gaW1wb3J0KCIuLi8uLi9kYXRhL2ZpbmFsL21lZGlhc3ViamVjdHNfd2l0aG9uZWRhdGFwLmNzdiIpCiNUaGUgc2Vjb25kIHR3byBmaWxlcyBpbmNsdWRlIHNpbmdsZSBzdWJqZWN0IElEIGFuZCBjb3JyZXNwb25kaW5nIGNvbHVtbnMKYm1pX3NpbmdsZXRvbl9kYXRhIDwtIGltcG9ydCgiLi4vLi4vZGF0YS9wcm9jZXNzaW5nL2JtaV9zdWJqZWN0X3NpbmdsZXRvbi5jc3YiKQptZWRpYV9zaW5nbGV0b25fZGF0YSA8LSBpbXBvcnQoIi4uLy4uL2RhdGEvcHJvY2Vzc2luZy9tZWRpYV9zdWJqZWN0X3NpbmdsZXRvbi5jc3YiKQpgYGAKCiMjIyMgTWF0Y2hpbmcgdGhlIFNpbmdsZXRvbnMKCmBgYHtyfQojQ2hlY2tpbmcgaG93IG1hbnkgY29tbWFuZCBJRHMgYXJlIGJldHdlZW4gU2luZ2xldG9uIEJNSSBhbmQgU2luZ2xldG9uIE1lZGlhCgpjb21tb25fSUQgPC0gaW50ZXJzZWN0KGJtaV9zaW5nbGV0b24kSURfLCBtZWRpYV9zaW5nbGV0b24kSURfKQpwcmludChjb21tb25fSUQpCgojQSBzaW5nbGUgc2luZ2xldG9uIHN1YmplY3QgSUQgb2YgNjI2IG1hdGNoZXMhCmBgYAoKKk5PVEUqIFRoZSBzdWJqZWN0SUQgNjI2IGhhcyAwIG1vbnRocyBpbiBCTUkgYW5kIH4zNiBtb250aHMgaW4gTUVESUEuIE90aGVyd2lzZSwgYWxsIG90aGVyIHN1YmplY3RJRCBoYXMgb25seSAxIHNpbmdsZSB2YWx1ZSBhbmQgaGFzIG5vIGNvcnJlc3BvbmRpbmcgbWF0Y2hlcyBhY3Jvc3MgYm90aCBmaWxlcwoqTk9URSoKCiMjIyMgRXhwbG9yaW5nIHRoZSBTaW5nbGV0b24gRGF0YSBGaWxlcwoKYGBge3J9CmhlYWQoYm1pX3NpbmdsZXRvbl9kYXRhKQpgYGAKCmBgYHtyfQpWaWV3KG1lZGlhX3NpbmdsZXRvbl9kYXRhKQpgYGAKCiMjIyMgVXBsb2FkaW5nIFJhdyBEYXRhIHRvIGV4cGxvcmUgU3ViamVjdCBJRCBtYXRjaGVzIGFuZCBtaXNtYXRjaGVzCgpgYGB7cn0KI3Byb2Nlc3NpbmcgYm1pIGRhdGEKcF9ibWkgPC0gaW1wb3J0KCIuLi8uLi9kYXRhL3Byb2Nlc3NpbmcvYm1pLmNzdiIpCnBfbWVkaWEgPC0gaW1wb3J0KCIuLi8uLi9kYXRhL3Byb2Nlc3NpbmcvbWVkaWEuY3N2IikKYGBgCgojIyMjIFRvdGFsIG51bWJlciBvZiBtYXRjaGVzIChhbmQgbWF0Y2ggSURzKSBpbmNsdWRpbmcgU2luZ2xldG9ucwoKRmlndXJpbmcgb3V0IHRoZSBzaGFyZWRJRHMgYmV0d2VlbiB0d28gZGF0YSB0YWJsZXMgYW5kIHNhdmluZyB0aGVtCmBgYHtyfQp0b3RhbF9tYXRjaGVzIDwtIGFzLmRhdGEuZnJhbWUoaW50ZXJzZWN0KHBfYm1pJElEXywgcF9tZWRpYSRJRF8pKQpjb2xuYW1lcyh0b3RhbF9tYXRjaGVzKSA8LSBjKCJtYXRjaElEcyIpCndyaXRlLmNzdih0b3RhbF9tYXRjaGVzLCAiLi4vLi4vZGF0YS9maW5hbC90b3RhbG1hdGNoZXMuY3N2IikKYGBgCgpQcmludGluZyBvdXQgc3VtbWFyeSBudW1iZXJzCmBgYHtyfQpwcmludChsZW5ndGgodG90YWxfbWF0Y2hlcyRtYXRjaElEcykpICM1MzcgbWF0Y2hlcwpgYGAKCiMjIyMgQWxsIHRoZSBzdWJqZWN0SURzIGluIEJNSSB0aGF0IGRvZXMgTk9UIG1hdGNoIHdpdGggbWVkaWEKCmBgYHtyfQojVXNpbmcgdGhlIGRwbHlyIHNldCBkaWZmIGZ1bmN0aW9uIHRvIGZpbmQgdGhlIElEcyBpbiB0aGUgZmlyc3QgcGFyYW1ldGVyIHRoYXQgZG9lcyBOT1QgZXhpc3QgaW4gdGhlIHNlY29uZCBwYXJhbWV0ZXIuCmJtaV9kaWZmIDwtIGFzLmRhdGEuZnJhbWUoc2V0ZGlmZihwX2JtaSRJRF8sIHBfbWVkaWEkSURfKSkKY29sbmFtZXMoYm1pX2RpZmYpIDwtIGMoImJtaV9ub25tYXRjaGVzIikKd3JpdGUuY3N2KGJtaV9kaWZmLCIuLi8uLi9kYXRhL2ZpbmFsL2JtaV9ub21tYXRjaGVzLmNzdiIpCmBgYAoKUHJpbnRpbmcgb3V0IHN1bW1hcnkgbnVtYmVycwpgYGB7cn0KcHJpbnQobGVuZ3RoKGJtaV9kaWZmJGJtaV9ub25tYXRjaGVzKSkgIzEzMCBub25tYXRjaGVzCmBgYAoKIyMjIyBBbGwgdGhlIHN1YmplY3RJRHMgaW4gTUVESUEgdGhhdCBkb2VzIE5PVCBtYXRjaCB3aXRoIEJNSQoKYGBge3J9CiNVc2luZyB0aGUgZHBseXIgc2V0IGRpZmYgZnVuY3Rpb24gdG8gZmluZCB0aGUgSURzIGluIHRoZSBmaXJzdCBwYXJhbWV0ZXIgdGhhdCBkb2VzIE5PVCBleGlzdCBpbiB0aGUgc2Vjb25kIHBhcmFtZXRlci4KbWVkaWFfZGlmZiA8LSBhcy5kYXRhLmZyYW1lKHNldGRpZmYocF9tZWRpYSRJRF8sIHBfYm1pJElEXykpCmNvbG5hbWVzKG1lZGlhX2RpZmYpIDwtIGMoIm1lZGlhX25vbm1hdGNoZXMiKQp3cml0ZS5jc3YobWVkaWFfZGlmZiwiLi4vLi4vZGF0YS9maW5hbC9tZWRpYV9ub21tYXRjaGVzLmNzdiIpCmBgYAoKUHJpbnRpbmcgb3V0IHN1bW1hcnkgbnVtYmVycwpgYGB7cn0KcHJpbnQobGVuZ3RoKG1lZGlhX2RpZmYkYm1pX25vbm1hdGNoZXMpKSAjMCBub25tYXRjaGVzCmBgYAoKSW4gY29uY2x1c2lvbiwgZXZlcnl0aGluZyBpbiAqTWVkaWEqIG1hdGNoZXMgZXZlcnl0aGluZyBpbiBCTUkgdW50aWwgU2luZ2xldG9ucyBoYXZlIGJlZW4gcmVtb3ZlZC4gVG8gZG91Ymx5IGNoZWNrOgoKCgoKCg==</div>
 
 
 
