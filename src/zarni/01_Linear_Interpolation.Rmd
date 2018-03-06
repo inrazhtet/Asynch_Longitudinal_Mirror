@@ -135,8 +135,34 @@ In this section, I will attempt to discover the subjects that only have 1 data p
 
 **[UPDATE_2]** The singletons *MUST* be removed from the file or be expanded. The approx function cannot handle a case where there is only 1 single point. Addendum markdown has been added to explore the Singleton case. The question is to which time points does the singleton value has to be applied to. It must have a corresponding subject ID match from media at least to get another valid time point.
 
+**[UPDATE_3]**
+*Based on Daphna's Feedback*
+
+The singletons will be handled in 4 different ways.
+
+* If there is only one timestamp for the ID for BOTH BMI and Media (that is they were both only collected once and at the same time point), then leave it as it is.
+
+*For coding purposes in Linear Interpolation, this data set has to be taken out while the others are being interpolated and then, merged later*
+
+* If one variable was collected once, and the other was collected serveral times, the LOCF/LOCB to fill in the blanks
+
+* If both variables were collected once, but at differnent time points, then merge those two values (equivalent to LOCF/LOCB)
+
+* If one variable is collected, and the other is never collected - we have to drop them from the dataset I think.
+
 
 ###### BMI cleaning
+
+The objective of this section is to temporarily remove the data set portion of bullet point 1 above and permanently remove the case for bullet point 4. The other 2 cases will handle itself through our Linear Interpolation function.
+
+
+Getting the IDs for the Singleton cases in both data sets
+```{r}
+
+```
+
+
+
 
 Figuring out the 1 data point subjects and saving it them to an output file.
 
