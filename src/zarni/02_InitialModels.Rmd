@@ -32,12 +32,38 @@ $$
 
 ```{r}
 fit <- lm(zBMI ~ Media + Months, data = bmi_media)
-summary(fit)
+print(summary(fit))
 ```
 
 #### Simple Linear Regression Interpretation
 
 On average, a unit increase in media is associated with a 0.02868 increase in BMI. 
+
+#### Multi Level Regression 
+##### Varying Intercept Model with individual predictor
+
+$$
+BMI_{ti} = b_{0} + b_{1}Media_{ti} + b_{2}Months_{ti} + \zeta_{i} + \epsilon_{ti}
+$$
+
+*Note to self: Need to write the distribution of Zeta and its error distribution*
+
+Lmer Code
+```{r}
+M1 = lmer(zBMI~Media + Months + (1|ID), data = bmi_media)
+print(summary(M1))
+```
+
+#### Model Interpretation
+
+Controlling for differences between subjets, the effect of one unit change in Media is 0.0161 to BMI and it is not statistically significant assuming our model assumptions are correct. With the likelihood ratio test below, the random effects are warranted.
+
+#### Likelihood ratio test
+
+```{r}
+rand(M1)
+```
+
 
 
 
