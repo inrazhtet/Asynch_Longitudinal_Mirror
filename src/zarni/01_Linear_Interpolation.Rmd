@@ -23,6 +23,8 @@ library(rio)
 library(dplyr)
 #GTools library for ordering numeric variables
 library(gtools)
+#For filling NA values
+library(tidyr)
 ```
 
 #### Uploading Raw data
@@ -144,114 +146,40 @@ The singletons will be handled in 4 different ways.
 
 *For coding purposes in Linear Interpolation, this data set has to be taken out while the others are being interpolated and then, merged later*
 
+[UPDATE] Results of such a case
+
 * If one variable was collected once, and the other was collected serveral times, the LOCF/LOCB to fill in the blanks
+
+[Method] To be used as a different function
 
 * If both variables were collected once, but at differnent time points, then merge those two values (equivalent to LOCF/LOCB)
 
+[Method] To be used as a different function
+
 * If one variable is collected, and the other is never collected - we have to drop them from the dataset I think.
 
+*This 4th case is taken care of by the Inner Join to be implemented later*
 
 ###### BMI cleaning
 
-The objective of this section is to temporarily remove the data set portion of bullet point 1 above and permanently remove the case for bullet point 4. The other 2 cases will handle itself through our Linear Interpolation function.
-
+The objective of this section is to temporarily remove the data set portion of bullet point 1 above where there is only 1 time each data set and the data set time stamps match.  
 
 Getting the IDs for the Singleton cases in both data sets
-```{r}
-
-```
-
-
-
-
-Figuring out the 1 data point subjects and saving it them to an output file.
 
 ```{r}
-#Recalling the count by ID dataset from above for BMI.
-head(bmi_timed)
-#Getting the indexes for which n = 1
+#1) Get the Singleton IDs of both Data Sets
+
 #An assumption has been that for each row, there is no missing corresponding time value or bmi value. This assumption holds because of the missingness checks above.
+
+### GET the BMI data set singletons
 bmi_exclude <- bmi_timed[bmi_timed$n==1,]
-print(bmi_exclude)
-write.csv(bmi_exclude, "../../data/final/bmisubjects_withonedatap.csv")
-```
-
-There are 3 subjects with 1 data point and has been saved to an output file.
-
-Removing the 3 subjects from the processing BMI file by their ID.
-
-```{r}
-dim(p_bmi)#checking the dimensions of p_bmi before removing
-p_bmi <- p_bmi[!(p_bmi$ID_ %in% bmi_exclude$ID_), ] #removing by a logical vector where we want all the subject IDs except those from the exclusion criteria
-dim(p_bmi)
-#This is the Singleton File of BMI 
-p_bmi_singleton <- p_bmi[(p_bmi$ID_ %in% bmi_exclude$ID_),]
-write.csv(p_bmi_singleton, "../../data/processing/bmi_subject_singleton.csv")
-```
-
-###### Media exposure cleaning
-
-Figuring out the 1 data point subjects and saving it them to an output file.
-
-```{r}
-#Recalling the count by ID dataset from above for Media exposure.
-head(media_timed)
-#Getting the indexes for which n = 1
-#An assumption has been that for each row, there is no missing corresponding time value or media value. This assumption holds because of the missingness checks above.
+### GET the MEDIA data set singletons
 media_exclude <- media_timed[media_timed$n==1,]
-print(media_exclude)
-write.csv(media_exclude, "../../data/final/mediasubjects_withonedatap.csv")
-```
-
-There are 100 subjects in media exposure file that only has 1 data point. 
-
-Removing the 100 subjects from the processing BMI file by their ID.
-
-```{r}
-dim(p_media)#checking the dimensions of p_bmi before removing
-p_media <- p_media[!(p_media$ID_ %in% media_exclude$ID_), ] #removing by a logical vector where we want all the subject IDs except those from the exclusion criteria
-dim(p_media)
-
-#This is the media Singleton Output
-p_media_singleton <- p_media[(p_media$ID_ %in% media_exclude$ID_),]
-write.csv(p_media_singleton, "../../data/processing/media_subject_singleton.csv")
-
-```
-##### Output 
-
-This is to build redundancy of data sets should code be accidentally changed etc. The data will be saved in the final data folder.
-
-Output
-
-*bmi_clean_1 has removed 3 subjects with 1 data point
-*media_clean_1 has removed 100 subjects with 1 data point
-
-```{r}
-#write.csv(p_bmi,"../../data/final/bmi_clean_1.csv")
-#write.csv(p_media, "../../data/final/media_clean_1.csv")
+### GET ALL THE SINGLETON IDS in one data set
+all_singletons <- rbind(bmi_exclude, media_exclude)
 ```
 
 ####Merging the two data sets
-
-#####Check the number of ID matches between the two files
-
-The two ids to merge across the data sets are not of equal length. We will use the smaller one as base and see how much more are missing.
-
-**[EDIT]** Need to document how many matches are in each data set and both data sets. **[EDIT]**
-
-**[UPDATE_1]** This matching issue has been handled in 01_Addendum.Rmd file.
-
-```{r}
-#Writing in the Media Exposure Smaller one first to fill in
-matched_index <- match(p_media$ID_, p_bmi$ID_)
-#Checking the number of non matches using is.na
-non_matches <- sum(is.na(matched_index))
-print(non_matches) #19
-#Checking total matches by substracting from maximum unique ID of smaller set to the missing ones
-total_matches <- length(unique(p_media$ID_)) - non_matches
-print(total_matches) #423
-#This is not perfect total number. The best way is to match it to match the IDs by innerjoin and capture the NA values
-```
 
 #####Join the two tables to fill in missing Xs and missing Ys for Each Subject
 
@@ -261,7 +189,7 @@ There are 10 steps in this section. At the end, we come out with an entirely int
 
 ```{r}
 common_ID <- intersect(p_bmi$ID_, p_media$ID_) # intersection works like in Set theory
-length(common_ID) #436 common subject IDs
+length(common_ID) #537 common subject IDs
 ```
 
 *Step 2: Extracting BMI and Media Data set based on shared ID*
@@ -343,25 +271,98 @@ my.max <- function(x) ifelse(!all(is.na(x)),max(x, na.rm = T), NA)
 
 ```{r}
 #If BMI and Media are recorded at the same time month, there should not be two separate rows for it.
+#Combined data that is arranged and merged.
 c_data_arr_mer <- c_data_arr %>% group_by(ID,Months) %>% summarise_each(funs(my.max))
 #View(c_data_arr_mer)
 #This is merged and cleaned data with the NAs
-write.csv(c_data_arr_mer, "../../data/final/merged_arranged_data.csv")
+write.csv(c_data_arr_mer, "../../data/final/final_na_data.csv")
+View(c_data_arr_mer)
 ```
 
 
-*Step 7: Split the data set by the Subject ID *
+*Step 7: Removing the Singleton Cases from the Data Set to handle Case I- Case III separately*
+```{r}
+#Getting all the rows with the Singleton IDs
+singleton_data <- c_data_arr_mer [(c_data_arr_mer$ID %in% all_singletons$ID_),]
+#Getting all the rows with non Singleton IDs
+non_singleton_data <- c_data_arr_mer[!(c_data_arr_mer$ID %in% all_singletons$ID_),]
+```
+
+*Step 8: Handling Singleton Data 3 Cases*
+
+The Singleton data will be combined back once the Singular NAs has been replaced appropriate with LOCF & LOCB which can then supplied into our approxfun as described in details in the Appendix.
+
+
+```{r}
+###Case I: Locating rows where there is only 1 time stamp for BMI and Media
+
+#Check if there are cases of row n = 1
+
+singleton_1 <- singleton_data %>% group_by(ID) %>%
+                                  summarise(n=n())
+nrow(singleton_1[singleton_1$n ==1,]) #0
+###Case I issues does not exist.
+```
+
+```{r}
+### Case II: LOCF/LOBF for BMI Singleton Cases
+
+### Below function takes care of LOCF, LOBF for Singleton Cases of 1 unit value
+### across multiple time periods
+
+fill_NA <- function(df){
+  
+  #Saving the data frame in a local variable
+  x <- df
+  #total length of data frame
+  total <- nrow(df)
+  #total length of NA values in media
+  total_na_media <- sum(is.na(df$Media))
+  #total length of NA values in bmi
+  total_na_bmi <- sum(is.na(df$zBMI))
+  
+  #Replacing the Media NA values if there is only 1 singular non-NA
+  if (total-total_na_media == 1){
+    #Get the replace value which is from non-NA
+    replace_value <- df$Media[which(!is.na(df$Media))]
+    #Replace it to the rest of the vector
+    df$Media[which(is.na(df$Media))] <- replace_value
+  }
+  #Replacing the zBMI NA values if there is only 1 singular non-NA
+  if (total-total_na_bmi == 1){
+    #Get the replace value which is from non-NA
+    replace_value <- df$zBMI[which(!is.na(df$zBMI))]
+    #Replace it to the rest of the vector
+    df$zBMI[which(is.na(df$zBMI))] <- replace_value
+  }
+  return(df)
+}
+
+#Split by each groupID
+singleton_data_split <- split(singleton_data, singleton_data[,1])
+#Apply NA fixes to each of the data splits
+singleton_NA_filled <- lapply(singleton_data_split, fill_NA)
+#Collapse the Split Data into a single data frame
+singleton_NA_filled <- bind_rows(singleton_NA_filled)
+write.csv(singleton_NA_filled, "../../data/Intermediate/singleton_NA_filled.csv")
+```
+
+*Step 9: Recombine the Singleton and Non-Singleton Data Sets*
+combined_data <- rbind(non_singleton_data, singleton_NA_filled)
+
+
+*Step 10: Split the combined data set by the Subject ID *
 
 Here we are spliting the data set by subject ID so that we can apply the
 interpolation function to each of the Subject ID
 
 ```{r}
 #Split the data by subject ID
-c_data_split <- split(c_data_arr_mer, c_data_arr_mer[,1])
+combined_data_split <- split(combined_data, combined_data[,1])
 
 ```
 
-*Step 8: Build Custom Function to Handle Interpolation*
+*Step 11: Build Custom Function to Handle Interpolation*
 
 Main Custom function that interpolates our data frame
 
@@ -429,14 +430,14 @@ d_replace <- function(df, robj, rcol){
 }
 ```
 
-*Step 9: Applies the Custom Interpolation Function to the Split data set*
+*Step 12: Applies the Custom Interpolation Function to the Split data set*
 
 ```{r}
 #The split data is put in and then, the time column: 2, the BMI column: 3 and the media column 4 are applied the interpolation function
-c_data_interp <- lapply(c_data_split, mdz_interpolate, par=c(2,3,4))
+c_data_interp <- lapply(combined_data_split, mdz_interpolate, par=c(2,3,4))
 ```
 
-*Step 10: Collapse the Split Data Into 1 Data Frame*
+*Step 13: Collapse the Split Data Into 1 Data Frame*
 
 ```{r}
 #Use dplyr bind_rows to recompose the split data together
