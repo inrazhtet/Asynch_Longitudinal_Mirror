@@ -146,7 +146,7 @@ The singletons will be handled in 4 different ways.
 
 *For coding purposes in Linear Interpolation, this data set has to be taken out while the others are being interpolated and then, merged later*
 
-[UPDATE] Results of such a case
+[UPDATE] Results of such a case is none.
 
 * If one variable was collected once, and the other was collected serveral times, the LOCF/LOCB to fill in the blanks
 

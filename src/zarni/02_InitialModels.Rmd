@@ -1,0 +1,46 @@
+---
+title: "02_InitialModels"
+author: "Zarni Htet"
+date: "March 7, 2018"
+output: html_document
+---
+
+### Libraries for the lm and lmer packages
+```{r}
+library(lme4) # For lmer function
+library(lmerTest)
+library(rio) # For importing data frames
+```
+
+### Importing the data frames to be used
+```{r}
+bmi_media <- import("../../data/final/final_interp_data.csv")
+bmi_media <- bmi_media[,-1]
+```
+
+
+
+### Functional Form
+
+#### Simple Linear Regression
+
+We are regressing BMI on Media and Time.
+
+$$
+Y(BMI) \sim X (Media)+ t (Months) + \epsilon   
+$$
+
+```{r}
+fit <- lm(zBMI ~ Media + Months, data = bmi_media)
+summary(fit)
+```
+
+#### Simple Linear Regression Interpretation
+
+On average, a unit increase in media is associated with a 0.02868 increase in BMI. 
+
+
+
+
+
+
