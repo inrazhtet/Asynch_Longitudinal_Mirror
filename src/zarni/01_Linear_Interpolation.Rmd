@@ -24,9 +24,20 @@ library(dplyr)
 library(gtools)
 #For filling NA values
 library(tidyr)
+#Loading Rmarkdown library for rendering
+library(rmarkdown)
+#knitr library for rendering
+library(knitr)
 ```
 
-#### Uploading Raw data
+Rendering a Markdown File for Github
+```{r}
+#render("01_Linear_Interpolation.Rmd", "all")
+```
+
+
+
+#### I: Uploading Raw data
 
 In this code chunk, we are uploading raw .dta data and converting to it a csv. This will then be saved to a processing data folder to protect the integrity of the raw data.
 
@@ -41,7 +52,7 @@ write.csv(bmi, "../../data/processing/bmi.csv")
 write.csv(media, "../../data/processing/media.csv")
 ```
 
-#### Loading the Data back from Processing Folder
+##### Loading the Data back from Processing Folder
 
 This code chunk is loading the working version of the data extra to be used throughout the document.
 
@@ -52,18 +63,11 @@ p_media <- import("../../data/processing/media.csv")
 ```
 
 
-```{r}
-p_me
-
-```
-
-
-
-#### Data Exploration
+#### II: Data Exploration
 
 This code chunks examine the two data sets. In particular, the focus here is on the key variables and the time intervals they are recorded. At the end of each code block for each data set, there is a short summary of what the data consists of.
 
-#####The BMI data set overview
+##### The BMI data set overview
 
 ```{r}
 head(p_bmi)
@@ -136,7 +140,7 @@ Like the BMI from before, each subject has different count of time as well as ti
 barplot(table(bmi$ID_), main = "Time Count Distribution \n for Each Subject for Media Exposure")
 ```
 
-#####Cleaning data
+##### Cleaning data
 
 In this section, I will attempt to discover the subjects that only have 1 data point for the BMI data set or the Media exposure data set. **[EDIT]**These will have to be removed from the working data set as Linear interpolation cannot happen unless we have more than 1 data point. Those subjects will be noted down and saved in a separate file.**[EDIT]**
 
@@ -186,9 +190,9 @@ media_exclude <- media_timed[media_timed$n==1,]
 all_singletons <- rbind(bmi_exclude, media_exclude)
 ```
 
-####Merging the two data sets
+#### Merging the two data sets
 
-#####Join the two tables to fill in missing Xs and missing Ys for Each Subject
+##### Join the two tables to fill in missing Xs and missing Ys for Each Subject
 
 There are 10 steps in this section. At the end, we come out with an entirely interpolated data set. An Appendix section goes through the concept of Linear Interpolation as well as testing the Approx function that has been used extensively in this section. Other tests of the custom function that is written has been removed. Should it need to be in the Appendix, we can easily provide.
 
@@ -458,7 +462,7 @@ write.csv(c_data_interp_bind, "../../data/final/final_interp_data.csv")
 
 #### Section I: Theorectical Explanation
 
-#####Base Linear Interpolation Function
+##### Base Linear Interpolation Function
 
 The linear interpolation equation to be used in the base function is below. The $y_{0}$ and $y_{1}$ would be either BMI or Media exposure variable. The $x_{0}$ and $x_{1}$ would be the time variable.
 
@@ -489,7 +493,7 @@ There are a couple of **key parameters** to consider
 
 * rule => Two options. 1 is to get NA for yleft, yright case. 2 is to output yleft, yright cases
 
-######Test Case 1
+###### Test Case 1
 
 This is a simple case of some missing Ys with X values.
 A manual calculation is done below to verify the answer.
@@ -557,7 +561,7 @@ print(res_3_1)
 
 All the results matches up. We only have a case of Last Value Carried forward and backward to test
 
-######Test Case 2
+###### Test Case 2
 
 Simulated data 2
 
@@ -587,76 +591,6 @@ Interpolated results
 print(out_2$y)
 ```
 Perfect. Left value carried forward and right value carried forward works like a charm.
-
-##### END: Testing Out Linear Interpolation approx/approxfun
-
-
-
-
-
-
-
-
-
-
-
-##### To Be Archived as R function is working as it should
-
-Filling using Base Function above Function
-
-```{r}
-#Parameters, X and Y values of each subject with missing NAs for the Y values
-
-#Within function
-## skip the first time point
-## from the second time point and onwards
-### if a missing NA is encountered for Y, go to the non-missing X and Y pair and the next one before. 
-### Calculate the time points in between.
-
-#This could be much easily done if I use indexes of missing and non-missing.
-##Have an index vector with the two X and Ys.
-## Missing indexes can be two types
-### It could be an index of count 1 and multiple
-### For either case, pick the x0 and y0 and fill it up
-```
-
-Applying for Last Value Carried Forward Function
-
-```{r}
-#Apply Last Value Carried Forward/Backward for the values
-```
-
-Applying to all the subjects function
-```{r}
-
-```
-
-Execution of the Functions
-
-```{r}
-#All BMI subjects
-```
-
-```{r}
-#All Media Exposure subjects
-```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
