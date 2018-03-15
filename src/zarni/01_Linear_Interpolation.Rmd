@@ -52,6 +52,14 @@ p_bmi <- import("../../data/processing/bmi.csv")
 p_media <- import("../../data/processing/media.csv")
 ```
 
+
+```{r}
+
+
+```
+
+
+
 #### Data Exploration
 
 This code chunks examine the two data sets. In particular, the focus here is on the key variables and the time intervals they are recorded. At the end of each code block for each data set, there is a short summary of what the data consists of.
