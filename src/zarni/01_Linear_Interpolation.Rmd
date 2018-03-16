@@ -87,6 +87,11 @@ bmi_timed <- p_bmi %>%
   group_by(ID_) %>%
   summarize(n = n()) 
 print(bmi_timed)
+#alternatively, this tells you a lot:
+tt <- table(table(p_bmi$ID_))
+print(tt)
+#or this:
+barplot(tt)
 ```
 
 We will do a quick barplot to see the distribution of time points for each subject has

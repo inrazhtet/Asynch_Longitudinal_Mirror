@@ -174,6 +174,25 @@ print(bmi_timed)
     ## 10    10    16
     ## # ... with 657 more rows
 
+``` r
+#alternatively, this tells you a lot:
+tt <- table(table(p_bmi$ID_))
+print(tt)
+```
+
+    ## 
+    ##  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 
+    ##  3  9 31 22 13 16 23 16 28 19 27 29 29 31 28 34 28 34 45 27 31 27 28 22 11 
+    ## 26 27 28 29 30 31 32 33 34 35 38 39 
+    ## 16  8  3  7  6  4  3  2  3  1  2  1
+
+``` r
+#or this:
+barplot(tt)
+```
+
+![](01_Linear_Interpolation_files/figure-markdown_github/unnamed-chunk-5-1.png)
+
 We will do a quick barplot to see the distribution of time points for each subject has
 
 ``` r
