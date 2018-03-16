@@ -25,7 +25,7 @@ We have two raw data set collected by the Bellvue Hospital's Belle Lab. <br />
   
 ### Code File Details
 
-#### 01_Linear_Interpolation
+### 01_Linear_Interpolation
 
 **I. Uploading Raw Data** <br />
 
@@ -62,7 +62,7 @@ This section checks if BMI and Media data has been recorded at the same time. Th
 
 7. **Merging duplicated row into 1 row** *[1 Data Output & 1 Custom Function]* <br />
 This section has a custom function applied to a dplyr summarize_each function to merge the duplicated time stamps data of BMI and Media.
-It also saved the **clean** data with **NAs** to the final data folder.
+The **data output** saved is the **clean** data with **NAs** to the final data folder.
 
 8. **Extracting the Singleton Cases from the data set to be handled separately** <br />
 To be applied to the Linear Interpolation, Approx function, the single rows of time stamped data with 1 value of either BMI or Media would not do. More details on the requirement of the Approx function are in the Appendix section. Step 8 and Step 9 handles this.
@@ -70,7 +70,39 @@ To be applied to the Linear Interpolation, Approx function, the single rows of t
 9. **Handling Singleton Data**  *[1 Data Output & 1 Custom Function]* <br />
 This section goes through bullet point **1** to bullet point **3** in the Singleton data scenario.
 The Singleton data will be combined back once the Singular NAs has been replaced appropriately with LOCF & LOCB which can then supplied into our approxfun as described in details in the Appendix.
+
 The **custom function** here takes care of LOCF and LOBF cases for subjectIDs with only one filled in Media or BMI value at that time stamp.
+
+The **data output** saved is the LOCF and LOBF applied data set to an intermediate data folder.
+
+10. **Recombine the Singleton and Non-Singleton Data Sets** <br />
+
+11. **Split the combined data set by the SubjectID** <br />
+We split the data set by subjectID so that we can apply the interpolation function to each of the Subject ID
+
+12. **Build Custom Function to Handle Interpolation** *[2 Custom Functions]* <br />
+
+There are two custom functions in this section that allow us to use the approx function (details of the function are in the Appendix) for interpolation for our data set.
+A couple of steps are involved to prepare to apply the approx function.
+- Figuring out the Vectors and its corresponding indexes to interpolate
+- Defining the minimum and maximum values in existing data set to apply LOCF/LOCB to tail missing NAs
+- Using a secondary custom function to merge the outputs of Approxfunction from multiple vectors to a single data frame
+
+13. **Applies the Custom Interpolation Function to the Split data set** <br />
+
+This section applies the **split** dataframe into the custom linear interpolation function from above. By split data, it means here that we are handling each subjectID spearately using lapply functions.
+
+14. **Collapse the Split Data Into a Single Data Frame** *[1 Data Output]* <br />
+
+The split data is recomposed into a Single Data Frame.
+
+**Appendix** <br />
+The Appendix has **two** primary sections. The first section went over a conceptual overview of **Lineaer Interpolation**. The second section deals with the *approx linear interpolation function* using two simulated data sets.
+
+
+
+
+
 
 
 
