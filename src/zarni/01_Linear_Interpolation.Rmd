@@ -195,20 +195,20 @@ print(media_singleton)
 ### Without even innerjoining, a quick scan of the printed data along the AgeMos variable indicate that these two have different time stamps. Therefore, we do not need to remove them from the data set as mentioned in bullet point 1 above.  
 ```
 
-#### Merging the two data sets
+#### IV: Creating Linearly Interpolated Data
 
-##### Join the two tables to fill in missing Xs and missing Ys for Each Subject
+There are **14** steps in this section. At the end, we come out with an entirely interpolated data set. An Appendix section goes through the concept of Linear Interpolation as well as testing the Approx function that has been used extensively in this section. Other tests of the custom functions that are written has been removed. Should it need to be in the Appendix, we can easily provide.
 
-There are 10 steps in this section. At the end, we come out with an entirely interpolated data set. An Appendix section goes through the concept of Linear Interpolation as well as testing the Approx function that has been used extensively in this section. Other tests of the custom function that is written has been removed. Should it need to be in the Appendix, we can easily provide.
+**Step 1: Finding the Common ID**
 
-*Step 1: Finding the Common ID*
+Finding the subject IDs that match
 
 ```{r}
 common_ID <- intersect(p_bmi$ID_, p_media$ID_) # intersection works like in Set theory
-length(common_ID) #537 common subject IDs
+print(length(common_ID)) #537 common subject IDs
 ```
 
-*Step 2: Extracting BMI and Media Data set based on shared ID*
+**Step 2: Extracting BMI and Media Data set based on shared ID**
 
 ```{r}
 #Matched BMI
@@ -217,8 +217,11 @@ m_bmi <- p_bmi[(p_bmi$ID_ %in% common_ID), ]
 m_media <- p_media [(p_media$ID_ %in% common_ID),]
 ```
 
-*Step 3: Generating NAs for each of the data set*
-This is referencing Professor Harel's code of spliting and merging data
+**Step 3: Generating NAs for each of the data set**
+
+We are generating NA columns for each of the data set so that when we joined later, they can fill in for the missing timepoints.
+
+*This references Professor Harel's code under her src folder*
 
 ```{r}
 #BMI data table first!
@@ -240,7 +243,7 @@ m_media <- cbind(m_media, NA)
 m_media <- m_media[,-4]
 ```
 
-*Step 4: Merging the two data sets together*
+**Step 4: Merging the two data sets together**
 
 ```{r}
 #The Column Names have to match for the data set to match together
@@ -248,38 +251,38 @@ colnames(m_bmi) <- c("ID", "Months", "Media", "zBMI")
 colnames(m_media) <- c("ID", "Months", "Media", "zBMI")
 #Combined Data Set
 c_data <- rbind(m_bmi, m_media)
-#Ordering to observe missing gaps in each data set
+#Ordering the data set by subject ID
 c_data <- c_data[order(c_data[,1]),]
 #Convert all the time variables into numeric for later sorting
 c_data$Months <- as.numeric(as.character(c_data$Months))
 ```
 
-*Step 4.5: Arrange the data set of each SubjectID by Time*
+**Step 5: Arrange the data set of each SubjectID by Time**
 
 ```{r}
 #dplyr command that does the arrange by the Group ID then within the groups
 #arrange it by Months
 c_data_arr<- c_data %>% arrange(ID,Months)
-View(c_data_arr)
 ```
 
-*Step 5: Checking # of duplicated values for each time value within each subject*
+**Step 6: Checking # of duplicated values for each time value within each subject**
+
+This section checks if BMI and Media data has been recorded at the same time. The goal is to merge the two rows so that we will not be interpolating either BMI or Media data for the time stamps where original data already exists.
 
 ```{r}
-#This is to check if BMI and Media has been recorded at the same time.
-#If so, we want to merge those two rows in the data set.
 dup_count <- c_data_arr %>% group_by(ID, Months) %>% summarise(n=n())
 #View a subset of all the duplicate rows
 v_dup <- dup_count[dup_count$n >1,]
-print(head(v_dup))
+#print(head(v_dup))
 print(dim(v_dup))
 
 ```
 
-*Step 6: Merging duplicated row into 1 unit*
+**Step 7: Merging duplicated row into 1 row**
 
 For merging rows, we are essentially saying between two values in both rows, do not pick NA, pick the value. Below is a custom-built function that achieves that. Said function will be applied to the dplyr summarize_each (which is essentially, apply this function to each row of each column).
 
+Custom Function
 ```{r}
 #The ifelse commands literally says, if not all of the x vector is NA, pick the maximum after removing the NA. Otherwise, keep the NA.
 my.max <- function(x) ifelse(!all(is.na(x)),max(x, na.rm = T), NA)
@@ -289,14 +292,15 @@ my.max <- function(x) ifelse(!all(is.na(x)),max(x, na.rm = T), NA)
 #If BMI and Media are recorded at the same time month, there should not be two separate rows for it.
 #Combined data that is arranged and merged.
 c_data_arr_mer <- c_data_arr %>% group_by(ID,Months) %>% summarise_each(funs(my.max))
-#View(c_data_arr_mer)
 #This is merged and cleaned data with the NAs
 write.csv(c_data_arr_mer, "../../data/final/final_na_data.csv")
-View(c_data_arr_mer)
 ```
 
 
-*Step 7: Removing the Singleton Cases from the Data Set to handle Case I- Case III separately*
+**Step 8: Extracting the Singleton Cases from the Data Set to be handled separately**
+
+To be applied to the Linear Interpolation, Approx function, the single rows of time stamped data with 1 value of either BMI or Media would not do. More details on the requirement of the Approx function are in the Appendix section. Step 8 and Step 9 handles this.
+
 ```{r}
 #Getting all the rows with the Singleton IDs
 singleton_data <- c_data_arr_mer [(c_data_arr_mer$ID %in% all_singletons$ID_),]
@@ -304,9 +308,10 @@ singleton_data <- c_data_arr_mer [(c_data_arr_mer$ID %in% all_singletons$ID_),]
 non_singleton_data <- c_data_arr_mer[!(c_data_arr_mer$ID %in% all_singletons$ID_),]
 ```
 
-*Step 8: Handling Singleton Data 3 Cases*
+**Step 9: Handling Singleton Data**
 
-The Singleton data will be combined back once the Singular NAs has been replaced appropriate with LOCF & LOCB which can then supplied into our approxfun as described in details in the Appendix.
+This section goes through bullet point **1** to bullet point **3** in the Singleton data scenario.
+The Singleton data will be combined back once the Singular NAs has been replaced appropriately with LOCF & LOCB which can then supplied into our approxfun as described in details in the Appendix.
 
 
 ```{r}
@@ -363,11 +368,13 @@ singleton_NA_filled <- bind_rows(singleton_NA_filled)
 write.csv(singleton_NA_filled, "../../data/Intermediate/singleton_NA_filled.csv")
 ```
 
-*Step 9: Recombine the Singleton and Non-Singleton Data Sets*
+**Step 10: Recombine the Singleton and Non-Singleton Data Sets**
+
+```{r}
 combined_data <- rbind(non_singleton_data, singleton_NA_filled)
+```
 
-
-*Step 10: Split the combined data set by the Subject ID *
+**Step 11: Split the combined data set by the Subject ID**
 
 Here we are spliting the data set by subject ID so that we can apply the
 interpolation function to each of the Subject ID
@@ -378,7 +385,7 @@ combined_data_split <- split(combined_data, combined_data[,1])
 
 ```
 
-*Step 11: Build Custom Function to Handle Interpolation*
+**Step 12: Build Custom Function to Handle Interpolation**
 
 Main Custom function that interpolates our data frame
 
@@ -446,14 +453,14 @@ d_replace <- function(df, robj, rcol){
 }
 ```
 
-*Step 12: Applies the Custom Interpolation Function to the Split data set*
+**Step 13: Applies the Custom Interpolation Function to the Split data set**
 
 ```{r}
 #The split data is put in and then, the time column: 2, the BMI column: 3 and the media column 4 are applied the interpolation function
 c_data_interp <- lapply(combined_data_split, mdz_interpolate, par=c(2,3,4))
 ```
 
-*Step 13: Collapse the Split Data Into 1 Data Frame*
+**Step 14: Collapse the Split Data Into 1 Data Frame**
 
 ```{r}
 #Use dplyr bind_rows to recompose the split data together
