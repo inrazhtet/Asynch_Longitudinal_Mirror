@@ -2,7 +2,9 @@
 title: "01_Linear_Interpolation"
 author: "Zarni Htet (zh938@nyu.edu)"
 date: March 15, 2018
-output: github_document
+output: 
+  md_document:
+    variant: markdown_github
 ---
 
 ### Imputation using Linear Interpolation
