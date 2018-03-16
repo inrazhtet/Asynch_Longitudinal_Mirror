@@ -33,13 +33,6 @@ library(rmarkdown)
 library(knitr)
 ```
 
-Rendering a Markdown File for Github Push
-```{r}
-render("01_Linear_Interpolation.Rmd", "all")
-```
-
-
-
 #### I: Uploading Raw data
 
 In this code chunk, we are uploading raw .dta data and converting to it a csv. This will then be saved to a processing data folder to protect the integrity of the raw data.
@@ -182,6 +175,9 @@ The objective of this section is to temporarily remove the data set portion of b
 bmi_exclude <- bmi_timed[bmi_timed$n==1,]
 ### GET the MEDIA data set singletons
 media_exclude <- media_timed[media_timed$n==1,]
+### Gather all the Singleton Values in 1 Data Set
+all_singletons <- unique(rbind(bmi_exclude, media_exclude))
+
 ### Check which Singleton Values between BMI and Media data set matches
 print(bmi_exclude$ID_ %in% media_exclude$ID_)
 ### As the third item in the list matches we need to see if the time matches too. If so, we need to remove it.
@@ -387,14 +383,17 @@ combined_data_split <- split(combined_data, combined_data[,1])
 
 **Step 12: Build Custom Function to Handle Interpolation**
 
-Main Custom function that interpolates our data frame
+There are two custom functions in this section that allow us to use the approx function (details of the function are in the Appendix) for interpolation for our data set.
+A couple of steps are involved to prepare to apply the approx function.
+- Figuring out the Vectors and its corresponding indexes to interpolate
+- Defining the minimum and maximum values in existing data set to apply LOCF/LOCB to tail missing NAs
+- Using a secondary custom function to merge the outputs of Approxfunction from multiple vectors to a single data frame
 
 ```{r}
-#The function will take in a data frame as well as an input vector that specifies which column indexes of the data frame are of interest for the interpolation. The reason we have the input vector to give us a flexible to use a single function which can deal with a large data frame whose multiple columns may need interpolation.
+#The function will take in a data frame as well as an input vector that specifies which column indexes of the data frame are of interest for the interpolation. The reason we have the input vector is that it give us a flexible to use single function which can deal with a large data frame where multiple columns may need interpolation.
 
 #df refers to the data frame of interest
 #par is a vector that specifies the TWO indexes: 1 being time in this case and the other being the missing column index
-
 mdz_interpolate <- function(df, par){
   #Saving the data frame in a local variable
   x <- df
@@ -455,12 +454,14 @@ d_replace <- function(df, robj, rcol){
 
 **Step 13: Applies the Custom Interpolation Function to the Split data set**
 
+This section applies the **split** dataframe into the custom linear interpolation function from above. By split data, it means here that we are handling each subjectID spearately using lapply functions.
+
 ```{r}
 #The split data is put in and then, the time column: 2, the BMI column: 3 and the media column 4 are applied the interpolation function
 c_data_interp <- lapply(combined_data_split, mdz_interpolate, par=c(2,3,4))
 ```
 
-**Step 14: Collapse the Split Data Into 1 Data Frame**
+**Step 14: Collapse the Split Data Into a Single Data Frame**
 
 ```{r}
 #Use dplyr bind_rows to recompose the split data together
