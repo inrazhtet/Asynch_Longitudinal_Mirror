@@ -71,9 +71,9 @@ To be applied to the Linear Interpolation, Approx function, the single rows of t
 This section goes through bullet point **1** to bullet point **3** in the Singleton data scenario.
 The Singleton data will be combined back once the Singular NAs has been replaced appropriately with LOCF & LOCB which can then supplied into our approxfun as described in details in the Appendix.
 
-The **custom function** here takes care of LOCF and LOBF cases for subjectIDs with only one filled in Media or BMI value at that time stamp.
+The custom function here takes care of LOCF and LOBF cases for subjectIDs with only one filled in Media or BMI value at that time stamp.
 
-The **data output** saved is the LOCF and LOBF applied data set to an intermediate data folder.
+The data output saved is the LOCF and LOBF applied data set to an intermediate data folder.
 
 10. **Recombine the Singleton and Non-Singleton Data Sets** <br />
 
@@ -94,7 +94,7 @@ This section applies the **split** dataframe into the custom linear interpolatio
 
 14. **Collapse the Split Data Into a Single Data Frame** *[1 Data Output]* <br />
 
-The split data is recomposed into a Single Data Frame.
+The split data is recomposed into a Single Data Frame. A final cleaned and filled data set is outputted for further use.
 
 **Appendix** <br />
 The Appendix has **two** primary sections. The first section went over a conceptual overview of **Lineaer Interpolation**. The second section deals with the *approx linear interpolation function* using two simulated data sets.
