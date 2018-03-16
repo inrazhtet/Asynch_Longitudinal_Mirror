@@ -5,13 +5,16 @@ date: March 15, 2018
 output: github_document
 ---
 
-###Linear Interpolation
+### Imputation using Linear Interpolation
 
-This Markdown is filling the missing data for BMI and media exposure at asynchronous time points using linear interpolation. The project is supervised by Professor Marc Scott and Professor Daphna Harel. The data is from the Belle Lab at the Bellevue Hospital. More details of the project scope is in the repository under lit folder.
+This Markdown is filling the missing data for **BMI** and **Media Exposure** data sets at asynchronous time points using linear interpolation. By missing data, we mean to link **subjects** across the **BMI** and **Media Exposure** data sets. For some **subjects** we may find that data has been collected for both BMI and Media Exposure all about at the same time points. On the other hand, some subjects may have BMI time points 1,2,3 but Media time points 3,5,6. We hope to have for the subject all the time points for both data sets at 1,2,3,5,6.    
+
+### Admnistration
+The project is supervised by Professor Marc Scott and Professor Daphna Harel. The data is from the Belle Lab at the Bellevue Hospital. More details of the project scope is in the README of the primary repository folder.
 
 #### R Libraries
 
-This code block has all the needed R libraries
+This code block has all the needed R libraries to run this segment of the Markdown.
 
 ```{r}
 #For the dta raw files
@@ -30,9 +33,9 @@ library(rmarkdown)
 library(knitr)
 ```
 
-Rendering a Markdown File for Github
+Rendering a Markdown File for Github Push
 ```{r}
-#render("01_Linear_Interpolation.Rmd", "all")
+render("01_Linear_Interpolation.Rmd", "all")
 ```
 
 
@@ -100,7 +103,7 @@ We will do a quick barplot to see the distribution of time points for each subje
 barplot(table(bmi$ID_), main = "Time Count Distribution \n for Each Subject for BMI")
 ```
 
-Check the Minimum/Maximum time intervals. This is to see if we have to explore edge cases later down the road for Last Value Carried forward at the end for each subject
+Check the Minimum/Maximum number of time intervals. If you have only 1 time interval, we may have to apply **LOCF** and/or **LOCB** to interpolate across other time intervals. By other time
 
 ```{r}
 min(bmi_timed$n) #1
@@ -140,16 +143,11 @@ Like the BMI from before, each subject has different count of time as well as ti
 barplot(table(bmi$ID_), main = "Time Count Distribution \n for Each Subject for Media Exposure")
 ```
 
-##### Cleaning data
+#### III: Data Cleaning
 
-In this section, I will attempt to discover the subjects that only have 1 data point for the BMI data set or the Media exposure data set. **[EDIT]**These will have to be removed from the working data set as Linear interpolation cannot happen unless we have more than 1 data point. Those subjects will be noted down and saved in a separate file.**[EDIT]**
+In this section, I will attempt to discover the subjects that only have 1 data point for the BMI data set or the Media exposure data set. The data points with only 1 time stamp cannot immediately be applied to a Linear Interpolation Function which requires 2 time points at the very least. See *Appendix* below for more details of how the function works.
 
-**[UPDATE_1]** The singletons will **NOT** be removed from the file. Instead, LOCF and LOCB will be applied. This will be done once, the interpolation function has been tested.
-
-**[UPDATE_2]** The singletons *MUST* be removed from the file or be expanded. The approx function cannot handle a case where there is only 1 single point. Addendum markdown has been added to explore the Singleton case. The question is to which time points does the singleton value has to be applied to. It must have a corresponding subject ID match from media at least to get another valid time point.
-
-**[UPDATE_3]**
-*Based on Daphna's Feedback*
+##### Handling the Singletons
 
 The singletons will be handled in 4 different ways.
 
@@ -157,25 +155,23 @@ The singletons will be handled in 4 different ways.
 
 *For coding purposes in Linear Interpolation, this data set has to be taken out while the others are being interpolated and then, merged later*
 
-[UPDATE] Results of such a case is none.
+**Results** None of these cases exist. <br />
 
 * If one variable was collected once, and the other was collected serveral times, the LOCF/LOCB to fill in the blanks
 
-[Method] To be used as a different function
+**Solution** A function has been created to handle this below.
 
 * If both variables were collected once, but at differnent time points, then merge those two values (equivalent to LOCF/LOCB)
 
-[Method] To be used as a different function
+**Solution** A function has been created to handle this below.
 
 * If one variable is collected, and the other is never collected - we have to drop them from the dataset I think.
 
-*This 4th case is taken care of by the Inner Join to be implemented later*
+**Solution** An Inner Join of the data set removes those that need to be dropped.
 
-###### BMI cleaning
+###### Handling Bullet Point 1 Scenario
 
 The objective of this section is to temporarily remove the data set portion of bullet point 1 above where there is only 1 time each data set and the data set time stamps match.  
-
-Getting the IDs for the Singleton cases in both data sets
 
 ```{r}
 #1) Get the Singleton IDs of both Data Sets
@@ -186,8 +182,17 @@ Getting the IDs for the Singleton cases in both data sets
 bmi_exclude <- bmi_timed[bmi_timed$n==1,]
 ### GET the MEDIA data set singletons
 media_exclude <- media_timed[media_timed$n==1,]
-### GET ALL THE SINGLETON IDS in one data set
-all_singletons <- rbind(bmi_exclude, media_exclude)
+### Check which Singleton Values between BMI and Media data set matches
+print(bmi_exclude$ID_ %in% media_exclude$ID_)
+### As the third item in the list matches we need to see if the time matches too. If so, we need to remove it.
+m_id <- bmi_exclude$ID_[3] #Getting the matched Singleton Subject_ID
+### Pulling out a data frame for the subject ID for each data set and Inner-joining
+#### Note: bmi_timed data frame only contains IDs of Singletons. We have to use p_bmi to pull the whole data set
+bmi_singleton <- p_bmi[p_bmi$ID_ == m_id,]
+print(bmi_singleton)
+media_singleton <- p_media[p_media$ID_ == m_id,]
+print(media_singleton)
+### Without even innerjoining, a quick scan of the printed data along the AgeMos variable indicate that these two have different time stamps. Therefore, we do not need to remove them from the data set as mentioned in bullet point 1 above.  
 ```
 
 #### Merging the two data sets
