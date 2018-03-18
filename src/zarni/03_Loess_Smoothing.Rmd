@@ -14,6 +14,8 @@ library (rio) # For importing data set
 ```{r}
 bmi_media <- import("../../data/final/final_interp_data.csv")
 bmi_media <- bmi_media[,-1]
+
+sum(is.na(bmi_media))
 ```
 
 ### Shaping Data for Lowess Curves
@@ -27,20 +29,31 @@ Then, we will follow the same trajectory for these IDs for 13.5 months, 21 month
 
 #The base data set for all the Ids for this Lowess Curve
 base <- bmi_media[bmi_media$Months >=5.5 & bmi_media$Months <= 6.5,]
+
+sum(is.na(base))
 nrow(base)
 #The distribution of the cut off points for media usage
 print(quantile(base$Media))
+table(cut(base$Media, breaks = quantile(base$Media)))
 ```
 
 ```{r}
 #The distribution of cut off points for time for the same Subject IDs
 base_alltime <- bmi_media[bmi_media$ID %in% base$ID,]
 print(nrow(base_alltime))
+sum(is.na(base_alltime))
 print(quantile(base_alltime$Months))
-print(quantile(base_alltime$zBMI))
+table(cut(base_alltime$Media, breaks = quantile(base_alltime$Media)))
+datasub <- cut(base_alltime$Media, breaks = quantile(base_alltime$Media), include.lowest = TRUE)
 ```
 
 Binning the months by interval of a month to desired integers of 6, 13.5, 21, 28.5, 36
+
+```{r}
+base_alltime_cut <- base_alltime[datasub,]
+head(base_alltime_cut)
+```
+
 ```{r}
 base_alltime[base_alltime$Months >=5.5 & base_alltime$Months <= 6.5,]$Months <-6
 base_alltime[base_alltime$Months >=13 & base_alltime$Months <= 14,]$Months <-13.5
@@ -61,11 +74,13 @@ Divide the IDs into 4 categories based on Media usage quantile above starting at
 ```{r}
 #6 months base IDs
 base_6 <- base_alltime[base_alltime$Months %in% c(6),]
-base6_l1 <- base_6[base_6$Media >=0 & base_6$Media <1, ]
-#base6_l2 <- base_6[base_6$Media >=1 & base_6$Media <2, ]
-base6_l3 <- base_6[base_6$Media >=2 & base_6$Media <3, ]
-base6_l4 <- base_6[base_6$Media >=3 & base_6$Media <4, ]
-base6_l5 <- base_6[base_6$Media >=4 & base_6$Media <5, ]
+base6_l1 <- base_6[base_6$Media >=0 & base_6$Media <4.11, ]
+base6_l2 <- base_6[base_6$Media >=4.11 & base_6$Media <4.71, ]
+#4.71,5.2
+base6_l3 <- base_6[base_6$Media >=4.71 & base_6$Media <5.2, ]
+#5.2,6.53
+base6_l4 <- base_6[base_6$Media >=5.2 & base_6$Media <6.53, ]
+#base6_l5 <- base_6[base_6$Media >=4 & base_6$Media <5, ]
 ```
 
 
@@ -73,7 +88,7 @@ base6_l5 <- base_6[base_6$Media >=4 & base_6$Media <5, ]
 ```{r}
 #Getting the same baseline level IDs for Trajectories across the months
 base_l1 <- base_alltime[base_alltime$ID %in% base6_l1$ID,]
-#base_l2 <- base_alltime[base_alltime$ID %in% base6_l2$ID,]
+base_l2 <- base_alltime[base_alltime$ID %in% base6_l2$ID,]
 base_l3 <- base_alltime[base_alltime$ID %in% base6_l3$ID,]
 base_l4 <- base_alltime[base_alltime$ID %in% base6_l4$ID,]
 base_l5 <- base_alltime[base_alltime$ID %in% base6_l5$ID,]
@@ -81,7 +96,7 @@ base_l5 <- base_alltime[base_alltime$ID %in% base6_l5$ID,]
 x<- c(6, 13.5, 21, 28.5, 36)
 y<- c(-4.86, -0.39, 0.40, 1.18, 4.98)
 
-plot(x, y, type = "n", main = "5 Bucket BMI Traj")
+plot(x, y, type = "n", main = "5 Bucket BMI Traj", ylim = c(0,2))
 lines(loess.smooth(x = base_l1$Months, y = base_l1$zBMI), col = "green")
 #lines(loess.smooth(x = base_l2$Months, y = base_l2$zBMI), col = "yellow")
 lines(loess.smooth(x = base_l3$Months, y = base_l3$zBMI), col = "orange")
