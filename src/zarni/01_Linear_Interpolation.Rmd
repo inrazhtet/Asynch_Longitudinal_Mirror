@@ -2,14 +2,20 @@
 title: "01_Linear_Interpolation"
 author: "Zarni Htet (zh938@nyu.edu)"
 date: March 15, 2018
-output: 
-  md_document:
-    variant: markdown_github
+output: github_document
 ---
 
 ### Imputation using Linear Interpolation
 
-This Markdown is filling the missing data for **BMI** and **Media Exposure** data sets at asynchronous time points using linear interpolation. By missing data, we mean to link **subjects** across the **BMI** and **Media Exposure** data sets. For some **subjects** we may find that data has been collected for both BMI and Media Exposure all about at the same time points. On the other hand, some subjects may have BMI time points 1,2,3 but Media time points 3,5,6. We hope to have for the subject all the time points for both data sets at 1,2,3,5,6.    
+This Markdown is filling the missing data for **BMI** and **Media Exposure** data sets at asynchronous time points using linear interpolation. By missing data, we mean to link **subjects** across the **BMI** and **Media Exposure** data sets. For some **subjects** we may find that data has been collected for both BMI and Media Exposure all about at the same time points. On the other hand, some subjects may have BMI time points 1,2,3 but Media time points 3,5,6. We hope to have for the subject all the time points for both data sets at 1,2,3,5,6. 
+
+|dfdf   |   |   |   |   |
+|-------|---|---|---|---|
+|   |   |   |   |   |
+|   |   |   |   |   |
+|   |   |   |   |   |
+
+
 
 ### Admnistration
 The project is supervised by Professor Marc Scott and Professor Daphna Harel. The data is from the Belle Lab at the Bellevue Hospital. More details of the project scope is in the README of the primary repository folder.

@@ -1,11 +1,12 @@
-01\_Linear\_Interpolation
-================
-Zarni Htet (<zh938@nyu.edu>)
-March 15, 2018
-
 ### Imputation using Linear Interpolation
 
 This Markdown is filling the missing data for **BMI** and **Media Exposure** data sets at asynchronous time points using linear interpolation. By missing data, we mean to link **subjects** across the **BMI** and **Media Exposure** data sets. For some **subjects** we may find that data has been collected for both BMI and Media Exposure all about at the same time points. On the other hand, some subjects may have BMI time points 1,2,3 but Media time points 3,5,6. We hope to have for the subject all the time points for both data sets at 1,2,3,5,6.
+
+| dfdf |     |     |     |     |
+|------|-----|-----|-----|-----|
+|      |     |     |     |     |
+|      |     |     |     |     |
+|      |     |     |     |     |
 
 ### Admnistration
 
@@ -25,6 +26,11 @@ library(foreign)
 ``` r
 #For importing different types of data set without specification
 library(rio)
+```
+
+    ## Warning: package 'rio' was built under R version 3.3.2
+
+``` r
 #For processing long form data
 library(dplyr)
 ```
@@ -52,11 +58,6 @@ library(tidyr)
 ``` r
 #Loading Rmarkdown library for rendering
 library(rmarkdown)
-```
-
-    ## Warning: package 'rmarkdown' was built under R version 3.3.2
-
-``` r
 #knitr library for rendering
 library(knitr)
 ```
@@ -340,7 +341,7 @@ The singletons will be handled in 4 different ways.
 The objective of this section is to temporarily remove the data set portion of bullet point 1 above where there is only 1 time each data set and the data set time stamps match.
 
 ``` r
-#1) Get the Singleton IDs of both Data Sets
+#1) Get the Singleton IDs of both Data Sets [People may not need to see this]
 
 #An assumption has been that for each row, there is no missing corresponding time value or bmi value. This assumption holds because of the missingness checks above.
 
@@ -348,7 +349,7 @@ The objective of this section is to temporarily remove the data set portion of b
 bmi_exclude <- bmi_timed[bmi_timed$n==1,]
 ### GET the MEDIA data set singletons
 media_exclude <- media_timed[media_timed$n==1,]
-### Gather all the Singleton Values in 1 Data Set
+### Gather all the Singleton Values in 1 Data Set [This is for later]
 all_singletons <- unique(rbind(bmi_exclude, media_exclude))
 
 ### Check which Singleton Values between BMI and Media data set matches
@@ -475,6 +476,7 @@ Custom Function
 
 ``` r
 #The ifelse commands literally says, if not all of the x vector is NA, pick the maximum after removing the NA. Otherwise, keep the NA.
+#Add an explanation to this more
 my.max <- function(x) ifelse(!all(is.na(x)),max(x, na.rm = T), NA)
 ```
 
@@ -580,6 +582,8 @@ combined_data_split <- split(combined_data, combined_data[,1])
 There are two custom functions in this section that allow us to use the approx function (details of the function are in the Appendix) for interpolation for our data set. A couple of steps are involved to prepare to apply the approx function. - Figuring out the Vectors and its corresponding indexes to interpolate - Defining the minimum and maximum values in existing data set to apply LOCF/LOCB to tail missing NAs - Using a secondary custom function to merge the outputs of Approxfunction from multiple vectors to a single data frame
 
 ``` r
+#Wrapper! Passes to a function:
+#Use ... Need to write it out!
 #The function will take in a data frame as well as an input vector that specifies which column indexes of the data frame are of interest for the interpolation. The reason we have the input vector is that it give us a flexible to use single function which can deal with a large data frame where multiple columns may need interpolation.
 
 #df refers to the data frame of interest

@@ -1,36 +1,51 @@
----
-title: "01_Function_LInterpolation"
-author: "Zarni Htet"
-output: "github_document"
----
+01\_Function\_LInterpolation
+================
+Zarni Htet
 
 ### Libraries for making the Function works!
-```{r}
+
+``` r
 #For processing long form data
 library(dplyr)
+```
+
+    ## 
+    ## Attaching package: 'dplyr'
+
+    ## The following objects are masked from 'package:stats':
+    ## 
+    ##     filter, lag
+
+    ## The following objects are masked from 'package:base':
+    ## 
+    ##     intersect, setdiff, setequal, union
+
+``` r
 #GTools library for ordering numeric variables
 library(gtools)
 #For filling NA values
 library(tidyr)
+```
+
+    ## Warning: package 'tidyr' was built under R version 3.3.2
+
+``` r
 #Loading Rmarkdown library for rendering
 ```
 
-## Custom Functions
+Custom Functions
+----------------
 
 ### Merging Custom Function
 
 This function is used to merge two rows of subject ID that has the time stamps. <br />
 
-A scenario would be <br />
-ID Time  BMI   Media Exposure  <br />
-A   1:00  3       NA           <br />  
-A   1:00  NA      4            <br />
+A scenario would be <br /> ID Time BMI Media Exposure <br /> A 1:00 3 NA <br />
+A 1:00 NA 4 <br />
 
-Applying this function, you would only have 1 Row <br />
-ID Time  BMI   Media Exposure <br />
-A  1:00  3     4              <br />
+Applying this function, you would only have 1 Row <br /> ID Time BMI Media Exposure <br /> A 1:00 3 4 <br />
 
-```{r}
+``` r
 my.max <- function(x) ifelse(!all(is.na(x)),max(x, na.rm = T), NA)
 ## *Arguments*:
 ### X - Takes in Rows of data with the Same SubjectID and Time Stamp
@@ -45,12 +60,11 @@ my.max <- function(x) ifelse(!all(is.na(x)),max(x, na.rm = T), NA)
 ### The function will go through each Same SubjectID and Time Stamp pairing and output a Single merged row! 
 ```
 
-
 ### LOCF/LOCB Function
 
-This function is used to fill in Media and BMI values for subjects that only have 1 value of Media and/or BMI at one time point. 
+This function is used to fill in Media and BMI values for subjects that only have 1 value of Media and/or BMI at one time point.
 
-```{r}
+``` r
 fill_NA <- function(df){
   
 ## *Arguments*
@@ -88,14 +102,14 @@ fill_NA <- function(df){
 }
 ```
 
-## Wrappers
+Wrappers
+--------
 
-### mdz_interpolate 
+### mdz\_interpolate
 
-The purpose of this function is to wrap around the built-in approx function. <br />
-Tests of the built-in approx function are in the Appendix Section of the corresponding code file **01_Linear_Interpolation.Rmd**
+The purpose of this function is to wrap around the built-in approx function. <br /> Tests of the built-in approx function are in the Appendix Section of the corresponding code file **01\_Linear\_Interpolation.Rmd**
 
-```{r}
+``` r
 mdz_interpolate <- function(df, par){
   
   ## *Arguments*
@@ -155,14 +169,14 @@ mdz_interpolate <- function(df, par){
 }
 ```
 
-
-## Helper Function
+Helper Function
+---------------
 
 ### Data Frame Update Function
 
 The purpose of this function is to take in the output of the approx linear interpolation function and compose it back to dataframe.
 
-```{r}
+``` r
 d_replace <- function(df, robj, rcol){
   
   ## *Arguments*
@@ -182,9 +196,3 @@ d_replace <- function(df, robj, rcol){
   return(df)
 }
 ```
-
-
-
-
-
-
