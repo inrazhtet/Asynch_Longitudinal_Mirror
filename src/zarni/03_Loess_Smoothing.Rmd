@@ -1,9 +1,8 @@
----
+å---
 title: "Loess Smoothing"
 author: "Zarni Htet"
 output: html_notebook
 ---
-
 
 ### Libraries
 ```{r}
@@ -23,6 +22,15 @@ sum(is.na(bmi_media))
 The goal here is to bin media usage to 5 categories (0 hrs, 1 hrs, 2 hrs, 3 hrs and 4 hrs) at a baseline of 6 months.
 
 Then, we will follow the same trajectory for these IDs for 13.5 months, 21 months, 28.5 months and 36 months.
+
+**The Time Conversion**
+
+```{r}
+bmi_media
+
+```
+
+
 
 ```{r}
 #Initial Data Exploration
