@@ -31,9 +31,9 @@ ID Time  BMI   Media Exposure <br />
 A  1:00  3     4              <br />
 
 ```{r}
-my.max <- function(x) ifelse(!all(is.na(x)),max(x, na.rm = T), NA)
+my.rowmerge <- function(x) ifelse(!all(is.na(x)),mean(x, na.rm = T), NA)
 ## *Arguments*:
-### X - Takes in Rows of data with the Same SubjectID and Time Stamp
+### x - Takes in Rows of data with the Same SubjectID and Time Stamp
 
 ## *Function Design*
 ### ifelse                - picks between two outcomes: output of TRUE condition or NA
@@ -52,10 +52,13 @@ This function is used to fill in Media and BMI values for subjects that only hav
 
 ```{r}
 fill_NA <- function(df){
-  
+
+## *Brief Description*
+### Apply LOCF to fill NAs   
+    
 ## *Arguments*
 ### df - Takes in a data frame of each SubjectID with their corresponding vector of BMI and Media Exposure Values
-
+  
 ## *Function Design*
 ### 1. We determine how many non-NAs are there in each vector of Media and BMI.
 ### 2. If there is only 1 non-NA, it fits our case. 
