@@ -1,36 +1,42 @@
+01\_Linear\_Interpolation
+================
+Zarni Htet (<zh938@nyu.edu>)
+March 15, 2018
+
 ### Imputation using Linear Interpolation
 
-This Markdown is filling the missing data for **BMI** and **Media Exposure** data sets at asynchronous time points using linear interpolation. By missing data, we mean to link **subjects** across the **BMI** and **Media Exposure** data sets. For some **subjects** we may find that data has been collected for both BMI and Media Exposure all about at the same time points. On the other hand, some subjects may have BMI time points 1,2,3 but Media time points 3,5,6. We hope to have for the subject all the time points for both data sets at 1,2,3,5,6.
+This Markdown is filling the missing data for **BMI** and **Media
+Exposure** data sets at asynchronous time points using linear
+interpolation. By missing data, we mean to link **subjects** across the
+**BMI** and **Media Exposure** data sets. For some **subjects** we may
+find that data has been collected for both BMI and Media Exposure all
+about at the same time points. On the other hand, some subjects may have
+BMI time points 1,2,3 but Media time points 3,5,6. We hope to have for
+the subject all the time points for both data sets at 1,2,3,5,6.
 
-| dfdf |     |     |     |     |
-|------|-----|-----|-----|-----|
-|      |     |     |     |     |
-|      |     |     |     |     |
-|      |     |     |     |     |
+| dfdf |  |  |  |  |
+| ---- |  |  |  |  |
+|      |  |  |  |  |
+|      |  |  |  |  |
+|      |  |  |  |  |
 
 ### Admnistration
 
-The project is supervised by Professor Marc Scott and Professor Daphna Harel. The data is from the Belle Lab at the Bellevue Hospital. More details of the project scope is in the README of the primary repository folder.
+The project is supervised by Professor Marc Scott and Professor Daphna
+Harel. The data is from the Belle Lab at the Bellevue Hospital. More
+details of the project scope is in the README of the primary repository
+folder.
 
 #### R Libraries
 
-This code block has all the needed R libraries to run this segment of the Markdown.
+This code block has all the needed R libraries to run this segment of
+the Markdown.
 
 ``` r
 #For the dta raw files
 library(foreign)
-```
-
-    ## Warning: package 'foreign' was built under R version 3.3.2
-
-``` r
 #For importing different types of data set without specification
 library(rio)
-```
-
-    ## Warning: package 'rio' was built under R version 3.3.2
-
-``` r
 #For processing long form data
 library(dplyr)
 ```
@@ -51,11 +57,6 @@ library(dplyr)
 library(gtools)
 #For filling NA values
 library(tidyr)
-```
-
-    ## Warning: package 'tidyr' was built under R version 3.3.2
-
-``` r
 #Loading Rmarkdown library for rendering
 library(rmarkdown)
 #knitr library for rendering
@@ -64,7 +65,9 @@ library(knitr)
 
 #### I: Uploading Raw data
 
-In this code chunk, we are uploading raw .dta data and converting to it a csv. This will then be saved to a processing data folder to protect the integrity of the raw data.
+In this code chunk, we are uploading raw .dta data and converting to it
+a csv. This will then be saved to a processing data folder to protect
+the integrity of the raw data.
 
 ``` r
 #The BMI data extract
@@ -79,7 +82,8 @@ write.csv(media, "../../data/processing/media.csv")
 
 ##### Loading the Data back from Processing Folder
 
-This code chunk is loading the working version of the data extra to be used throughout the document.
+This code chunk is loading the working version of the data extra to be
+used throughout the document.
 
 ``` r
 #processing bmi data
@@ -89,7 +93,10 @@ p_media <- import("../../data/processing/media.csv")
 
 #### II: Data Exploration
 
-This code chunks examine the two data sets. In particular, the focus here is on the key variables and the time intervals they are recorded. At the end of each code block for each data set, there is a short summary of what the data consists of.
+This code chunks examine the two data sets. In particular, the focus
+here is on the key variables and the time intervals they are recorded.
+At the end of each code block for each data set, there is a short
+summary of what the data consists of.
 
 ##### The BMI data set overview
 
@@ -148,9 +155,11 @@ print(sum(is.na(p_bmi$AgeMos))) #0 no values are missing here
 
     ## [1] 0
 
-Each subject has different time points. For subject 1, months may be 0, 0.5, 1.0 while subject 2 has months in 0, 0.7, 1.2 etc.
+Each subject has different time points. For subject 1, months may be 0,
+0.5, 1.0 while subject 2 has months in 0, 0.7, 1.2 etc.
 
-This is to explore the number of time intervals each subject has.
+This is to explore the number of time intervals each subject
+has.
 
 ``` r
 #This uses dplyr to group by each subject and count their instances. This effectively counts the number of time points each of them have.
@@ -160,18 +169,18 @@ bmi_timed <- p_bmi %>%
 print(bmi_timed)
 ```
 
-    ## # A tibble: 667 × 2
+    ## # A tibble: 667 x 2
     ##      ID_     n
     ##    <int> <int>
-    ## 1      1     7
-    ## 2      2    18
-    ## 3      3     9
-    ## 4      4     9
-    ## 5      5    11
-    ## 6      6     5
-    ## 7      7    24
-    ## 8      8    14
-    ## 9      9    10
+    ##  1     1     7
+    ##  2     2    18
+    ##  3     3     9
+    ##  4     4     9
+    ##  5     5    11
+    ##  6     6     5
+    ##  7     7    24
+    ##  8     8    14
+    ##  9     9    10
     ## 10    10    16
     ## # ... with 657 more rows
 
@@ -192,18 +201,21 @@ print(tt)
 barplot(tt)
 ```
 
-![](01_Linear_Interpolation_files/figure-markdown_github/unnamed-chunk-5-1.png)
+![](01_Linear_Interpolation_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
 
-We will do a quick barplot to see the distribution of time points for each subject has
+We will do a quick barplot to see the distribution of time points for
+each subject has
 
 ``` r
 #Using the table function and barplot to draw the distribution of time. 
 barplot(table(bmi$ID_), main = "Time Count Distribution \n for Each Subject for BMI")
 ```
 
-![](01_Linear_Interpolation_files/figure-markdown_github/unnamed-chunk-6-1.png)
+![](01_Linear_Interpolation_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
 
-Check the Minimum/Maximum number of time intervals. If you have only 1 time interval, we may have to apply **LOCF** and/or **LOCB** to interpolate across other time intervals. By other time
+Check the Minimum/Maximum number of time intervals. If you have only 1
+time interval, we may have to apply **LOCF** and/or **LOCB** to
+interpolate across other time intervals. By other time
 
 ``` r
 min(bmi_timed$n) #1
@@ -217,7 +229,8 @@ max(bmi_timed$n) #39
 
     ## [1] 39
 
-At least 1 subject has only 1 time interval for BMI. These **singletons** will be applied **LOCF** or **LOCB**.
+At least 1 subject has only 1 time interval for BMI. These
+**singletons** will be applied **LOCF** or **LOCB**.
 
 ##### Media exposure data set overview
 
@@ -276,7 +289,8 @@ print(sum(is.na(p_media$AgeMos))) #0
 
     ## [1] 0
 
-This is to explore the number of time intervals each subject has.
+This is to explore the number of time intervals each subject
+has.
 
 ``` r
 #This uses dplyr to group by each subject and count their instances. This effectively counts the number of time points each of them have.
@@ -286,59 +300,82 @@ media_timed <- p_media %>%
 print(media_timed)
 ```
 
-    ## # A tibble: 542 × 2
+    ## # A tibble: 542 x 2
     ##      ID_     n
     ##    <int> <int>
-    ## 1      1     2
-    ## 2      2     4
-    ## 3      3     1
-    ## 4      4     2
-    ## 5      5     5
-    ## 6      6     3
-    ## 7      7     3
-    ## 8      8     4
-    ## 9      9     2
+    ##  1     1     2
+    ##  2     2     4
+    ##  3     3     1
+    ##  4     4     2
+    ##  5     5     5
+    ##  6     6     3
+    ##  7     7     3
+    ##  8     8     4
+    ##  9     9     2
     ## 10    10     3
     ## # ... with 532 more rows
 
-Like the BMI from before, each subject has different count of time as well as time intervals where the data is collected.
+Like the BMI from before, each subject has different count of time as
+well as time intervals where the data is collected.
 
 ``` r
 #Using the table function and barplot to draw the distribution of time. 
 barplot(table(bmi$ID_), main = "Time Count Distribution \n for Each Subject for Media Exposure")
 ```
 
-![](01_Linear_Interpolation_files/figure-markdown_github/unnamed-chunk-10-1.png)
+![](01_Linear_Interpolation_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
+
+``` r
+tt2 = table(table(bmi$ID_))
+barplot(tt2)
+```
+
+![](01_Linear_Interpolation_files/figure-gfm/unnamed-chunk-10-2.png)<!-- -->
 
 #### III: Data Cleaning
 
-In this section, I will attempt to discover the subjects that only have 1 data point for the BMI data set or the Media exposure data set. The data points with only 1 time stamp cannot immediately be applied to a Linear Interpolation Function which requires 2 time points at the very least. See *Appendix* below for more details of how the function works.
+In this section, I will attempt to discover the subjects that only have
+1 data point for the BMI data set or the Media exposure data set. The
+data points with only 1 time stamp cannot immediately be applied to a
+Linear Interpolation Function which requires 2 time points at the very
+least. See *Appendix* below for more details of how the function works.
 
 ##### Handling the Singletons
 
 The singletons will be handled in 4 different ways.
 
--   If there is only one timestamp for the ID for BOTH BMI and Media (that is they were both only collected once and at the same time point), then leave it as it is.
+  - If there is only one timestamp for the ID for BOTH BMI and Media
+    (that is they were both only collected once and at the same time
+    point), then leave it as it is.
 
-*For coding purposes in Linear Interpolation, this data set has to be taken out while the others are being interpolated and then, merged later*
+*For coding purposes in Linear Interpolation, this data set has to be
+taken out while the others are being interpolated and then, merged
+later*
 
 **Results** None of these cases exist. <br />
 
--   If one variable was collected once, and the other was collected serveral times, the LOCF/LOCB to fill in the blanks
+  - If one variable was collected once, and the other was collected
+    serveral times, the LOCF/LOCB to fill in the blanks
 
 **Solution** A function has been created to handle this below.
 
--   If both variables were collected once, but at differnent time points, then merge those two values (equivalent to LOCF/LOCB)
+  - If both variables were collected once, but at differnent time
+    points, then merge those two values (equivalent to LOCF/LOCB)
 
 **Solution** A function has been created to handle this below.
 
--   If one variable is collected, and the other is never collected - we have to drop them from the dataset I think.
+  - If one variable is collected, and the other is never collected - we
+    have to drop them from the dataset I think.
 
-**Solution** An Inner Join of the data set removes those that need to be dropped.
+**Solution** An Inner Join of the data set removes those that need to be
+dropped.
 
 ###### Handling Bullet Point 1 Scenario
 
-The objective of this section is to temporarily remove the data set portion of bullet point 1 above where there is only 1 time each data set and the data set time stamps match.
+The objective of this section is to temporarily remove the data set
+portion of bullet point 1 above where there is only 1 time each data set
+and the data set time stamps
+match.
 
 ``` r
 #1) Get the Singleton IDs of both Data Sets [People may not need to see this]
@@ -384,11 +421,17 @@ print(media_singleton)
 
 #### IV: Creating Linearly Interpolated Data
 
-There are **14** steps in this section. At the end, we come out with an entirely interpolated data set. An Appendix section goes through the concept of Linear Interpolation as well as testing the Approx function that has been used extensively in this section. Other tests of the custom functions that are written has been removed. Should it need to be in the Appendix, we can easily provide.
+There are **14** steps in this section. At the end, we come out with an
+entirely interpolated data set. An Appendix section goes through the
+concept of Linear Interpolation as well as testing the Approx function
+that has been used extensively in this section. Other tests of the
+custom functions that are written has been removed. Should it need to be
+in the Appendix, we can easily provide.
 
 **Step 1: Finding the Common ID**
 
-Finding the subject IDs that match
+Finding the subject IDs that
+match
 
 ``` r
 common_ID <- intersect(p_bmi$ID_, p_media$ID_) # intersection works like in Set theory
@@ -408,9 +451,10 @@ m_media <- p_media [(p_media$ID_ %in% common_ID),]
 
 **Step 3: Generating NAs for each of the data set**
 
-We are generating NA columns for each of the data set so that when we joined later, they can fill in for the missing timepoints.
+We are generating NA columns for each of the data set so that when we
+joined later, they can fill in for the missing timepoints.
 
-*This references Professor Harel's code under her src folder*
+*This references Professor Harel’s code under her src folder*
 
 ``` r
 #BMI data table first!
@@ -446,7 +490,8 @@ c_data <- c_data[order(c_data[,1]),]
 c_data$Months <- as.numeric(as.character(c_data$Months))
 ```
 
-**Step 5: Arrange the data set of each SubjectID by Time**
+**Step 5: Arrange the data set of each SubjectID by
+Time**
 
 ``` r
 #dplyr command that does the arrange by the Group ID then within the groups
@@ -454,9 +499,13 @@ c_data$Months <- as.numeric(as.character(c_data$Months))
 c_data_arr<- c_data %>% arrange(ID,Months)
 ```
 
-**Step 6: Checking \# of duplicated values for each time value within each subject**
+**Step 6: Checking \# of duplicated values for each time value within
+each subject**
 
-This section checks if BMI and Media data has been recorded at the same time. The goal is to merge the two rows so that we will not be interpolating either BMI or Media data for the time stamps where original data already exists.
+This section checks if BMI and Media data has been recorded at the same
+time. The goal is to merge the two rows so that we will not be
+interpolating either BMI or Media data for the time stamps where
+original data already exists.
 
 ``` r
 dup_count <- c_data_arr %>% group_by(ID, Months) %>% summarise(n=n())
@@ -470,9 +519,14 @@ print(dim(v_dup))
 
 **Step 7: Merging duplicated row into 1 row**
 
-For merging rows, we are essentially saying between two values in both rows, do not pick NA, pick the value. Below is a custom-built function that achieves that. Said function will be applied to the dplyr summarize\_each (which is essentially, apply this function to each row of each column).
+For merging rows, we are essentially saying between two values in both
+rows, do not pick NA, pick the value. Below is a custom-built function
+that achieves that. Said function will be applied to the dplyr
+summarize\_each (which is essentially, apply this function to each row
+of each column).
 
-Custom Function
+Custom
+Function
 
 ``` r
 #The ifelse commands literally says, if not all of the x vector is NA, pick the maximum after removing the NA. Otherwise, keep the NA.
@@ -484,13 +538,24 @@ my.max <- function(x) ifelse(!all(is.na(x)),max(x, na.rm = T), NA)
 #If BMI and Media are recorded at the same time month, there should not be two separate rows for it.
 #Combined data that is arranged and merged.
 c_data_arr_mer <- c_data_arr %>% group_by(ID,Months) %>% summarise_each(funs(my.max))
+```
+
+    ## `summarise_each()` is deprecated.
+    ## Use `summarise_all()`, `summarise_at()` or `summarise_if()` instead.
+    ## To map `funs` over all variables, use `summarise_all()`
+
+``` r
 #This is merged and cleaned data with the NAs
 write.csv(c_data_arr_mer, "../../data/final/final_na_data.csv")
 ```
 
-**Step 8: Extracting the Singleton Cases from the Data Set to be handled separately**
+**Step 8: Extracting the Singleton Cases from the Data Set to be handled
+separately**
 
-To be applied to the Linear Interpolation, Approx function, the single rows of time stamped data with 1 value of either BMI or Media would not do. More details on the requirement of the Approx function are in the Appendix section. Step 8 and Step 9 handles this.
+To be applied to the Linear Interpolation, Approx function, the single
+rows of time stamped data with 1 value of either BMI or Media would not
+do. More details on the requirement of the Approx function are in the
+Appendix section. Step 8 and Step 9 handles this.
 
 ``` r
 #Getting all the rows with the Singleton IDs
@@ -501,7 +566,12 @@ non_singleton_data <- c_data_arr_mer[!(c_data_arr_mer$ID %in% all_singletons$ID_
 
 **Step 9: Handling Singleton Data**
 
-This section goes through bullet point **1** to bullet point **3** in the Singleton data scenario. The Singleton data will be combined back once the Singular NAs has been replaced appropriately with LOCF & LOCB which can then supplied into our approxfun as described in details in the Appendix.
+This section goes through bullet point **1** to bullet point **3** in
+the Singleton data scenario. The Singleton data will be combined back
+once the Singular NAs has been replaced appropriately with LOCF & LOCB
+which can then supplied into our approxfun as described in details in
+the
+Appendix.
 
 ``` r
 ###Case I: Locating rows where there is only 1 time stamp for BMI and Media
@@ -570,7 +640,8 @@ combined_data <- rbind(non_singleton_data, singleton_NA_filled)
 
 **Step 11: Split the combined data set by the Subject ID**
 
-Here we are spliting the data set by subject ID so that we can apply the interpolation function to each of the Subject ID
+Here we are spliting the data set by subject ID so that we can apply the
+interpolation function to each of the Subject ID
 
 ``` r
 #Split the data by subject ID
@@ -579,7 +650,14 @@ combined_data_split <- split(combined_data, combined_data[,1])
 
 **Step 12: Build Custom Function to Handle Interpolation**
 
-There are two custom functions in this section that allow us to use the approx function (details of the function are in the Appendix) for interpolation for our data set. A couple of steps are involved to prepare to apply the approx function. - Figuring out the Vectors and its corresponding indexes to interpolate - Defining the minimum and maximum values in existing data set to apply LOCF/LOCB to tail missing NAs - Using a secondary custom function to merge the outputs of Approxfunction from multiple vectors to a single data frame
+There are two custom functions in this section that allow us to use the
+approx function (details of the function are in the Appendix) for
+interpolation for our data set. A couple of steps are involved to
+prepare to apply the approx function. - Figuring out the Vectors and its
+corresponding indexes to interpolate - Defining the minimum and maximum
+values in existing data set to apply LOCF/LOCB to tail missing NAs -
+Using a secondary custom function to merge the outputs of Approxfunction
+from multiple vectors to a single data frame
 
 ``` r
 #Wrapper! Passes to a function:
@@ -630,7 +708,8 @@ mdz_interpolate <- function(df, par){
 }
 ```
 
-Helper Function that puts missing values back into the data frame.
+Helper Function that puts missing values back into the data
+frame.
 
 ``` r
 #The function takes in an actual data frame (df), an Robject of the interpolation function which contains the index values that has been replaced under vector x and the values that has been imputed under vector y. Then, we specify the column to which those values are replaced with rcol
@@ -646,9 +725,13 @@ d_replace <- function(df, robj, rcol){
 }
 ```
 
-**Step 13: Applies the Custom Interpolation Function to the Split data set**
+**Step 13: Applies the Custom Interpolation Function to the Split data
+set**
 
-This section applies the **split** dataframe into the custom linear interpolation function from above. By split data, it means here that we are handling each subjectID spearately using lapply functions.
+This section applies the **split** dataframe into the custom linear
+interpolation function from above. By split data, it means here that we
+are handling each subjectID spearately using lapply
+functions.
 
 ``` r
 #The split data is put in and then, the time column: 2, the BMI column: 3 and the media column 4 are applied the interpolation function
@@ -670,32 +753,45 @@ write.csv(c_data_interp_bind, "../../data/final/final_interp_data.csv")
 
 ##### Base Linear Interpolation Function
 
-The linear interpolation equation to be used in the base function is below. The *y*<sub>0</sub> and *y*<sub>1</sub> would be either BMI or Media exposure variable. The *x*<sub>0</sub> and *x*<sub>1</sub> would be the time variable.
+The linear interpolation equation to be used in the base function is
+below. The \(y_{0}\) and \(y_{1}\) would be either BMI or Media exposure
+variable. The \(x_{0}\) and \(x_{1}\) would be the time variable.
 
-The *y* variable is the missing value we are looking for at time *x*. For BMI variable, the *x* corresponds to time from Media exposure that is missing between the *x*<sub>0</sub> and the *x*<sub>1</sub> intervals. The converse can be said of the Media Exposure variable to BMI as well.
+The \(y\) variable is the missing value we are looking for at time
+\(x\). For BMI variable, the \(x\) corresponds to time from Media
+exposure that is missing between the \(x_{0}\) and the \(x_{1}\)
+intervals. The converse can be said of the Media Exposure variable to
+BMI as well.
 
-Source: Linear Interpolation, Wikipedia
-$$
-y = y\_{0} + (x - x\_{0}) \\frac{y\_{1}- y\_{0}}{x\_{1} - x\_{0}}
-$$
+Source: Linear Interpolation, Wikipedia \[
+y = y_{0} + (x - x_{0}) \frac{y_{1}- y_{0}}{x_{1} - x_{0}}
+\]
 
 This section deals with testing out functions and other stuffs
 
-Use ApproxFun: <https://stat.ethz.ch/R-manual/R-devel/library/stats/html/approxfun.html>
+Use ApproxFun:
+<https://stat.ethz.ch/R-manual/R-devel/library/stats/html/approxfun.html>
 
 #### Section II: Testing the Approx Function
 
 ##### START: Testing Out Linear Interpolation approx/approxfun
 
-Both approx and approxfun looks fairly similar. There are a couple of **key parameters** to consider \* x,y =&gt; input vectors \* xout =&gt; we specify which indexes we want to interpolate values for \* yleft =&gt; this is specifying the last value to be carried to the left or backward if x values are less than min(x)
+Both approx and approxfun looks fairly similar. There are a couple of
+**key parameters** to consider \* x,y =\> input vectors \* xout =\> we
+specify which indexes we want to interpolate values for \* yleft =\>
+this is specifying the last value to be carried to the left or backward
+if x values are less than min(x)
 
--   yright =&gt; this is specifying the last value to be carried to the right or forward if x values are more than max(x)
+  - yright =\> this is specifying the last value to be carried to the
+    right or forward if x values are more than max(x)
 
--   rule =&gt; Two options. 1 is to get NA for yleft, yright case. 2 is to output yleft, yright cases
+  - rule =\> Two options. 1 is to get NA for yleft, yright case. 2 is to
+    output yleft, yright cases
 
 ###### Test Case 1
 
-This is a simple case of some missing Ys with X values. A manual calculation is done below to verify the answer.
+This is a simple case of some missing Ys with X values. A manual
+calculation is done below to verify the answer.
 
 This helper function puts back the output to the actual data frame.
 
@@ -709,7 +805,10 @@ xout_1 <- which(is.na(y_1)) #which returns the indexes where y_1 vector has NA v
 
 Specifying y\_left and y\_right
 
-This code chunk will tackle the case of last carried left/backward and last carried right/forward. The goal is to find the furthest left y index that is not NA and save the value. The same goes for the furthest right.
+This code chunk will tackle the case of last carried left/backward and
+last carried right/forward. The goal is to find the furthest left y
+index that is not NA and save the value. The same goes for the furthest
+right.
 
 ``` r
 y_nmis_1 <- which(!is.na(y_1)) #indexes of non-missing y values
@@ -719,7 +818,8 @@ y_max_1 <- y_1[max(y_nmis_1)] #get the value from the furthest right index of y
 
 Applying the function
 
-This code chunk applies the function
+This code chunk applies the
+function
 
 ``` r
 out_1 <- approx(x_1, y_1, xout = xout_1,  method = "linear", yleft = y_min_1, yright = y_max_1, rule = 2)
@@ -735,7 +835,8 @@ print(out_1$y)
 
 Manual calculation to confirm it.
 
-Notetoself: In the future, helper functions should be in a separate source file. Seek permission from MS/DH.
+Notetoself: In the future, helper functions should be in a separate
+source file. Seek permission from MS/DH.
 
 Base interpolation helper function
 
@@ -772,13 +873,15 @@ print(res_3_1)
 
     ## [1] 8.333333
 
-All the results matches up. We only have a case of Last Value Carried forward and backward to test
+All the results matches up. We only have a case of Last Value Carried
+forward and backward to test
 
 ###### Test Case 2
 
 Simulated data 2
 
-We are testing the case of last value carried forward with 1 value missing on the left and 2 values missing on the right
+We are testing the case of last value carried forward with 1 value
+missing on the left and 2 values missing on the right
 
 ``` r
 x_2 <- c(1,2,3,4,5,6)
@@ -794,7 +897,8 @@ y_min_2 <- y_2[min(y_nmis_2)] #get the value from the furtherest left index of y
 y_max_2 <- y_2[max(y_nmis_2)] #get the value from the furthest right index of y
 ```
 
-This code chunk applies the function
+This code chunk applies the
+function
 
 ``` r
 out_2 <- approx(x_2, y_2, xout = xout_2,  method = "linear", yleft = y_min_2, yright = y_max_2, rule = 2)
@@ -808,4 +912,5 @@ print(out_2$y)
 
     ## [1]  3 10 10
 
-Perfect. Left value carried forward and right value carried forward works like a charm.
+Perfect. Left value carried forward and right value carried forward
+works like a charm.

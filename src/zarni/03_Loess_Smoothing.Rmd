@@ -44,7 +44,7 @@ The goal here is to bin media usage to 5 categories (0 hrs, 1 hrs, 2 hrs, 3 hrs 
 
 #### Question to Marc/Daphna
 
-*Do you want me to exponetiate? It would blow up the current range of Hrs we have from 0-7.
+*Do you want me to exponentiate? It would blow up the current range of Hrs we have from 0-7.
 The Log would bring in negative values.*
 ```{r}
 

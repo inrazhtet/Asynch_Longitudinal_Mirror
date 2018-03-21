@@ -147,6 +147,9 @@ Like the BMI from before, each subject has different count of time as well as ti
 ```{r}
 #Using the table function and barplot to draw the distribution of time. 
 barplot(table(bmi$ID_), main = "Time Count Distribution \n for Each Subject for Media Exposure")
+
+tt2 = table(table(bmi$ID_))
+barplot(tt2)
 ```
 
 #### III: Data Cleaning
@@ -159,7 +162,7 @@ The singletons will be handled in 4 different ways.
 
 * If there is only one timestamp for the ID for BOTH BMI and Media (that is they were both only collected once and at the same time point), then leave it as it is.
 
-*For coding purposes in Linear Interpolation, this data set has to be taken out while the others are being interpolated and then, merged later*
+* For coding purposes in Linear Interpolation, this data set has to be taken out while the others are being interpolated and then, merged later*
 
 **Results** None of these cases exist. <br />
 
