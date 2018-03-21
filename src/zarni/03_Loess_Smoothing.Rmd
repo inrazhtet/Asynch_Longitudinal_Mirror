@@ -34,7 +34,7 @@ Removing the missing values in bmi_media raw
 bmi_media_raw_nna <- bmi_media_raw[complete.cases(bmi_media_raw),]
 ```
 
-### Tracjectory for Linearly Interpolated Data Set
+### Trajectory for Linearly Interpolated Data Set
 
 #### 1: LOESS application of 1 month interval at each time cut point
 
@@ -123,7 +123,7 @@ legend("topleft", legend = c("0-hrs", "1-hrs", "2-hrs", "3-hrs"), col = c("green
 
 
 
-### Tracjectory for Raw Data
+### Trajectory for Raw Data
 
 #### 1: LOESS application of across all time periods with base at 6 months
 
