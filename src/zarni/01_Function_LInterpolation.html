@@ -326,20 +326,20 @@ library(dplyr)</code></pre>
 <pre class="r"><code>#GTools library for ordering numeric variables
 library(gtools)
 #For filling NA values
-library(tidyr)</code></pre>
-<pre><code>## Warning: package 'tidyr' was built under R version 3.3.2</code></pre>
-<pre class="r"><code>#Loading Rmarkdown library for rendering</code></pre>
+library(tidyr)
+#Loading Rmarkdown library for rendering</code></pre>
 </section>
 <section id="custom-functions" class="level2">
 <h2>Custom Functions</h2>
 <section id="merging-custom-function" class="level3">
 <h3>Merging Custom Function</h3>
 <p>This function is used to merge two rows of subject ID that has the time stamps. <br /></p>
-<p>A scenario would be <br /> ID Time BMI Media Exposure <br /> A 1:00 3 NA <br /> A 1:00 NA 4 <br /></p>
+<p>A scenario would be <br /> ID Time BMI Media Exposure <br /> A 1:00 3 NA <br /><br />
+A 1:00 NA 4 <br /></p>
 <p>Applying this function, you would only have 1 Row <br /> ID Time BMI Media Exposure <br /> A 1:00 3 4 <br /></p>
-<pre class="r"><code>my.max &lt;- function(x) ifelse(!all(is.na(x)),max(x, na.rm = T), NA)
+<pre class="r"><code>my.rowmerge &lt;- function(x) ifelse(!all(is.na(x)),mean(x, na.rm = T), NA)
 ## *Arguments*:
-### X - Takes in Rows of data with the Same SubjectID and Time Stamp
+### x - Takes in Rows of data with the Same SubjectID and Time Stamp
 
 ## *Function Design*
 ### ifelse                - picks between two outcomes: output of TRUE condition or NA
@@ -354,10 +354,13 @@ library(tidyr)</code></pre>
 <h3>LOCF/LOCB Function</h3>
 <p>This function is used to fill in Media and BMI values for subjects that only have 1 value of Media and/or BMI at one time point.</p>
 <pre class="r"><code>fill_NA &lt;- function(df){
-  
+
+## *Brief Description*
+### Apply LOCF to fill NAs   
+    
 ## *Arguments*
 ### df - Takes in a data frame of each SubjectID with their corresponding vector of BMI and Media Exposure Values
-
+  
 ## *Function Design*
 ### 1. We determine how many non-NAs are there in each vector of Media and BMI.
 ### 2. If there is only 1 non-NA, it fits our case. 
