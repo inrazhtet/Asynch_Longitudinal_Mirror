@@ -348,9 +348,9 @@ The singletons will be handled in 4 different ways.
     (that is they were both only collected once and at the same time
     point), then leave it as it is.
 
-*For coding purposes in Linear Interpolation, this data set has to be
-taken out while the others are being interpolated and then, merged
-later*
+  - For coding purposes in Linear Interpolation, this data set has to be
+    taken out while the others are being interpolated and then, merged
+    later\*
 
 **Results** None of these cases exist. <br />
 
