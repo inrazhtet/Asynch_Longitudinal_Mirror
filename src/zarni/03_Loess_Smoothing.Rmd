@@ -38,7 +38,7 @@ bmi_media_raw_nna <- bmi_media_raw[complete.cases(bmi_media_raw),]
 
 #### 1: LOESS application of 1 month interval at each time cut point
 
-The goal here is to bin media usage to 5 categories (0 hrs, 1 hrs, 2 hrs, 3 hrs and 4 hrs) starting from a baseline of 6 months. Then, we will follow the same trajectory for these *same* subjectIDs for 13.5 months, 21 months, 28.5 months and 36 months.
+The goal here is to bin media usage to 5 categories (0 hrs, 1 hrs, 2 hrs, 3 hrs and 4 hrs) starting from a baseline of 6 months. Then, we will follow the trajectory for these *same* subjectIDs for 13.5 months, 21 months, 28.5 months and 36 months.
 
 **The Time Conversion**
 
@@ -90,7 +90,7 @@ x <- c(6, 13.5, 21, 28.5, 36) # Months Vector for subsetting data
 base_alltime <- base_alltime[base_alltime$Months %in% x,]
 ```
 
-Divide the IDs into 4 categories based on Media usage quantile above starting at base like of 6 months
+Divide the IDs into 4 categories based on the media usage quantiles above starting at a baseline of 6 months
 
 ```{r}
 #6 months base IDs

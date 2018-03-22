@@ -10,8 +10,6 @@ require (rio) # For importing data set
 
     ## Loading required package: rio
 
-    ## Warning: package 'rio' was built under R version 3.3.2
-
 ``` r
 require (mi)  # For removing missing data
 ```
@@ -78,15 +76,20 @@ bmi_media_raw_nna <- bmi_media_raw[complete.cases(bmi_media_raw),]
 
 #### 1: LOESS application of 1 month interval at each time cut point
 
-The goal here is to bin media usage to 5 categories (0 hrs, 1 hrs, 2 hrs, 3 hrs and 4 hrs) starting from a baseline of 6 months. Then, we will follow the same trajectory for these *same* subjectIDs for 13.5 months, 21 months, 28.5 months and 36 months.
+The goal here is to bin media usage to 5 categories (0 hrs, 1 hrs, 2
+hrs, 3 hrs and 4 hrs) starting from a baseline of 6 months. Then, we
+will follow the trajectory for these *same* subjectIDs for 13.5 months,
+21 months, 28.5 months and 36 months.
 
 **The Time Conversion**
 
 #### Question to Marc/Daphna
 
-*Do you want me to exponetiate? It would blow up the current range of Hrs we have from 0-7. The Log would bring in negative values.*
+*Do you want me to exponentiate? It would blow up the current range of
+Hrs we have from 0-7. The Log would bring in negative values.*
 
-We are subsetting the data set to only include the SubjectIDs that have media exposure at about 1 month interval centering at 6 months.
+We are subsetting the data set to only include the SubjectIDs that have
+media exposure at about 1 month interval centering at 6 months.
 
 ``` r
 #The base data set for all the Ids for this Lowess Curve
@@ -126,7 +129,9 @@ print(table(cut(base_alltime$Media, breaks = quantile(base_alltime$Media))))
 #datasub <- cut(base_alltime$Media, breaks = quantile(base_alltime$Media), include.lowest = TRUE)
 ```
 
-Binning the months by interval of a month to desired integers of 6, 13.5, 21, 28.5, 36
+Binning the months by interval of a month to desired integers of 6,
+13.5, 21, 28.5,
+36
 
 ``` r
 base_alltime[base_alltime$Months >=5.5 & base_alltime$Months <= 6.5,]$Months <-6
@@ -143,7 +148,8 @@ x <- c(6, 13.5, 21, 28.5, 36) # Months Vector for subsetting data
 base_alltime <- base_alltime[base_alltime$Months %in% x,]
 ```
 
-Divide the IDs into 4 categories based on Media usage quantile above starting at base like of 6 months
+Divide the IDs into 4 categories based on the media usage quantiles
+above starting at a baseline of 6 months
 
 ``` r
 #6 months base IDs
@@ -174,9 +180,9 @@ lines(loess.smooth(x = base_l4$Months, y = base_l4$zBMI), col = "blue")
 legend("topleft", legend = c("0-hrs", "1-hrs", "2-hrs", "3-hrs"), col = c("green", "yellow", "red","blue"), lty = 1, cex = 0.8)
 ```
 
-![](03_Loess_Smoothing_files/figure-markdown_github/unnamed-chunk-11-1.png)
+![](03_Loess_Smoothing_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
 
-### Tracjectory for Raw Data
+### Trajectory for Raw Data
 
 #### 1: LOESS application of across all time periods with base at 6 months
 
@@ -240,7 +246,7 @@ lines(loess.smooth(x = base_l4_raw$Months, y = base_l4_raw$zBMI), col = "blue")
 legend("topleft", legend = c("0-hrs", "1-hrs", "2-hrs", "3-hrs"), col = c("green", "yellow", "red","blue"), lty = 1, cex = 0.8)
 ```
 
-![](03_Loess_Smoothing_files/figure-markdown_github/unnamed-chunk-16-1.png)
+![](03_Loess_Smoothing_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
 
 ### Diagonosis
 
@@ -272,67 +278,131 @@ base_l3_raw$zBMI
     ## [46]  0.53706098 -0.12000490  0.51902181
 
 <!-- ## IGNORE CODE BELOW -->
+
 <!-- #### 2: LOESS application of 1 month interval at each time cut point with base at 6 months -->
+
 <!-- The goal here is to bin media usage to 5 categories (0 hrs, 1 hrs, 2 hrs, 3 hrs and 4 hrs) starting from a baseline of 6 months. Then, we will follow the same trajectory for these *same* subjectIDs for 13.5 months, 21 months, 28.5 months and 36 months. -->
+
 <!-- **The Time Conversion** -->
+
 <!-- #### Question to Marc -->
+
 <!-- *Do you want me to exponetiate? It would blow up the current range of Hrs we have from 0-7. -->
+
 <!-- The Log would bring in negative values.* -->
+
 <!-- ```{r} -->
+
 <!-- ``` -->
+
 <!-- We are subsetting the data set to only include the SubjectIDs that have media exposure at about 1 month interval -->
+
 <!-- centering at 6 months. -->
+
 <!-- ```{r} -->
+
 <!-- #The base data set for all the Ids for this Lowess Curve -->
+
 <!-- base_raw <- bmi_media_raw_nna[bmi_media_raw_nna$Months >=5.5 & bmi_media_raw_nna$Months <= 6.5,] -->
+
 <!-- #The distribution of the cut off points for media usage -->
+
 <!-- print(quantile(base_raw$Media)) -->
+
 <!-- ``` -->
+
 <!-- ```{r} -->
+
 <!-- #The distribution of cut off points for time for the same Subject IDs -->
+
 <!-- base_alltime_raw <- bmi_media_raw_nna[bmi_media_raw_nna$ID %in% base_raw$ID,] -->
+
 <!-- print(sum(is.na(base_alltime_raw))) -->
+
 <!-- #Quantile breaks for Media Exposure -->
+
 <!-- table(cut(base_alltime_raw$Media, breaks = quantile(base_alltime_raw$Media))) -->
+
 <!-- #the Cut command returns a vector where each entry has a factor indicator of what quantile it belongs to  -->
+
 <!-- #datasub <- cut(base_alltime$Media, breaks = quantile(base_alltime$Media), include.lowest = TRUE) -->
+
 <!-- ``` -->
+
 <!-- Binning the months by interval of a month to desired integers of 6, 13.5, 21, 28.5, 36 -->
+
 <!-- ```{r} -->
+
 <!-- base_alltime_raw[base_alltime_raw$Months >=5.5 & base_alltime_raw$Months <= 6.5,]$Months <-6 -->
+
 <!-- base_alltime_raw[base_alltime_raw$Months >=13 & base_alltime_raw$Months <= 14,]$Months <-13.5 -->
+
 <!-- #Data interval has to be widened for the month centered around 21 to 3 month interval -->
+
 <!-- base_alltime_raw[base_alltime_raw$Months >=18.5 & base_alltime_raw$Months <= 23.5,]$Months <-21 -->
+
 <!-- base_alltime_raw[base_alltime_raw$Months >=28 & base_alltime_raw$Months <= 29,]$Months <-28.5 -->
+
 <!-- base_alltime_raw[base_alltime_raw$Months >=35.5 & base_alltime_raw$Months <= 36.5,]$Months <-36 -->
+
 <!-- ``` -->
+
 <!-- Subsetting the data set of those months only -->
+
 <!-- ```{r} -->
+
 <!-- x <- c(6, 13.5, 21, 28.5, 36) # Months Vector for subsetting data -->
+
 <!-- base_alltime_raw <- base_alltime_raw[base_alltime_raw$Months %in% x,] -->
+
 <!-- ``` -->
+
 <!-- Divide the IDs into 4 categories based on Media usage quantile above starting at base like of 6 months. -->
+
 <!-- The quantile cuts in raw data are **different** from the quantile cuts of interpolated data which is to be expected.  -->
+
 <!-- ```{r} -->
+
 <!-- #6 months base IDs -->
+
 <!-- base_6_raw <- base_alltime_raw[base_alltime_raw$Months %in% c(6),] -->
+
 <!-- base6_l1_raw <- base_6_raw[base_6_raw$Media >=0 & base_6_raw$Media <4.11, ] -->
+
 <!-- base6_l2_raw <- base_6_raw[base_6_raw$Media >=4.11 & base_6_raw$Media <4.8, ] -->
+
 <!-- base6_l3_raw <- base_6_raw[base_6_raw$Media >=4.8 & base_6_raw$Media <5.28, ] -->
+
 <!-- base6_l4_raw <- base_6_raw[base_6_raw$Media >=5.28 & base_6_raw$Media <6.24, ] -->
+
 <!-- ``` -->
+
 <!-- ```{r} -->
+
 <!-- #Getting the same baseline level IDs for Trajectories across the months -->
+
 <!-- base_l1_raw <- base_alltime_raw[base_alltime_raw$ID %in% base6_l1_raw$ID,] -->
+
 <!-- base_l2_raw <- base_alltime_raw[base_alltime_raw$ID %in% base6_l2_raw$ID,] -->
+
 <!-- base_l3_raw <- base_alltime_raw[base_alltime_raw$ID %in% base6_l3_raw$ID,] -->
+
 <!-- base_l4_raw <- base_alltime_raw[base_alltime_raw$ID %in% base6_l4_raw$ID,] -->
+
 <!-- x<- c(6, 13.5, 21, 28.5, 36) -->
+
 <!-- y<- c(-4.86, -0.39, 0.40, 1.18, 4.98) -->
+
 <!-- plot(x, y, type = "n", main = "4 Bucket BMI Trajectory with Raw Data", ylim = c(-1.0,10.0)) -->
+
 <!-- lines(loess.smooth(x = base_l1_raw$Months, y = base_l1_raw$zBMI), col = "green") -->
+
 <!-- lines(loess.smooth(x = base_l2_raw$Months, y = base_l2_raw$zBMI), col = "yellow") -->
+
 <!-- lines(loess.smooth(x = base_l3_raw$Months, y = base_l3_raw$zBMI), col = "orange") -->
+
 <!-- lines(loess.smooth(x = base_l4_raw$Months, y = base_l4_raw$zBMI), col = "blue") -->
+
 <!-- legend("topleft", legend = c("0-hrs", "1-hrs", "2-hrs", "3-hrs"), col = c("green", "yellow", "red","blue"), lty = 1, cex = 0.8) -->
+
 <!-- ``` -->
