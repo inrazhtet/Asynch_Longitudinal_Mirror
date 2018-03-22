@@ -134,7 +134,7 @@ print(summary(M1))
 
 #### Model Interpretation
 
-Controlling for differences between subjets, the effect of one unit
+Controlling for differences between subjects, the effect of one unit
 change in Media is 0.0161 to BMI and it is not statistically significant
 assuming our model assumptions are correct. With the likelihood ratio
 test below, the random effects are warranted.
