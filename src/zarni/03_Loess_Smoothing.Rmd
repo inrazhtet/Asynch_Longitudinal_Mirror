@@ -217,7 +217,7 @@ baseline_6months$MediaCategory <- cut(baseline_6months$Media, breaks = breaks, l
 ```{r}
 baseline_6_media_nonNA <- baseline_6months[!is.na(baseline_6months$MediaCategory),]
 baseline_cat <- baseline %>% inner_join(baseline_6_media_nonNA, by = c("ID" = "ID"))
-baseline_cat <- baseline_cat[,c(1:5)] #To remove the Y side of the join
+baseline_cat <- baseline_cat[,c(1:4,8)] #To remove the Y side of the join
 baseline_cat <- baseline_cat %>% arrange(ID, Months.x) #To rearrange it by subjectID and available months
 ```
 
@@ -271,7 +271,8 @@ At each time interval for each media exposure category, what is the average bmi 
 
 Use tapply here
 ```{r}
-
+baseline_media_months_final <- tapply(baseline_cat_months$zBMI.x, list(baseline_cat_months$Months.x, baseline_cat_months$MediaCategory), mean, na.rm = TRUE)
+head(baseline_media_months_final)
 ```
 
 
