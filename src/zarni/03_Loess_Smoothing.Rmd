@@ -5,7 +5,7 @@ output: "github_document"
 ---
 
 ### Libraries
-```{r, R.options= "false"}
+```{r, R.options= "true"}
 require (rio) # For importing data set
 require (mi)  # For removing missing data
 ```
@@ -27,29 +27,44 @@ print(dim(bmi_media_raw))
 print(dim(bmi_media_raw[complete.cases(bmi_media_raw),]))
 ```
 
-Removing the missing values in bmi_media raw
+
+### Check the Distribution of Media Exposure
+
+* Question: If we are checking the distribution of media exposure, should not we be checking the distribution of other variables too? *
+
 ```{r}
-#na.omit ?
-#complete.cases ?
-bmi_media_raw_nna <- bmi_media_raw[complete.cases(bmi_media_raw),]
+par(mfrow=c(1,1))
+plot(density(bmi_media$Media), main = "Density of Media Exposure")
 ```
+As expected, there are a lot of zeros. What does zero Media Exposure *could* mean? It could mean that some of the subjects (kids) actually are not exposed to media at all. It could also mean that there are some self-reported errors in the data collection.
+
+Transforming Media Exposure to adjust for the zeros 
+```{r}
+media_trans <- bmi_media$Media
+media_trans_1 <- sqrt(media_trans)
+media_trans_2 <- log(media_trans + 1)
+media_trans_3 <- log(media_trans + 0.1) #Daphna's suggestion
+media_trans_4 <- log(media_trans + 0.5) #Marc's suggestion
+```
+
+```{r}
+par(mfrow= c(2,2))
+plot(density(media_trans_1), main = "Sqrt Density of Media Exposure")
+plot(density(media_trans_2), main = "Log_1 Density of Media Exposure")
+plot(density(media_trans_3), main = "Log_0.1 Density of Media Exposure")
+plot(density(media_trans_4), main = "Log_0.5 Density of Media Exposure")
+```
+
+
+
+
+
 
 ### Trajectory for Linearly Interpolated Data Set
 
 #### 1: LOESS application of 1 month interval at each time cut point
 
 The goal here is to bin media usage to 5 categories (0 hrs, 1 hrs, 2 hrs, 3 hrs and 4 hrs) starting from a baseline of 6 months. Then, we will follow the trajectory for these *same* subjectIDs for 13.5 months, 21 months, 28.5 months and 36 months.
-
-**The Time Conversion**
-
-#### Question to Marc/Daphna
-
-*Do you want me to exponentiate? It would blow up the current range of Hrs we have from 0-7.
-The Log would bring in negative values.*
-```{r}
-
-
-```
 
 
 We are subsetting the data set to only include the SubjectIDs that have media exposure at about 1 month interval

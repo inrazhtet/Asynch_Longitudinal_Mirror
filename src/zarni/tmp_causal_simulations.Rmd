@@ -1,0 +1,62 @@
+---
+title: "RCT Outputs"
+output: html_notebook
+---
+
+1) 
+
+**Problem Set**
+
+Show a treatment effect of 5 unit increase in Causal Inference Quiz I Score take II after the intervention of a home tutor program that is randomly assigned to students taking Professor Hill's class in Fall of 2018 .The home tutors (treatments) are equally talented in **All Ways** of graduate students by the name of Boss Andrea, Raven Ray and Zany Htet.  
+
+**Assumptions**
+Class size N is 100
+The pre-treatment Causal Quiz Score is N(80, 10)
+Treatment assigned is completely random.
+
+**Conditions on Quiz 1 Take 2**
+Both treated and non-treated score improves! 
+
+**Expected Output**
+A Linear Regression model for Causal Inference. Coefficient may round.
+
+**Hint**
+Build a simulated data set first
+
+#### Simulated Data Set
+
+Creating the Vectors for the Data Set
+```{r}
+#Create 100 students
+students <- c(1:100)
+#Create pre-treatment test scores for everyone
+pretest <- rnorm(n=100, mean = 80, sd = 10)
+#Create a vector of 0 and 1
+zero <- rep(0,50)
+one  <- rep(1,50)
+zone <- c(zero, one)
+#Creat a Randomly Assigned Treatment Variable
+treat <- sample(zone, 100, replace = FALSE)
+#Create a non-treated test score post-intervention
+postest_nt <- rnorm(n=50, mean = 82, sd = 10)
+#Create a treated test score post-intervention
+postest_t <- rnorm(n =50, mean = 87, sd = 10)
+```
+
+#### Gluing the Data Together
+
+```{r}
+
+
+
+```
+
+### Running the LM model
+
+
+
+
+
+
+
+
