@@ -253,13 +253,45 @@ print(length(unique(baseline_cat_months$ID))) #368
 ```
 We have suffered zero loss of data in our choice of interval.
 
-Saving the 5 x 5, Media Exposure categories and Year(Month) data set
+Saving the 5 x 5, Media Exposure categories and Year(Month) intermediate data set
 ```{r}
-write.csv(baseline_cat_months, "../../data/final/baseline_media_months.csv")
+write.csv(baseline_cat_months, "../../data/Intermediate/baseline_media_months.csv")
+```
+
+#### Generating Final Data Set for Trajectory Plot
+
+```{r}
+baseline_cat_months <- import("../../data/Intermediate/baseline_media_months.csv")
 ```
 
 
-- Use tapplys on both the time intervals and media categories of each subject ID to to create a 5 by 5 matrix
+** Objective **
+
+At each time interval for each media exposure category, what is the average bmi value when NAs are removed?
+
+Use tapply here
+```{r}
+
+```
+
+
+Save the final data set
+```{r}
+
+```
+
+Import the data set back
+
+```{r}
+
+```
+
+Plot the Trajectory Plots and Label them
+```{r}
+
+```
+
+Is it similar to what we have on the slides?
 
 
 
