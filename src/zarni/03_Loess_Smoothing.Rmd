@@ -8,6 +8,7 @@ output: "github_document"
 ```{r, R.options= "true"}
 require (rio) # For importing data set
 require (mi)  # For removing missing data
+require (dplyr) # For grouping manipulations
 ```
 
 ### Importing Data
@@ -139,6 +140,71 @@ legend("topleft", legend = c("0-hrs", "1-hrs", "2-hrs", "3-hrs"), col = c("green
 
 
 ### Trajectory for Raw Data
+
+#### Steps to apply data trajectory
+
+```{r}
+head(bmi_media_raw)
+```
+
+Initial Data Explorations
+
+```{r}
+#Number of unique subjectIDs
+print(length(unique(bmi_media_raw$ID))) #537
+```
+
+```{r}
+#Checking out the distribution of Months
+plot(density(bmi_media_raw$Months), main = "Months Distribution", xlim = c(4,8))
+hist(bmi_media_raw$Months, xlim = c(2,20))
+```
+
+Binning the Baseline 6 months
+
+Due to the histogram distribution being flat between 5-10 months, I would wager to bin 6 months by a 1 month range of between 5 and 7.
+
+```{r}
+baseline <- bmi_media_raw
+#creating baseline 6 months interval
+baseline[baseline$Months >=5 & baseline$Months <= 7,]$Months <- 6
+```
+
+Pulling the 6 months data set out to **categorize** the subjectIDs by their Media Exposure quantiles.
+
+```{r}
+baseline_6months <- baseline[baseline$Months == 6, ]
+#Number of unique subjectIDs at baseline 6 months
+print(length(unique(baseline_6months$ID))) #460
+#Out of 537 subjectIDs at all time, we lose around 77 subject IDs.
+print(537-460) 
+```
+
+For each subjectID, how many has 1 instance of non-NA media exposure value at 6 months?
+
+```{r}
+
+```
+
+
+Check the distribution of BMI values at baseline 6 months
+
+```{r}
+plot(hist(baseline_6months$Media, na.rm = TRUE), main = "Media Distribution at 6 months")
+```
+
+Use cut to divide into 0,1,2,3, and above 4
+```{r}
+labels <- c("0hrs", "1hrs", "2hrs", "3hrs", "4hrs")
+breaks <- c(0,1,2,3,4,6.3) #The breaks are based on slide 38 of Langone Hospital presentation with the maximum BMI hours being the end point.
+cut(baseline_6months$Media, breaks = breaks, include.lowest = TRUE, right = FALSE)
+
+```
+
+
+
+
+
 
 #### 1: LOESS application of across all time periods with base at 6 months
 
