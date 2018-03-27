@@ -147,7 +147,7 @@ legend("topleft", legend = c("0-hrs", "1-hrs", "2-hrs", "3-hrs"), col = c("green
 head(bmi_media_raw)
 ```
 
-Initial Data Explorations
+** Initial Data Explorations **
 
 ```{r}
 #Number of unique subjectIDs
@@ -160,7 +160,7 @@ plot(density(bmi_media_raw$Months), main = "Months Distribution", xlim = c(4,8))
 hist(bmi_media_raw$Months, xlim = c(2,20))
 ```
 
-Binning the Baseline 6 months
+** Binning the Baseline 6 months **
 
 Due to the histogram distribution being flat between 5-10 months, I would wager to bin 6 months by a 1 month range of between 5 and 7.
 
@@ -180,7 +180,7 @@ print(length(unique(baseline_6months$ID))) #460
 print(537-460) 
 ```
 
-For each subjectID, how many has 1 instance of non-NA media exposure value at 6 months?
+* For each subjectID, how many has 1 instance of non-NA media exposure value at 6 months? *
 
 ```{r}
 baseline_6_media_nonNA <- baseline_6months %>% group_by(ID) %>% summarise(non_na_count = sum(!is.na(Media)))
@@ -188,8 +188,8 @@ print(dim(baseline_6_media_nonNA)) #460 subjectIDs
 head(baseline_6_media_nonNA)
 ```
 
-Out of the 460 subjectIDs, how many has the non-NA values for Media exposure at 6 months? <br />
-What percentage of the subjectIDs does it correspond to?
+* Out of the 460 subjectIDs, how many has the non-NA values for Media exposure at 6 months? <br />
+What percentage of the subjectIDs does it correspond to? *
 
 ```{r}
 print(sum(baseline_6_media_nonNA$non_na_count)) #289
@@ -197,24 +197,32 @@ print(sum(baseline_6_media_nonNA$non_na_count)) #289
 print((289/460) * 100)
 ```
 
-Check the distribution of BMI values at baseline 6 months
+** Check the distribution of Media Exposure values at baseline 6 months **
 
 ```{r}
 plot(hist(baseline_6months$Media, na.rm = TRUE), main = "Media Distribution at 6 months")
 ```
 
-Use cut to divide into 0,1,2,3, and above 4 to reflect the 
+Use cut to divide into 0,1,2,3, and above 4 hrs to best reflect the divisions by slide **38** of presentation material from Belle Research Group.
 
 ```{r}
 labels <- c("0hrs", "1hrs", "2hrs", "3hrs", "4hrs")
 breaks <- c(0,1,2,3,4,6.3) #The breaks are based on slide 38 of Langone Hospital presentation with the maximum BMI hours being the end point.
-cut(baseline_6months$Media, breaks = breaks, include.lowest = TRUE, right = FALSE)
+baseline_6months$MediaCategory <- cut(baseline_6months$Media, breaks = breaks, labels = labels, include.lowest = TRUE, right = FALSE) #include.lowest, True to be inclusive of left hand-side and exclusive of right hand side.
 ```
 
-- Figure out how to apply cut's result back to the data set (Is it match?)
+
+
 - Subset these IDs back from the Raw Data
+
+```{r}
+head(baseline_6months)
+```
+
 - Apply the Categories to this raw data set
 - Need to create intervals for the rest of the months based on what you had for 6 months (a 2 months interval)
+- Use tapplys on both the time intervals and media categories of each subject ID to to create a 5 by 5 matrix
+
 
 
 
