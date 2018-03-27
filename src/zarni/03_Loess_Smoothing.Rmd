@@ -219,10 +219,49 @@ baseline_6_media_nonNA <- baseline_6months[!is.na(baseline_6months$MediaCategory
 baseline_cat <- baseline %>% inner_join(baseline_6_media_nonNA, by = c("ID" = "ID"))
 baseline_cat <- baseline_cat[,c(1:5)] #To remove the Y side of the join
 baseline_cat <- baseline_cat %>% arrange(ID, Months.x) #To rearrange it by subjectID and available months
-head(baseline_cat)
 ```
 
-- Need to create intervals for the rest of the months based on what you had for 6 months (a 2 months interval)
+Checking the dimensions of the data set and subject IDs
+
+```{r}
+print(dim(baseline_cat)) #7103 5 
+print(length(unique(baseline_cat$ID))) #368
+#From the initial 520, there are only 368 subjectIDs left that has media exposure which could be binned. We retain 70.76 percent of the data.
+print((368/520) * 100)
+```
+
+Need to collapse time months onto 13.5, 21, 28.5 and 36 months using a 6 month interval centered around those months
+
+```{r}
+baseline_cat[baseline_cat$Months.x >=10.5 & baseline_cat$Months.x <= 16.5, ]$Months.x <- 13.5
+baseline_cat[baseline_cat$Months.x >=18 & baseline_cat$Months.x <= 24, ]$Months.x <- 21
+baseline_cat[baseline_cat$Months.x >=25.5 & baseline_cat$Months.x <= 31.5, ]$Months.x <- 28.5
+baseline_cat[baseline_cat$Months.x >=33 & baseline_cat$Months.x <= 39, ]$Months.x <- 36
+```
+
+Subsetting the data to only the timepoints at 6, 13.5, 21, 28.5 and 36 months
+
+```{r}
+baseline_cat_months <- dplyr::filter(baseline_cat, Months.x == 6 | Months.x == 13.5 | Months.x == 21 | Months.x == 28.5 | Months.x == 36)
+head(baseline_cat_months)
+```
+
+Checking the number of unique SubjectIDs after subsetting by time
+
+```{r}
+print(length(unique(baseline_cat_months$ID))) #368
+```
+We have suffered zero loss of data in our choice of interval.
+
+
+Saving the 5 x 5, Media Exposure categories and Year(Month) data set
+```{r}
+write.csv(baseline_cat_months, "../../data/final/baseline_media_months.csv")
+```
+
+
+
+
 - Use tapplys on both the time intervals and media categories of each subject ID to to create a 5 by 5 matrix
 
 
