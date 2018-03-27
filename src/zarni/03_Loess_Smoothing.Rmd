@@ -156,18 +156,19 @@ print(length(unique(bmi_media_raw$ID))) #537
 
 ```{r}
 #Checking out the distribution of Months
-plot(density(bmi_media_raw$Months), main = "Months Distribution", xlim = c(4,8))
-hist(bmi_media_raw$Months, xlim = c(2,20))
+plot(density(bmi_media_raw$Months), main = "Months Distribution")
+hist(bmi_media_raw$Months, main = "Months Distribution")
 ```
 
 ** Binning the Baseline 6 months **
 
-Due to the histogram distribution being flat between 5-10 months, I would wager to bin 6 months by a 1 month range of between 5 and 7.
+In the graphical report from Belle Lab, the month intervals are segemented at 6, 13.5, 21, 28.5 and 36 months.
+With an average interval of at least 6 months between each time period, we are going to collapse the raw data months centered at the above periods by 3 months each way. 
 
 ```{r}
 baseline <- bmi_media_raw
 #creating baseline 6 months interval
-baseline[baseline$Months >=5 & baseline$Months <= 7,]$Months <- 6
+baseline[baseline$Months >=3 & baseline$Months <= 9,]$Months <- 6
 ```
 
 Pulling the 6 months data set out to **categorize** the subjectIDs by their Media Exposure quantiles.
@@ -175,9 +176,9 @@ Pulling the 6 months data set out to **categorize** the subjectIDs by their Medi
 ```{r}
 baseline_6months <- baseline[baseline$Months == 6, ]
 #Number of unique subjectIDs at baseline 6 months
-print(length(unique(baseline_6months$ID))) #460
-#Out of 537 subjectIDs at all time, we lose around 77 subject IDs.
-print(537-460) 
+print(length(unique(baseline_6months$ID))) #520
+#Out of 537 subjectIDs at all time, we lose around 17 subject IDs.
+print(537-520) 
 ```
 
 * For each subjectID, how many has 1 instance of non-NA media exposure value at 6 months? *
@@ -188,13 +189,13 @@ print(dim(baseline_6_media_nonNA)) #460 subjectIDs
 head(baseline_6_media_nonNA)
 ```
 
-* Out of the 460 subjectIDs, how many has the non-NA values for Media exposure at 6 months? <br />
+* Out of the 520 subjectIDs, how many has the non-NA values for Media exposure at 6 months? <br />
 What percentage of the subjectIDs does it correspond to? *
 
 ```{r}
 print(sum(baseline_6_media_nonNA$non_na_count)) #289
 #Proportionally, it corresponds to 
-print((289/460) * 100)
+print((372/520) * 100)
 ```
 
 ** Check the distribution of Media Exposure values at baseline 6 months **
@@ -215,22 +216,11 @@ baseline_6months$MediaCategory <- cut(baseline_6months$Media, breaks = breaks, l
 
 ```{r}
 baseline_6_media_nonNA <- baseline_6months[!is.na(baseline_6months$MediaCategory),]
-baseline_cat <- baseline_6months %>% inner_join(baseline_6_media_nonNA, by = c("ID" = "ID"))
+baseline_cat <- baseline %>% inner_join(baseline_6_media_nonNA, by = c("ID" = "ID"))
 baseline_cat <- baseline_cat[,c(1:5)] #To remove the Y side of the join
 baseline_cat <- baseline_cat %>% arrange(ID, Months.x) #To rearrange it by subjectID and available months
 head(baseline_cat)
 ```
-
-Check the unique number of subjectIDs and distribution of months available
-
-```{r}
-
-```
-
-
-
-
-
 
 - Need to create intervals for the rest of the months based on what you had for 6 months (a 2 months interval)
 - Use tapplys on both the time intervals and media categories of each subject ID to to create a 5 by 5 matrix
