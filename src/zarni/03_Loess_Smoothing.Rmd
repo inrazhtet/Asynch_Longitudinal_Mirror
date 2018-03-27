@@ -211,15 +211,27 @@ breaks <- c(0,1,2,3,4,6.3) #The breaks are based on slide 38 of Langone Hospital
 baseline_6months$MediaCategory <- cut(baseline_6months$Media, breaks = breaks, labels = labels, include.lowest = TRUE, right = FALSE) #include.lowest, True to be inclusive of left hand-side and exclusive of right hand side.
 ```
 
-
-
-- Subset these IDs back from the Raw Data
+** Subset the subjectIDs only with Media Exposure Hrs at 6 months and map it back to Raw Data **
 
 ```{r}
-head(baseline_6months)
+baseline_6_media_nonNA <- baseline_6months[!is.na(baseline_6months$MediaCategory),]
+baseline_cat <- baseline_6months %>% inner_join(baseline_6_media_nonNA, by = c("ID" = "ID"))
+baseline_cat <- baseline_cat[,c(1:5)] #To remove the Y side of the join
+baseline_cat <- baseline_cat %>% arrange(ID, Months.x) #To rearrange it by subjectID and available months
+head(baseline_cat)
 ```
 
-- Apply the Categories to this raw data set
+Check the unique number of subjectIDs and distribution of months available
+
+```{r}
+
+```
+
+
+
+
+
+
 - Need to create intervals for the rest of the months based on what you had for 6 months (a 2 months interval)
 - Use tapplys on both the time intervals and media categories of each subject ID to to create a 5 by 5 matrix
 
