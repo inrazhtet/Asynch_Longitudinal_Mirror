@@ -183,9 +183,19 @@ print(537-460)
 For each subjectID, how many has 1 instance of non-NA media exposure value at 6 months?
 
 ```{r}
-
+baseline_6_media_nonNA <- baseline_6months %>% group_by(ID) %>% summarise(non_na_count = sum(!is.na(Media)))
+print(dim(baseline_6_media_nonNA)) #460 subjectIDs
+head(baseline_6_media_nonNA)
 ```
 
+Out of the 460 subjectIDs, how many has the non-NA values for Media exposure at 6 months? <br />
+What percentage of the subjectIDs does it correspond to?
+
+```{r}
+print(sum(baseline_6_media_nonNA$non_na_count)) #289
+#Proportionally, it corresponds to 
+print((289/460) * 100)
+```
 
 Check the distribution of BMI values at baseline 6 months
 
