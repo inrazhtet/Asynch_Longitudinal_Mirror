@@ -139,9 +139,9 @@ legend("topleft", legend = c("0-hrs", "1-hrs", "2-hrs", "3-hrs"), col = c("green
 
 
 
-### Trajectory for Raw Data
+### BMI Trajectories for Raw Data at baseline of 6 months
 
-#### Steps to apply data trajectory
+#### Generating Raw Data Set to generate zBMI trajectories
 
 ```{r}
 head(bmi_media_raw)
@@ -253,13 +253,10 @@ print(length(unique(baseline_cat_months$ID))) #368
 ```
 We have suffered zero loss of data in our choice of interval.
 
-
 Saving the 5 x 5, Media Exposure categories and Year(Month) data set
 ```{r}
 write.csv(baseline_cat_months, "../../data/final/baseline_media_months.csv")
 ```
-
-
 
 
 - Use tapplys on both the time intervals and media categories of each subject ID to to create a 5 by 5 matrix
@@ -272,53 +269,53 @@ write.csv(baseline_cat_months, "../../data/final/baseline_media_months.csv")
 
 
 
-#### 1: LOESS application of across all time periods with base at 6 months
+<!-- #### 1: LOESS application of across all time periods with base at 6 months -->
 
-```{r}
-#The base data set for all the Ids for this Lowess Curve
-base_6_raw <- bmi_media_raw_nna[bmi_media_raw_nna$Months >=5.5 & bmi_media_raw_nna$Months <= 6.5,]
-#The distribution of the cut off points for media usage
-print(quantile(base_6_raw$Media))
-```
+<!-- ```{r} -->
+<!-- #The base data set for all the Ids for this Lowess Curve -->
+<!-- base_6_raw <- bmi_media_raw_nna[bmi_media_raw_nna$Months >=5.5 & bmi_media_raw_nna$Months <= 6.5,] -->
+<!-- #The distribution of the cut off points for media usage -->
+<!-- print(quantile(base_6_raw$Media)) -->
+<!-- ``` -->
 
-```{r}
-#The distribution of cut off points for time for the same Subject IDs
-base_alltime_raw <- bmi_media_raw_nna[bmi_media_raw_nna$ID %in% base_6_raw$ID,]
-print(sum(is.na(base_alltime_raw)))
-#Quantile breaks for Media Exposure
-table(cut(base_alltime_raw$Media, breaks = quantile(base_alltime_raw$Media)))
-#the Cut command returns a vector where each entry has a factor indicator of what quantile it belongs to 
-#datasub <- cut(base_alltime$Media, breaks = quantile(base_alltime$Media), include.lowest = TRUE)
-```
+<!-- ```{r} -->
+<!-- #The distribution of cut off points for time for the same Subject IDs -->
+<!-- base_alltime_raw <- bmi_media_raw_nna[bmi_media_raw_nna$ID %in% base_6_raw$ID,] -->
+<!-- print(sum(is.na(base_alltime_raw))) -->
+<!-- #Quantile breaks for Media Exposure -->
+<!-- table(cut(base_alltime_raw$Media, breaks = quantile(base_alltime_raw$Media))) -->
+<!-- #the Cut command returns a vector where each entry has a factor indicator of what quantile it belongs to  -->
+<!-- #datasub <- cut(base_alltime$Media, breaks = quantile(base_alltime$Media), include.lowest = TRUE) -->
+<!-- ``` -->
 
-```{r}
-#Getting the Loess data points
-base6_l1_raw <- base_6_raw[base_6_raw$Media >=0 & base_6_raw$Media <4.11, ]
-base6_l2_raw <- base_6_raw[base_6_raw$Media >=4.11 & base_6_raw$Media <4.79, ]
-base6_l3_raw <- base_6_raw[base_6_raw$Media >=4.79 & base_6_raw$Media <5.30, ]
-base6_l4_raw <- base_6_raw[base_6_raw$Media >=5.30 & base_6_raw$Media <6.24, ]
-```
+<!-- ```{r} -->
+<!-- #Getting the Loess data points -->
+<!-- base6_l1_raw <- base_6_raw[base_6_raw$Media >=0 & base_6_raw$Media <4.11, ] -->
+<!-- base6_l2_raw <- base_6_raw[base_6_raw$Media >=4.11 & base_6_raw$Media <4.79, ] -->
+<!-- base6_l3_raw <- base_6_raw[base_6_raw$Media >=4.79 & base_6_raw$Media <5.30, ] -->
+<!-- base6_l4_raw <- base_6_raw[base_6_raw$Media >=5.30 & base_6_raw$Media <6.24, ] -->
+<!-- ``` -->
 
-```{r}
-#Getting the same baseline level IDs for Trajectories across the months
-base_l1_raw <- base_alltime_raw[base_alltime_raw$ID %in% base6_l1_raw$ID,] #everything is at 6 months
-base_l2_raw <- base_alltime_raw[base_alltime_raw$ID %in% base6_l2_raw$ID,]
-base_l3_raw <- base_alltime_raw[base_alltime_raw$ID %in% base6_l3_raw$ID,]
-base_l4_raw <- base_alltime_raw[base_alltime_raw$ID %in% base6_l4_raw$ID,]
-```
+<!-- ```{r} -->
+<!-- #Getting the same baseline level IDs for Trajectories across the months -->
+<!-- base_l1_raw <- base_alltime_raw[base_alltime_raw$ID %in% base6_l1_raw$ID,] #everything is at 6 months -->
+<!-- base_l2_raw <- base_alltime_raw[base_alltime_raw$ID %in% base6_l2_raw$ID,] -->
+<!-- base_l3_raw <- base_alltime_raw[base_alltime_raw$ID %in% base6_l3_raw$ID,] -->
+<!-- base_l4_raw <- base_alltime_raw[base_alltime_raw$ID %in% base6_l4_raw$ID,] -->
+<!-- ``` -->
 
 
-```{r, warning=FALSE}
-x<- c(6, 13.5, 21, 28.5, 36)
-y<- c(-4.86, -0.39, 0.40, 1.18, 4.98)
+<!-- ```{r, warning=FALSE} -->
+<!-- x<- c(6, 13.5, 21, 28.5, 36) -->
+<!-- y<- c(-4.86, -0.39, 0.40, 1.18, 4.98) -->
 
-plot(x, y, type = "n", main = "4 Bucket BMI Trajectory with Raw Data", ylim = c(-10,10))
-lines(loess.smooth(x = base_l1_raw$Months, y = base_l1_raw$zBMI), col = "green")
-lines(loess.smooth(x = base_l2_raw$Months, y = base_l2_raw$zBMI), col = "yellow")
-lines(loess.smooth(x = base_l3_raw$Months, y = base_l3_raw$zBMI), col = "orange")
-lines(loess.smooth(x = base_l4_raw$Months, y = base_l4_raw$zBMI), col = "blue")
-legend("topleft", legend = c("0-hrs", "1-hrs", "2-hrs", "3-hrs"), col = c("green", "yellow", "red","blue"), lty = 1, cex = 0.8)
-```
+<!-- plot(x, y, type = "n", main = "4 Bucket BMI Trajectory with Raw Data", ylim = c(-10,10)) -->
+<!-- lines(loess.smooth(x = base_l1_raw$Months, y = base_l1_raw$zBMI), col = "green") -->
+<!-- lines(loess.smooth(x = base_l2_raw$Months, y = base_l2_raw$zBMI), col = "yellow") -->
+<!-- lines(loess.smooth(x = base_l3_raw$Months, y = base_l3_raw$zBMI), col = "orange") -->
+<!-- lines(loess.smooth(x = base_l4_raw$Months, y = base_l4_raw$zBMI), col = "blue") -->
+<!-- legend("topleft", legend = c("0-hrs", "1-hrs", "2-hrs", "3-hrs"), col = c("green", "yellow", "red","blue"), lty = 1, cex = 0.8) -->
+<!-- ``` -->
 
 ### Diagonosis
 
