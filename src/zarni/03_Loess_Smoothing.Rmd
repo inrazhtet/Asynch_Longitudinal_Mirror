@@ -203,13 +203,20 @@ Check the distribution of BMI values at baseline 6 months
 plot(hist(baseline_6months$Media, na.rm = TRUE), main = "Media Distribution at 6 months")
 ```
 
-Use cut to divide into 0,1,2,3, and above 4
+Use cut to divide into 0,1,2,3, and above 4 to reflect the 
+
 ```{r}
 labels <- c("0hrs", "1hrs", "2hrs", "3hrs", "4hrs")
 breaks <- c(0,1,2,3,4,6.3) #The breaks are based on slide 38 of Langone Hospital presentation with the maximum BMI hours being the end point.
 cut(baseline_6months$Media, breaks = breaks, include.lowest = TRUE, right = FALSE)
-
 ```
+
+- Figure out how to apply cut's result back to the data set (Is it match?)
+- Subset these IDs back from the Raw Data
+- Apply the Categories to this raw data set
+- Need to create intervals for the rest of the months based on what you had for 6 months (a 2 months interval)
+
+
 
 
 
