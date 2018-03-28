@@ -292,10 +292,11 @@ baseline_media_months_final <- tapply(baseline_cat_months$zBMI.x, list(baseline_
 head(baseline_media_months_final)
 ```
 
+As expected from above the 1 hr Media Exposure category is missing. Therefore, we have 5x4 matrix to draw trajectories on.
 
 Save the final data set
 ```{r}
-
+write.csv(baseline_media_months_final, "../../data/baseline_media_months.csv")
 ```
 
 Import the data set back
