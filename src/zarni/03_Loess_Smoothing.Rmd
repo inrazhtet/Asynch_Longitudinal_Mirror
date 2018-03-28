@@ -5,10 +5,12 @@ output: "github_document"
 ---
 
 ### Libraries
-```{r, R.options= "true"}
+```{r, R.options= "TRUE"}
 require (rio) # For importing data set
 require (mi)  # For removing missing data
 require (dplyr) # For grouping manipulations
+require (reshape) # For converting data to long format
+require (ggplot2) # For more visually stunning graphics
 ```
 
 ### Importing Data
@@ -55,11 +57,6 @@ plot(density(media_trans_2), main = "Log_1 Density of Media Exposure")
 plot(density(media_trans_3), main = "Log_0.1 Density of Media Exposure")
 plot(density(media_trans_4), main = "Log_0.5 Density of Media Exposure")
 ```
-
-
-
-
-
 
 ### Trajectory for Linearly Interpolated Data Set
 
@@ -302,11 +299,19 @@ write.csv(baseline_media_months_final, "../../data/final/baseline_media_months.c
 Import the data set back
 
 ```{r}
-baseline_media_months <- import("../../data/")
+baseline_media_months <- import("../../data/final/baseline_media_months.csv")
+colnames(baseline_media_months) <- c("Months", "0hrs", "2hrs", "3hrs", "4hrs")
 ```
 
 Plot the Trajectory Plots and Label them
+
 ```{r}
+plot(baseline_media_months$Mo, baseline_media_months$`0hrs`, type = "l", xaxt = "n", main = "4 Bucket BMI Trajectory with Raw Data", xlab = "Months", ylab = "zBMI", ylim = c(-0.4, 1.2),  col = "green")
+axis(1, at = baseline_media_months$Months)
+lines(baseline_media_months$Mo,baseline_media_months$`2hrs`, col = "yellow")
+lines(baseline_media_months$Mo,baseline_media_months$`3hrs`, col = "orange")
+lines(baseline_media_months$Mo,baseline_media_months$`4hrs`, col = "blue")
+legend("topleft", legend = c("0-hrs", "2-hrs", "3-hrs", "4-hrs"), col = c("green", "yellow", "red","blue"), lty = 1, cex = 0.8)
 
 ```
 
@@ -367,18 +372,6 @@ Is it similar to what we have on the slides?
 <!-- lines(loess.smooth(x = base_l4_raw$Months, y = base_l4_raw$zBMI), col = "blue") -->
 <!-- legend("topleft", legend = c("0-hrs", "1-hrs", "2-hrs", "3-hrs"), col = c("green", "yellow", "red","blue"), lty = 1, cex = 0.8) -->
 <!-- ``` -->
-
-### Diagonosis
-
-```{r}
-
-min(base_l2_raw$zBMI)
-max(base_l1_raw$zBMI)
-base_l3_raw$zBMI
-
-```
-
-
 <!-- ## IGNORE CODE BELOW -->
 
 <!-- #### 2: LOESS application of 1 month interval at each time cut point with base at 6 months -->
