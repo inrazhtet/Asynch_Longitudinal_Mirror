@@ -210,6 +210,23 @@ Use cut to divide into 0,1,2,3, and above 4 hrs to best reflect the divisions by
 labels <- c("0hrs", "1hrs", "2hrs", "3hrs", "4hrs")
 breaks <- c(0,1,2,3,4,6.3) #The breaks are based on slide 38 of Langone Hospital presentation with the maximum BMI hours being the end point.
 baseline_6months$MediaCategory <- cut(baseline_6months$Media, breaks = breaks, labels = labels, include.lowest = TRUE, right = FALSE) #include.lowest, True to be inclusive of left hand-side and exclusive of right hand side.
+unique(baseline_6months$MediaCategory) #There appears to be no data point for those who are exposed to Media between 1 to <2 hrs
+```
+
+Check from the Raw Data Set if there are those who have media exposure between 1 to < 2 hrs 
+
+```{r}
+bmi_1_hr_raw <- bmi_media_raw[bmi_media_raw$Media >=1 & bmi_media_raw$Media <2,]
+sum(bmi_1_hr_raw, na.rm = TRUE)
+```
+
+In the raw data set, there are those that have the media exposure between 1 to 2 hours. However, as can be seen below, if we use our baseline 6 months data, those subject IDs drop. In fact, I have increased the interval around 6 months to an 8 month interval and it still would not capture those subject IDs.
+
+Check from Baseline 6 Months data if there are those who have media exposure between 1 to < 2 hrs
+
+```{r}
+bmi_1_hr_baseline <- baseline_6months[baseline_6months$Media >=1 & baseline_6months$Media <2,]
+sum(bmi_1_hr_baseline$Media, na.rm = TRUE)
 ```
 
 ** Subset the subjectIDs only with Media Exposure Hrs at 6 months and map it back to Raw Data **
