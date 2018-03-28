@@ -46,14 +46,16 @@ print(dim(bmi_media_raw[complete.cases(bmi_media_raw),]))
 
 ### Check the Distribution of Media Exposure
 
--   Question: If we are checking the distribution of media exposure, should not we be checking the distribution of other variables too? \*
+-   Question: If we are checking the distribution of media exposure, should not we be checking the distribution of other variables too?
 
 ``` r
 par(mfrow=c(1,1))
 plot(density(bmi_media$Media), main = "Density of Media Exposure")
 ```
 
-![](03_Loess_Smoothing_files/figure-markdown_github/unnamed-chunk-4-1.png) As expected, there are a lot of zeros. What does zero Media Exposure *could* mean? It could mean that some of the subjects (kids) actually are not exposed to media at all. It could also mean that there are some self-reported errors in the data collection.
+![](03_Loess_Smoothing_files/figure-markdown_github/unnamed-chunk-4-1.png)
+
+As expected, there are a lot of zeros. What does zero Media Exposure hours mean? It could mean that some of the subjects (kids) actually are not exposed to media at all. It could also mean that there are some self-reported errors in the data collection.
 
 Transforming Media Exposure to adjust for the zeros
 

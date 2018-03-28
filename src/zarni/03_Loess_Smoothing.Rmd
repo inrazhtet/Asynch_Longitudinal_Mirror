@@ -39,6 +39,7 @@ print(dim(bmi_media_raw[complete.cases(bmi_media_raw),]))
 par(mfrow=c(1,1))
 plot(density(bmi_media$Media), main = "Density of Media Exposure")
 ```
+
 As expected, there are a lot of zeros. What does zero Media Exposure hours mean? It could mean that some of the subjects (kids) actually are not exposed to media at all. It could also mean that there are some self-reported errors in the data collection.
 
 Transforming Media Exposure to adjust for the zeros 
