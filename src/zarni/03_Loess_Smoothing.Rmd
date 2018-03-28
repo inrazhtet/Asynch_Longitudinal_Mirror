@@ -5,7 +5,7 @@ output: "github_document"
 ---
 
 ### Libraries
-```{r, R.options= "TRUE"}
+```{r, message = FALSE, warning= FALSE}
 require (rio) # For importing data set
 require (mi)  # For removing missing data
 require (dplyr) # For grouping manipulations
@@ -33,13 +33,13 @@ print(dim(bmi_media_raw[complete.cases(bmi_media_raw),]))
 
 ### Check the Distribution of Media Exposure
 
-* Question: If we are checking the distribution of media exposure, should not we be checking the distribution of other variables too? *
+* Question: If we are checking the distribution of media exposure, should not we be checking the distribution of other variables too? 
 
 ```{r}
 par(mfrow=c(1,1))
 plot(density(bmi_media$Media), main = "Density of Media Exposure")
 ```
-As expected, there are a lot of zeros. What does zero Media Exposure *could* mean? It could mean that some of the subjects (kids) actually are not exposed to media at all. It could also mean that there are some self-reported errors in the data collection.
+As expected, there are a lot of zeros. What does zero Media Exposure hours mean? It could mean that some of the subjects (kids) actually are not exposed to media at all. It could also mean that there are some self-reported errors in the data collection.
 
 Transforming Media Exposure to adjust for the zeros 
 ```{r}
@@ -312,7 +312,6 @@ lines(baseline_media_months$Mo,baseline_media_months$`2hrs`, col = "yellow")
 lines(baseline_media_months$Mo,baseline_media_months$`3hrs`, col = "orange")
 lines(baseline_media_months$Mo,baseline_media_months$`4hrs`, col = "blue")
 legend("topleft", legend = c("0-hrs", "2-hrs", "3-hrs", "4-hrs"), col = c("green", "yellow", "red","blue"), lty = 1, cex = 0.8)
-
 ```
 
 Is it similar to what we have on the slides?
