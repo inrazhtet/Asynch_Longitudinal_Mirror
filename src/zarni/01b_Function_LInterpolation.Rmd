@@ -4,7 +4,7 @@ author: "Zarni Htet"
 output: "github_document"
 ---
 
-### Libraries for making the Function works!
+### Libraries for making the Function works
 ```{r}
 #For processing long form data
 library(dplyr)

@@ -36,7 +36,7 @@ library(mi)
 
 #### I: Uploading Raw data
 
-In this code chunk, we are uploading raw .dta data files and converting to them a csv format. These will then be saved to a processing data folder to protect the integrity of the raw data.
+In this section, the raw data is processed to a .csv format. The data files will then be saved to a processing data folder to protect the integrity of the raw data.
 
 ``` r
 #The BMI data extract
@@ -64,7 +64,7 @@ The overarching goal of the project is to assess whether infant media exposure i
 
 #### II: Data Exploration
 
-This code chunk examines the two datasets. The focus here is to explore the distribution of BMI and Media Exposure as well as cases of missing data and distribution of time points for each data set.
+This section examines the two datasets. The focus here is to explore the distribution of BMI and Media Exposure as well as cases of missing data and distribution of time points for each data set.
 
 ##### The BMI data set overview
 
@@ -85,7 +85,7 @@ This code chunk examines the two datasets. The focus here is to explore the dist
     ## 14 14   2 26.4147835  1.7445436
     ## 15 15   2 38.6365509  2.4713204
 
-Each subject has different time points. For subject 1, months may be 0, 0.13, 0.55 while subject 2 has months in 0, 1.5, 2.5 etc.
+Each subject has different time points. For subject 1, months may be 0, 0.13 , 0.55 while subject 2 has months in 0, 1.5, 2.5 etc.
 
 ###### Missing data exploration
 
@@ -196,79 +196,56 @@ barplot(media_tt, main = "Number of Time Interval Distribution by Subject Count"
 
 ![](01a_Linear_Interpolation_files/figure-markdown_github/unnamed-chunk-17-1.png)
 
-The number of time points counted over the number of subject ID within each count of time points can be seen below. Unlike BMI data set, all the Media data set subjects have time points between 1 and 5 inclusive. It indicates that more time points are missing in Media data set compared to the BMI data set.
+The number of time points counted over the number of subject ID within each count of time points can be seen below. Unlike BMI data set, all the Media data set subjects have time points between **1** and **5** inclusive. It indicates that more time points are missing in Media data set compared to the BMI data set.
 
-#### III: Data Cleaning
+#### III: Interpolation Scenarios
 
-In this section, I will attempt to discover the subjects that only have 1 data point for the BMI data set or the Media exposure data set. The data points with only 1 time stamp cannot immediately be applied to a Linear Interpolation Function which requires 2 time points at the very least. See *Appendix* below for more details of how the function works.
+This section lays out the different interpolation scenarios as the two data sets are joined to capture missing values in each data set. The goal as stated before is to impute these values using **linear interpolation**.
 
-##### Handling the Singletons
+###### Scenario I:
 
-The singletons will be handled in 4 different ways.
+In this case, there are missing BMI and Media Exposure values at varying time points. The built-in linear interpolation function (as described in the *Appendix*) can be applied to each value column of BMI and Media Exposure. The function will work smoothly for cases like these as there is at least **two** values for the respective missing columns. If there are less than **two** non-missing values in BMI or Media Exposure column, the built-in function will fail. Such cases are handled with a custom function as demonstrated later.
 
--   If there is only one timestamp for the ID for BOTH BMI and Media (that is they were both only collected once and at the same time point), then leave it as it is.
+    ##   ID_    AgeMos      zBMI lnmediatimespent sqrtmediatimespent
+    ## 6   1  6.373717 -2.558583               NA                 NA
+    ## 7   1  7.786448        NA         5.463832           15.32971
+    ## 8   1 12.813142  1.011972               NA                 NA
+    ## 9   1 15.244353        NA         4.948760           11.83216
 
--   For coding purposes in Linear Interpolation, this data set has to be taken out while the others are being interpolated and then, merged later\*
+###### Scenario II:
 
-**Results** None of these cases exist. <br />
+In this case, one column value (zBMI) is completely filled across all the time points. The Media Exposure value on the other hand has only **one** value. In that case, we cannot utilize the built-in linear interpolation function. A custom function has been created to execute last value carried forward and backward on these cases. This type of scenario can happen similarly to zBMI where it only has **one** value while the Media Exposure column is filled. Additionally, it could be that one of the columns does not necessarily have to be filled completely. Rather that it has at least **two** values or more. Those cases would fall under this scenario as well.
 
--   If one variable was collected once, and the other was collected serveral times, the LOCF/LOCB to fill in the blanks
+    ##    ID_    AgeMos       zBMI lnmediatimespent sqrtmediatimespent
+    ## 31   3  0.000000 -0.2047709               NA                 NA
+    ## 32   3  0.164271 -0.8374662               NA                 NA
+    ## 33   3  0.624230  1.2653127               NA                 NA
+    ## 34   3  1.577002  1.0108550               NA                 NA
+    ## 35   3  2.825462  1.4965336               NA                 NA
+    ## 36   3  3.745380  0.9784334               NA                 NA
+    ## 37   3  6.275154  0.2728231               NA                 NA
+    ## 38   3  9.494866  0.6977530         5.888878           18.97367
+    ## 39   3 13.634497  1.8940200               NA                 NA
 
-**Solution** A function has been created to handle this below.
+###### Scenario III:
 
--   If both variables were collected once, but at differnent time points, then merge those two values (equivalent to LOCF/LOCB)
+In this case, the subject ID only exists in one data set and does not exist in the other. The confirmation to that case is that all the Media Exposure values are NAs as shown below. As shown before, the Media data has no missing values by itself. Thus, this is a case of subject ID mismatch. There is no point in constructing a study where the subject altogether does not exist in one data set or the other. These cases will be taken care of through only matching common ids between the two data sets.
 
-**Solution** A function has been created to handle this below.
+    ##     ID_    AgeMos      zBMI lnmediatimespent sqrtmediatimespent
+    ## 622  39  0.000000 0.6400806               NA                 NA
+    ## 623  39  0.624230 0.2247941               NA                 NA
+    ## 624  39  1.314168 0.9656801               NA                 NA
+    ## 625  39  1.774127 1.4292920               NA                 NA
+    ## 626  39  4.106776 2.3997307               NA                 NA
+    ## 627  39 11.203285 2.7849188               NA                 NA
 
--   If one variable is collected, and the other is never collected - we have to drop them from the dataset I think.
+###### Scenario IV:
 
-**Solution** An Inner Join of the data set removes those that need to be dropped.
+Scenario IV is where the subject ID from both BMI and Media data sets match. Additionally, they only have 1 time point each and that time point is exactly equal as well. In that case, there is **no** other time point to linearly interpolate. As a result such data rows must be temporarily removed before applying our linear interpolation functions. Fortunately, as can be seen below, there is only one subject ID of one time instance in both data sets that where the subject ID matches. However, the exact time instance does not match. Therefore, this scenario is avoided.
 
-###### Handling Bullet Point 1 Scenario
-
-The objective of this section is to temporarily remove the data set portion of bullet point 1 above where there is only 1 time each data set and the data set time stamps match.
-
-``` r
-#1) Get the Singleton IDs of both Data Sets [People may not need to see this]
-
-#An assumption has been that for each row, there is no missing corresponding time value or bmi value. This assumption holds because of the missingness checks above.
-
-### GET the BMI data set singletons
-bmi_exclude <- bmi_timed[bmi_timed$n==1,]
-### GET the MEDIA data set singletons
-media_exclude <- media_timed[media_timed$n==1,]
-### Gather all the Singleton Values in 1 Data Set [This is for later]
-all_singletons <- unique(rbind(bmi_exclude, media_exclude))
-
-### Check which Singleton Values between BMI and Media data set matches
-print(bmi_exclude$ID_ %in% media_exclude$ID_)
-```
-
-    ## [1] FALSE FALSE  TRUE
-
-``` r
-### As the third item in the list matches we need to see if the time matches too. If so, we need to remove it.
-m_id <- bmi_exclude$ID_[3] #Getting the matched Singleton Subject_ID
-### Pulling out a data frame for the subject ID for each data set and Inner-joining
-#### Note: bmi_timed data frame only contains IDs of Singletons. We have to use p_bmi to pull the whole data set
-bmi_singleton <- p_bmi[p_bmi$ID_ == m_id,]
-print(bmi_singleton)
-```
-
-    ##        V1 ID_ AgeMos      zBMI
-    ## 9334 9334 626      0 -1.546457
-
-``` r
-media_singleton <- p_media[p_media$ID_ == m_id,]
-print(media_singleton)
-```
-
-    ##        V1 ID_   AgeMos lnmediatimespent sqrtmediatimespent
-    ## 1536 1536 626 36.79671         5.888878           18.97367
-
-``` r
-### Without even innerjoining, a quick scan of the printed data along the AgeMos variable indicate that these two have different time stamps. Therefore, we do not need to remove them from the data set as mentioned in bullet point 1 above.  
-```
+    ##       ID_   AgeMos      zBMI lnmediatimespent sqrtmediatimespent
+    ## 10551 626  0.00000 -1.546457               NA                 NA
+    ## 10552 626 36.79671        NA         5.888878           18.97367
 
 #### IV: Creating Linearly Interpolated Data
 
