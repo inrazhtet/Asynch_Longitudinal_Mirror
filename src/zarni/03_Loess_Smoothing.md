@@ -58,26 +58,21 @@ plot(density(bmi_media$Media), main = "Density of Media Exposure")
 
 As expected, there are a lot of zeros. What does zero media exposure hours mean? It could mean that some of the subjects (kids) actually are not exposed to media at all. It could also mean that there are some self-reported errors in the data collection.
 
-Transforming media exposure to adjust for zero inflation
-
-``` r
-media_trans <- bmi_media$Media
-media_trans_1 <- sqrt(media_trans)
-media_trans_2 <- log(media_trans + 1)
-media_trans_3 <- log(media_trans + 0.1) #Daphna's suggestion
-media_trans_4 <- log(media_trans + 0.5) #Marc's suggestion
-```
-
-``` r
-par(mfrow= c(2,2))
-plot(density(media_trans_1), main = "Sqrt Density of Media Exposure")
-plot(density(media_trans_2), main = "Log_1 Density of Media Exposure")
-plot(density(media_trans_3), main = "Log_0.1 Density of Media Exposure")
-plot(density(media_trans_4), main = "Log_0.5 Density of Media Exposure")
-```
-
-![](03_Loess_Smoothing_files/figure-markdown_github/unnamed-chunk-6-1.png)
-
+<!-- Transforming media exposure to adjust for zero inflation -->
+<!-- ```{r} -->
+<!-- media_trans <- bmi_media$Media -->
+<!-- media_trans_1 <- sqrt(media_trans) -->
+<!-- media_trans_2 <- log(media_trans + 1) -->
+<!-- media_trans_3 <- log(media_trans + 0.1) #Daphna's suggestion -->
+<!-- media_trans_4 <- log(media_trans + 0.5) #Marc's suggestion -->
+<!-- ``` -->
+<!-- ```{r} -->
+<!-- par(mfrow= c(2,2)) -->
+<!-- plot(density(media_trans_1), main = "Sqrt Density of Media Exposure") -->
+<!-- plot(density(media_trans_2), main = "Log_1 Density of Media Exposure") -->
+<!-- plot(density(media_trans_3), main = "Log_0.1 Density of Media Exposure") -->
+<!-- plot(density(media_trans_4), main = "Log_0.5 Density of Media Exposure") -->
+<!-- ``` -->
 Trajectory for Linearly Interpolated Data Set
 ---------------------------------------------
 
@@ -100,8 +95,8 @@ sum(is.na(base))
 print(quantile(base$Media))
 ```
 
-    ##       0%      25%      50%      75%     100% 
-    ## 0.000000 4.110874 4.795791 5.198497 6.532418
+    ##        0%       25%       50%       75%      100% 
+    ##  0.000000  7.745967 10.954452 13.416408 26.860884
 
 ``` r
 #The distribution of cut off points for time for the same Subject IDs
@@ -117,8 +112,8 @@ print(table(cut(base_alltime$Media, breaks = quantile(base_alltime$Media))))
 ```
 
     ## 
-    ##    (0,4.11] (4.11,4.76]  (4.76,5.2]   (5.2,6.7] 
-    ##        1798        1455        1869        1576
+    ##    (0,7.75] (7.75,10.9] (10.9,13.4] (13.4,28.5] 
+    ##        1756        1497        1843        1602
 
 ``` r
 #the Cut command returns a vector where each entry has a factor indicator of what quantile it belongs to 
@@ -147,10 +142,10 @@ Divide the IDs into 4 categories based on the media usage quantiles above starti
 ``` r
 #6 months base IDs
 base_6 <- base_alltime[base_alltime$Months %in% c(6),]
-base6_l1 <- base_6[base_6$Media >=0 & base_6$Media <4.11, ]
-base6_l2 <- base_6[base_6$Media >=4.11 & base_6$Media <4.76, ]
-base6_l3 <- base_6[base_6$Media >=4.76 & base_6$Media <5.2, ]
-base6_l4 <- base_6[base_6$Media >=5.2 & base_6$Media <6.7, ]
+base6_l1 <- base_6[base_6$Media >=0 & base_6$Media <7.75, ]
+base6_l2 <- base_6[base_6$Media >=7.75 & base_6$Media <10.9, ]
+base6_l3 <- base_6[base_6$Media >=10.9 & base_6$Media <13.4, ]
+base6_l4 <- base_6[base_6$Media >=13.4 & base_6$Media <28.5, ]
 ```
 
 ``` r
@@ -165,7 +160,7 @@ base_l4 <- base_alltime[base_alltime$ID %in% base6_l4$ID,]
 x<- c(6, 13.5, 21, 28.5, 36)
 y<- c(-4.86, -0.39, 0.40, 1.18, 4.98)
 
-plot(x, y, type = "n", main = "BMI Trajectory with Interpolated Data \n across 4 media exposure categories", ylim = c(0,2))
+plot(x, y, type = "n", main = "BMI Trajectory with Interpolated Data \n across 4 media exposure categories", ylim = c(-0.5,2))
 lines(loess.smooth(x = base_l1$Months, y = base_l1$zBMI), col = "green")
 lines(loess.smooth(x = base_l2$Months, y = base_l2$zBMI), col = "yellow")
 lines(loess.smooth(x = base_l3$Months, y = base_l3$zBMI), col = "orange")
@@ -173,7 +168,7 @@ lines(loess.smooth(x = base_l4$Months, y = base_l4$zBMI), col = "blue")
 legend("topleft", legend = c("0-hrs", "1-hrs", "2-hrs", "3-hrs"), col = c("green", "yellow", "red","blue"), lty = 1, cex = 0.8)
 ```
 
-![](03_Loess_Smoothing_files/figure-markdown_github/unnamed-chunk-12-1.png)
+![](03_Loess_Smoothing_files/figure-markdown_github/unnamed-chunk-10-1.png)
 
 Trajectory of zBMI for raw data with baseline Media Exposure categories at 6 months
 -----------------------------------------------------------------------------------
@@ -206,13 +201,13 @@ print(length(unique(bmi_media_raw$ID))) #537
 plot(density(bmi_media_raw$Months), main = "Months Distribution")
 ```
 
-![](03_Loess_Smoothing_files/figure-markdown_github/unnamed-chunk-15-1.png)
+![](03_Loess_Smoothing_files/figure-markdown_github/unnamed-chunk-13-1.png)
 
 ``` r
 hist(bmi_media_raw$Months, main = "Months Distribution")
 ```
 
-![](03_Loess_Smoothing_files/figure-markdown_github/unnamed-chunk-15-2.png)
+![](03_Loess_Smoothing_files/figure-markdown_github/unnamed-chunk-13-2.png)
 
 ##### Binning the Baseline 6 months
 
@@ -286,19 +281,19 @@ print((372/520) * 100)
 plot(hist(baseline_6months$Media, na.rm = TRUE), main = "Media Distribution at 6 months")
 ```
 
-![](03_Loess_Smoothing_files/figure-markdown_github/unnamed-chunk-20-1.png)![](03_Loess_Smoothing_files/figure-markdown_github/unnamed-chunk-20-2.png)
+![](03_Loess_Smoothing_files/figure-markdown_github/unnamed-chunk-18-1.png)![](03_Loess_Smoothing_files/figure-markdown_github/unnamed-chunk-18-2.png)
 
 Using the cut function to divide into 0,1,2,3, and above 4 hrs categories to best reflect the divisions by slide **38** of presentation material from Belle Research Group.
 
 ``` r
-labels <- c("0hrs", "1hrs", "2hrs", "3hrs", "4hrs")
+labels <- c("0hrs", "1hrs", "2hrs", "3hrs")
 breaks <- c(0,1,2,3,4,6.3) #The breaks are based on slide 38 of Langone Hospital presentation with the maximum BMI hours being the end point.
-baseline_6months$MediaCategory <- cut(baseline_6months$Media, breaks = breaks, labels = labels, include.lowest = TRUE, right = FALSE) #include.lowest, True to be inclusive of left hand-side and exclusive of right hand side.
+baseline_6months$MediaCategory <- cut(baseline_6months$Media, breaks = quantile(baseline_6months$Media, na.rm = TRUE), labels = labels, include.lowest = TRUE, right = FALSE) #include.lowest, True to be inclusive of left hand-side and exclusive of right hand side.
 unique(baseline_6months$MediaCategory) #There appears to be no data point for those who are exposed to Media between 1 to <2 hrs
 ```
 
-    ## [1] <NA> 4hrs 3hrs 2hrs 0hrs
-    ## Levels: 0hrs 1hrs 2hrs 3hrs 4hrs
+    ## [1] <NA> 3hrs 1hrs 0hrs 2hrs
+    ## Levels: 0hrs 1hrs 2hrs 3hrs
 
 Check from the Raw Data Set if there are those who have media exposure between 1 to &lt; 2 hrs
 
@@ -307,7 +302,7 @@ bmi_1_hr_raw <- bmi_media_raw[bmi_media_raw$Media >=1 & bmi_media_raw$Media <2,]
 sum(bmi_1_hr_raw, na.rm = TRUE)
 ```
 
-    ## [1] 157.2332
+    ## [1] 0
 
 In the raw data set, there are those that have the media exposure between 1 to 2 hours. However, as can be seen below, if we use our baseline 6 months data, those subject IDs drop. In fact, I have increased the interval from a six months to an eight months interval and it still would not capture those subject IDs. However, we cannot use an eight months interval because we will not be able to consistently apply across all time cut off points.
 
@@ -335,13 +330,13 @@ Checking the dimensions of the data set and subject IDs
 print(dim(baseline_cat)) #7103 5 
 ```
 
-    ## [1] 7103    5
+    ## [1] 7157    5
 
 ``` r
 print(length(unique(baseline_cat$ID))) #368
 ```
 
-    ## [1] 368
+    ## [1] 372
 
 ``` r
 #From the initial 520, there are only 368 subjectIDs left that has media exposure which could be binned. We retain 70.76 percent of the data.
@@ -366,13 +361,13 @@ baseline_cat_months <- dplyr::filter(baseline_cat, Months.x == 6 | Months.x == 1
 head(baseline_cat_months)
 ```
 
-    ##   ID Months.x  Media.x    zBMI.x MediaCategory
-    ## 1  1      6.0       NA -1.183701          4hrs
-    ## 2  1      6.0       NA -2.558583          4hrs
-    ## 3  1      6.0 5.463832        NA          4hrs
-    ## 4  1     13.5       NA  1.011972          4hrs
-    ## 5  1     13.5 4.948760        NA          4hrs
-    ## 6  2      6.0 4.330733  1.051928          4hrs
+    ##   ID Months.x   Media.x    zBMI.x MediaCategory
+    ## 1  1      6.0        NA -1.183701          3hrs
+    ## 2  1      6.0        NA -2.558583          3hrs
+    ## 3  1      6.0 15.329710        NA          3hrs
+    ## 4  1     13.5        NA  1.011972          3hrs
+    ## 5  1     13.5 11.832160        NA          3hrs
+    ## 6  2      6.0  8.660254  1.051928          1hrs
 
 Checking the number of unique SubjectIDs after subsetting by time points
 
@@ -380,7 +375,7 @@ Checking the number of unique SubjectIDs after subsetting by time points
 print(length(unique(baseline_cat_months$ID))) #368
 ```
 
-    ## [1] 368
+    ## [1] 372
 
 We have suffered zero loss of data (i.e subjectID) in our choice of interval
 
@@ -405,12 +400,12 @@ baseline_media_months_final <- tapply(baseline_cat_months$zBMI.x, list(baseline_
 head(baseline_media_months_final)
 ```
 
-    ##              0hrs        2hrs      3hrs      4hrs
-    ## 6     0.507961097 -0.26892956 0.6697646 0.3608567
-    ## 13.5 -0.005495699 -0.07165636 0.4520513 0.1854109
-    ## 21    0.500418227  0.29716734 0.9182146 0.4327167
-    ## 28.5  0.575634065  0.51832566 0.9106296 0.4662354
-    ## 36    0.863053618  0.47233573 0.7872329 0.7040446
+    ##           0hrs       1hrs      2hrs      3hrs
+    ## 6    0.5550487 0.27483255 0.3745449 0.4196311
+    ## 13.5 0.2782522 0.01792882 0.3343689 0.2525913
+    ## 21   0.7831918 0.20337318 0.5121336 0.6006685
+    ## 28.5 0.7643058 0.33490434 0.5326615 0.5783209
+    ## 36   0.7714520 0.58317597 0.7619591 0.7765702
 
 As expected from above the 1 hr Media Exposure category is missing. Therefore, we have 5x4 matrix to draw trajectories from.
 
@@ -424,7 +419,7 @@ Import the data set back
 
 ``` r
 baseline_media_months <- import("../../data/final/baseline_media_months.csv")
-colnames(baseline_media_months) <- c("Months", "0hrs", "2hrs", "3hrs", "4hrs")
+colnames(baseline_media_months) <- c("Months", "0hrs", "1hrs", "2hrs", "3hrs")
 ```
 
 #### Plotting the zBMI across 4 Media Exposure categories across time
@@ -432,13 +427,14 @@ colnames(baseline_media_months) <- c("Months", "0hrs", "2hrs", "3hrs", "4hrs")
 ``` r
 plot(baseline_media_months$Mo, baseline_media_months$`0hrs`, type = "l", xaxt = "n", main = "4 Bucket BMI Trajectory with Raw Data", xlab = "Months", ylab = "zBMI", ylim = c(-0.4, 1.2),  col = "green")
 axis(1, at = baseline_media_months$Months)
-lines(baseline_media_months$Mo,baseline_media_months$`2hrs`, col = "yellow")
-lines(baseline_media_months$Mo,baseline_media_months$`3hrs`, col = "orange")
-lines(baseline_media_months$Mo,baseline_media_months$`4hrs`, col = "blue")
-legend("topleft", legend = c("0-hrs", "2-hrs", "3-hrs", "4-hrs"), col = c("green", "yellow", "red","blue"), lty = 1, cex = 0.8)
+lines(baseline_media_months$Mo,baseline_media_months$`1hrs`, col = "yellow")
+lines(baseline_media_months$Mo,baseline_media_months$`2hrs`, col = "red")
+lines(baseline_media_months$Mo,baseline_media_months$`3hrs`, col = "blue")
+#lines(baseline_media_months$Mo,baseline_media_months$`4hrs`, col = "blue")
+legend("topleft", legend = c("0-hrs", "1-hrs" ,"2-hrs", "3-hrs"), col = c("green", "yellow", "red","blue"), lty = 1, cex = 0.8)
 ```
 
-![](03_Loess_Smoothing_files/figure-markdown_github/unnamed-chunk-34-1.png)
+![](03_Loess_Smoothing_files/figure-markdown_github/unnamed-chunk-32-1.png)
 
 Is it similar to what we have on the slides? Nope.
 
