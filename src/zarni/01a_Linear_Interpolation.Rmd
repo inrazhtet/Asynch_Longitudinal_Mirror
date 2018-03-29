@@ -246,9 +246,20 @@ if("V1" %in% colnames(m_media)){
 }
 #Adding NAs in the MEDIA table by expanding the column
 m_media <- cbind(m_media, NA)
-#Also need to drop log transformation of media time spent as it is not as normal as the square root transformation
-m_media <- m_media[,-3]
+head(m_media)
 ```
+
+```{r}
+#dropping the log transformed media
+m_media <- m_media[, -3]
+```
+
+```{r}
+head(m_media)
+#transforming the square root media to square media for linear interpolation
+m_media$sqrtmediatimespent <- m_media$sqrtmediatimespent^2
+```
+
 
 **Step 4: Merging the two data sets together**
 
