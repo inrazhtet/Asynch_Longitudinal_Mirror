@@ -42,22 +42,22 @@ plot(density(bmi_media$Media), main = "Density of Media Exposure")
 
 As expected, there are a lot of zeros. What does zero media exposure hours mean? It could mean that some of the subjects (kids) actually are not exposed to media at all. It could also mean that there are some self-reported errors in the data collection.
 
-Transforming media exposure to adjust for zero inflation
-```{r}
-media_trans <- bmi_media$Media
-media_trans_1 <- sqrt(media_trans)
-media_trans_2 <- log(media_trans + 1)
-media_trans_3 <- log(media_trans + 0.1) #Daphna's suggestion
-media_trans_4 <- log(media_trans + 0.5) #Marc's suggestion
-```
+<!-- Transforming media exposure to adjust for zero inflation -->
+<!-- ```{r} -->
+<!-- media_trans <- bmi_media$Media -->
+<!-- media_trans_1 <- sqrt(media_trans) -->
+<!-- media_trans_2 <- log(media_trans + 1) -->
+<!-- media_trans_3 <- log(media_trans + 0.1) #Daphna's suggestion -->
+<!-- media_trans_4 <- log(media_trans + 0.5) #Marc's suggestion -->
+<!-- ``` -->
 
-```{r}
-par(mfrow= c(2,2))
-plot(density(media_trans_1), main = "Sqrt Density of Media Exposure")
-plot(density(media_trans_2), main = "Log_1 Density of Media Exposure")
-plot(density(media_trans_3), main = "Log_0.1 Density of Media Exposure")
-plot(density(media_trans_4), main = "Log_0.5 Density of Media Exposure")
-```
+<!-- ```{r} -->
+<!-- par(mfrow= c(2,2)) -->
+<!-- plot(density(media_trans_1), main = "Sqrt Density of Media Exposure") -->
+<!-- plot(density(media_trans_2), main = "Log_1 Density of Media Exposure") -->
+<!-- plot(density(media_trans_3), main = "Log_0.1 Density of Media Exposure") -->
+<!-- plot(density(media_trans_4), main = "Log_0.5 Density of Media Exposure") -->
+<!-- ``` -->
 
 ## Trajectory for Linearly Interpolated Data Set
 
@@ -109,10 +109,10 @@ Divide the IDs into 4 categories based on the media usage quantiles above starti
 ```{r}
 #6 months base IDs
 base_6 <- base_alltime[base_alltime$Months %in% c(6),]
-base6_l1 <- base_6[base_6$Media >=0 & base_6$Media <4.11, ]
-base6_l2 <- base_6[base_6$Media >=4.11 & base_6$Media <4.76, ]
-base6_l3 <- base_6[base_6$Media >=4.76 & base_6$Media <5.2, ]
-base6_l4 <- base_6[base_6$Media >=5.2 & base_6$Media <6.7, ]
+base6_l1 <- base_6[base_6$Media >=0 & base_6$Media <7.75, ]
+base6_l2 <- base_6[base_6$Media >=7.75 & base_6$Media <10.9, ]
+base6_l3 <- base_6[base_6$Media >=10.9 & base_6$Media <13.4, ]
+base6_l4 <- base_6[base_6$Media >=13.4 & base_6$Media <28.5, ]
 ```
 
 ```{r, warning=FALSE}
@@ -127,7 +127,7 @@ base_l4 <- base_alltime[base_alltime$ID %in% base6_l4$ID,]
 x<- c(6, 13.5, 21, 28.5, 36)
 y<- c(-4.86, -0.39, 0.40, 1.18, 4.98)
 
-plot(x, y, type = "n", main = "BMI Trajectory with Interpolated Data \n across 4 media exposure categories", ylim = c(0,2))
+plot(x, y, type = "n", main = "BMI Trajectory with Interpolated Data \n across 4 media exposure categories", ylim = c(-0.5,2))
 lines(loess.smooth(x = base_l1$Months, y = base_l1$zBMI), col = "green")
 lines(loess.smooth(x = base_l2$Months, y = base_l2$zBMI), col = "yellow")
 lines(loess.smooth(x = base_l3$Months, y = base_l3$zBMI), col = "orange")
@@ -205,9 +205,9 @@ plot(hist(baseline_6months$Media, na.rm = TRUE), main = "Media Distribution at 6
 Using the cut function to divide into 0,1,2,3, and above 4 hrs categories to best reflect the divisions by slide **38** of presentation material from Belle Research Group.
 
 ```{r}
-labels <- c("0hrs", "1hrs", "2hrs", "3hrs", "4hrs")
+labels <- c("0hrs", "1hrs", "2hrs", "3hrs")
 breaks <- c(0,1,2,3,4,6.3) #The breaks are based on slide 38 of Langone Hospital presentation with the maximum BMI hours being the end point.
-baseline_6months$MediaCategory <- cut(baseline_6months$Media, breaks = breaks, labels = labels, include.lowest = TRUE, right = FALSE) #include.lowest, True to be inclusive of left hand-side and exclusive of right hand side.
+baseline_6months$MediaCategory <- cut(baseline_6months$Media, breaks = quantile(baseline_6months$Media, na.rm = TRUE), labels = labels, include.lowest = TRUE, right = FALSE) #include.lowest, True to be inclusive of left hand-side and exclusive of right hand side.
 unique(baseline_6months$MediaCategory) #There appears to be no data point for those who are exposed to Media between 1 to <2 hrs
 ```
 
@@ -302,7 +302,7 @@ Import the data set back
 
 ```{r}
 baseline_media_months <- import("../../data/final/baseline_media_months.csv")
-colnames(baseline_media_months) <- c("Months", "0hrs", "2hrs", "3hrs", "4hrs")
+colnames(baseline_media_months) <- c("Months", "0hrs", "1hrs", "2hrs", "3hrs")
 ```
 
 #### Plotting the zBMI across 4 Media Exposure categories across time
@@ -310,10 +310,11 @@ colnames(baseline_media_months) <- c("Months", "0hrs", "2hrs", "3hrs", "4hrs")
 ```{r}
 plot(baseline_media_months$Mo, baseline_media_months$`0hrs`, type = "l", xaxt = "n", main = "4 Bucket BMI Trajectory with Raw Data", xlab = "Months", ylab = "zBMI", ylim = c(-0.4, 1.2),  col = "green")
 axis(1, at = baseline_media_months$Months)
-lines(baseline_media_months$Mo,baseline_media_months$`2hrs`, col = "yellow")
-lines(baseline_media_months$Mo,baseline_media_months$`3hrs`, col = "orange")
-lines(baseline_media_months$Mo,baseline_media_months$`4hrs`, col = "blue")
-legend("topleft", legend = c("0-hrs", "2-hrs", "3-hrs", "4-hrs"), col = c("green", "yellow", "red","blue"), lty = 1, cex = 0.8)
+lines(baseline_media_months$Mo,baseline_media_months$`1hrs`, col = "yellow")
+lines(baseline_media_months$Mo,baseline_media_months$`2hrs`, col = "red")
+lines(baseline_media_months$Mo,baseline_media_months$`3hrs`, col = "blue")
+#lines(baseline_media_months$Mo,baseline_media_months$`4hrs`, col = "blue")
+legend("topleft", legend = c("0-hrs", "1-hrs" ,"2-hrs", "3-hrs"), col = c("green", "yellow", "red","blue"), lty = 1, cex = 0.8)
 ```
 
 Is it similar to what we have on the slides? Nope.
