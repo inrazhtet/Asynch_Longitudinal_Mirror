@@ -33,16 +33,7 @@ print(dim(bmi_media))
 #raw data
 bmi_media_raw <- import("../../data/final/final_na_data.csv")
 bmi_media_raw <- bmi_media_raw[,-1]
-print(dim(bmi_media_raw))
 ```
-
-    ## [1] 10170     4
-
-``` r
-print(dim(bmi_media_raw[complete.cases(bmi_media_raw),]))
-```
-
-    ## [1] 332   4
 
 Check the Distribution of Media Exposure
 ----------------------------------------
@@ -96,7 +87,7 @@ print(quantile(base$Media))
 ```
 
     ##        0%       25%       50%       75%      100% 
-    ##  0.000000  7.745967 10.954452 13.416408 26.860884
+    ##  0.000000  7.745967 10.954452 13.416408 27.292544
 
 ``` r
 #The distribution of cut off points for time for the same Subject IDs
@@ -112,8 +103,8 @@ print(table(cut(base_alltime$Media, breaks = quantile(base_alltime$Media))))
 ```
 
     ## 
-    ##    (0,7.75] (7.75,10.9] (10.9,13.4] (13.4,28.5] 
-    ##        1756        1497        1843        1602
+    ##    (0,7.75]   (7.75,11]   (11,13.4] (13.4,28.5] 
+    ##        1709        2036        1318        1635
 
 ``` r
 #the Cut command returns a vector where each entry has a factor indicator of what quantile it belongs to 
@@ -364,10 +355,10 @@ head(baseline_cat_months)
     ##   ID Months.x   Media.x    zBMI.x MediaCategory
     ## 1  1      6.0        NA -1.183701          3hrs
     ## 2  1      6.0        NA -2.558583          3hrs
-    ## 3  1      6.0 15.329710        NA          3hrs
+    ## 3  1      6.0 235.00001        NA          3hrs
     ## 4  1     13.5        NA  1.011972          3hrs
-    ## 5  1     13.5 11.832160        NA          3hrs
-    ## 6  2      6.0  8.660254  1.051928          1hrs
+    ## 5  1     13.5 140.00001        NA          3hrs
+    ## 6  2      6.0  75.00001  1.051928          1hrs
 
 Checking the number of unique SubjectIDs after subsetting by time points
 

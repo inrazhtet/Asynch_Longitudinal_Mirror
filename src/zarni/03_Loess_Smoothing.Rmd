@@ -26,8 +26,6 @@ print(dim(bmi_media))
 #raw data
 bmi_media_raw <- import("../../data/final/final_na_data.csv")
 bmi_media_raw <- bmi_media_raw[,-1]
-print(dim(bmi_media_raw))
-print(dim(bmi_media_raw[complete.cases(bmi_media_raw),]))
 ```
 
 

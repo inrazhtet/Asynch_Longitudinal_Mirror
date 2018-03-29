@@ -369,8 +369,37 @@ if("V1" %in% colnames(m_media)){
 }
 #Adding NAs in the MEDIA table by expanding the column
 m_media <- cbind(m_media, NA)
-#Also need to drop log transformation of media time spent as it is not as normal as the square root transformation
-m_media <- m_media[,-3]
+head(m_media)
+```
+
+    ##   ID_    AgeMos lnmediatimespent sqrtmediatimespent NA
+    ## 1   1 15.244353         4.948760          11.832160 NA
+    ## 2   1  7.786448         5.463832          15.329710 NA
+    ## 3   2 24.147844         4.795791          10.954452 NA
+    ## 4   2 42.940453         3.433987           5.477226 NA
+    ## 5   2  6.735113         4.330733           8.660254 NA
+    ## 6   2 60.714581         4.795791          10.954452 NA
+
+``` r
+#dropping the log transformed media
+m_media <- m_media[, -3]
+```
+
+``` r
+head(m_media)
+```
+
+    ##   ID_    AgeMos sqrtmediatimespent NA
+    ## 1   1 15.244353          11.832160 NA
+    ## 2   1  7.786448          15.329710 NA
+    ## 3   2 24.147844          10.954452 NA
+    ## 4   2 42.940453           5.477226 NA
+    ## 5   2  6.735113           8.660254 NA
+    ## 6   2 60.714581          10.954452 NA
+
+``` r
+#transforming the square root media to square media for linear interpolation
+m_media$sqrtmediatimespent <- m_media$sqrtmediatimespent^2
 ```
 
 **Step 4: Merging the two data sets together**
@@ -605,6 +634,41 @@ c_data_interp <- lapply(combined_data_split, mdz_interpolate, par=c(2,3,4))
 #Use dplyr bind_rows to recompose the split data together
 #http://dplyr.tidyverse.org/reference/bind.html
 c_data_interp_bind <- bind_rows(c_data_interp)
+```
+
+``` r
+head(c_data_interp_bind)
+```
+
+    ## # A tibble: 6 x 4
+    ## # Groups:   ID [1]
+    ##      ID Months Media   zBMI
+    ##   <int>  <dbl> <dbl>  <dbl>
+    ## 1     1  0.     235. -3.54 
+    ## 2     1  0.131  235. -3.19 
+    ## 3     1  0.559  235. -0.283
+    ## 4     1  1.54   235. -1.27 
+    ## 5     1  4.30   235. -1.18 
+    ## 6     1  6.37   235. -2.56
+
+``` r
+#Converting the squared transformation back to to square root transformation 
+c_data_interp_bind$Media <- sqrt(c_data_interp_bind$Media)
+head(c_data_interp_bind)
+```
+
+    ## # A tibble: 6 x 4
+    ## # Groups:   ID [1]
+    ##      ID Months Media   zBMI
+    ##   <int>  <dbl> <dbl>  <dbl>
+    ## 1     1  0.     15.3 -3.54 
+    ## 2     1  0.131  15.3 -3.19 
+    ## 3     1  0.559  15.3 -0.283
+    ## 4     1  1.54   15.3 -1.27 
+    ## 5     1  4.30   15.3 -1.18 
+    ## 6     1  6.37   15.3 -2.56
+
+``` r
 write.csv(c_data_interp_bind, "../../data/final/final_interp_data.csv")
 ```
 
