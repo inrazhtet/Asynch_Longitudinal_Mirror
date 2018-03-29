@@ -1,19 +1,19 @@
-01\_Linear\_Interpolation
+Linear Interpolation
 ================
-Zarni Htet (<zh938@nyu.edu>)
+Zarni Htet
 March 15, 2018
 
-### Imputation using Linear Interpolation
+### Introduction
 
-This Markdown is filling the missing data for **BMI** and **Media Exposure** data sets at asynchronous time points using linear interpolation. By missing data, we mean to link **subjects** across the **BMI** and **Media Exposure** data sets. For some **subjects** we may find that data has been collected for both BMI and Media Exposure all about at the same time points. On the other hand, some subjects may have BMI time points 1,2,3 but Media time points 3,5,6. We hope to have for the subject all the time points for both data sets at 1,2,3,5,6.
+The goal of this code file is to generate an imputed data set of **BMI** and **Media Exposure** for young children from low income families. The existing raw data set has been linearly interpolated to fill in the missing values for **BMI** and **Media Exposure** at missing time points. A sample of the raw data set along with the existing issue and one proposed method for resolution is demonstrated in the objective section below.
 
 ### Admnistration
 
-The project is supervised by Professor Marc Scott and Professor Daphna Harel. The data is from the Belle Lab at the Bellevue Hospital. More details of the project scope is in the README of the primary repository folder.
+The project is supervised by Professor Marc Scott and Professor Daphna Harel. The data is from the Belle Lab at the Bellevue Hospital. Additional background on the project is in the *README* at the root directory of the Github repository associated with the project.
 
 #### R Libraries
 
-This code block has all the needed R libraries to run this segment of the Markdown.
+This block has all the *required* libraries for this code file.
 
 ``` r
 #For the dta raw files
@@ -30,11 +30,13 @@ library(tidyr)
 library(rmarkdown)
 #knitr library for rendering
 library(knitr)
+#for missing data
+library(mi)
 ```
 
 #### I: Uploading Raw data
 
-In this code chunk, we are uploading raw .dta data and converting to it a csv. This will then be saved to a processing data folder to protect the integrity of the raw data.
+In this code chunk, we are uploading raw .dta data files and converting to them a csv format. These will then be saved to a processing data folder to protect the integrity of the raw data.
 
 ``` r
 #The BMI data extract
@@ -47,170 +49,132 @@ write.csv(bmi, "../../data/processing/bmi.csv")
 write.csv(media, "../../data/processing/media.csv")
 ```
 
-##### Loading the Data back from Processing Folder
+This code chunk is reloading and doing minor cleaning to the working version of the data to be used throughout the rest of the code file.
 
-This code chunk is loading the working version of the data extra to be used throughout the document.
+**Note to self** Insert a custom function to remove the V1 from the data set.
 
-``` r
-#processing bmi data
-p_bmi <- import("../../data/processing/bmi.csv")
-p_media <- import("../../data/processing/media.csv")
-```
+### Objective
+
+The overarching goal of the project is to assess whether infant media exposure is associated with weight/bmi trajectories during their infant to early childhood periods. In order to examine that association, media exposure data and weight/bmi data must be collected at the **same** time. As can be seen below in our short data snippet, media exposure and weight/bmi are collected at **asynchronous** time points. Our goal is to impute these missing data at missing time points via **linear interpolation**. For more on **linear interpolation**, please see the *Appendix* section.
+
+    ##   ID_    AgeMos     zBMI lnmediatimespent sqrtmediatimespent
+    ## 7   1  7.786448       NA         5.463832           15.32971
+    ## 8   1 12.813142 1.011972               NA                 NA
+    ## 9   1 15.244353       NA         4.948760           11.83216
 
 #### II: Data Exploration
 
-This code chunk examines the two datasets. In particular, the focus here is on the key variables and the time intervals on which they are recorded. At the end of each block of code for each dataset, there is a short summary of what the data consists.
+This code chunk examines the two datasets. The focus here is to explore the distribution of BMI and Media Exposure as well as cases of missing data and distribution of time points for each data set.
 
 ##### The BMI data set overview
 
+    ##    V1 ID_     AgeMos       zBMI
+    ## 1   1   1  0.0000000 -3.5407891
+    ## 2   2   1  0.1314168 -3.1878707
+    ## 3   3   1  0.5585216 -0.2831618
+    ## 4   4   1  1.5441478 -1.2716171
+    ## 5   5   1  4.3039017 -1.1837007
+    ## 6   6   1  6.3737168 -2.5585830
+    ## 7   7   1 12.8131418  1.0119723
+    ## 8   8   2  0.0000000  1.2820979
+    ## 9   9   2  1.5441478  2.6198270
+    ## 10 10   2  2.5297742  1.0224092
+    ## 11 11   2  6.7351131  1.0519278
+    ## 12 12   2 10.8418894  1.9389179
+    ## 13 13   2 11.7289524  0.9665915
+    ## 14 14   2 26.4147835  1.7445436
+    ## 15 15   2 38.6365509  2.4713204
+
+Each subject has different time points. For subject 1, months may be 0, 0.13, 0.55 while subject 2 has months in 0, 1.5, 2.5 etc.
+
+###### Missing data exploration
+
+As can be seen from the visuals below, the BMI dataset by itself before joining across subjectID and time with the Media Exposure dataset has no missing values.
+
 ``` r
-head(p_bmi)
+mdf_bmi = missing_data.frame(p_bmi)
 ```
 
-    ##   V1 ID_    AgeMos       zBMI
-    ## 1  1   1 0.0000000 -3.5407891
-    ## 2  2   1 0.1314168 -3.1878707
-    ## 3  3   1 0.5585216 -0.2831618
-    ## 4  4   1 1.5441478 -1.2716171
-    ## 5  5   1 4.3039017 -1.1837007
-    ## 6  6   1 6.3737168 -2.5585830
-
 ``` r
-tail(p_bmi)
+image(mdf_bmi)
 ```
 
-    ##          V1   ID_    AgeMos       zBMI
-    ## 10321 10321 91008 0.9199179  1.4600797
-    ## 10322 10322 91008 1.2813141  1.8749880
-    ## 10323 10323 91118 0.0000000 -0.9925033
-    ## 10324 10324 91118 0.5913758  1.3112072
-    ## 10325 10325 91118 1.5112936  1.9073267
-    ## 10326 10326 91118 3.9096510  2.6738663
+![](01a_Linear_Interpolation_files/figure-markdown_github/unnamed-chunk-8-1.png)
+
+###### Distribution of BMI values
+
+The BMI values are more or less normalized as can be seen below.
 
 ``` r
-dim(p_bmi) #10326, 4
+plot(density(p_bmi$zBMI), main = "Distrbution of BMI Values")
 ```
 
-    ## [1] 10326     4
+![](01a_Linear_Interpolation_files/figure-markdown_github/unnamed-chunk-9-1.png)
+
+###### Distribution of Number of Time Intervals by Subject Count for BMI
+
+The number of time points counted over the number of subject ID within each count of time points can be seen below. The majority of the subjects appear to have between 11 and 23 time points.
+
+![](01a_Linear_Interpolation_files/figure-markdown_github/unnamed-chunk-10-1.png)
+
+The count of time points per subject ID is also calculated. As shown below, at least one subject ID has only **1** timepoint and **39** timepoints respectively. This insight is useful in that the built-in linear interpolation cannot impute data with only one timepoint. Therefore, those cases will have to be handled separately.
 
 ``` r
-#check the number of unique subjects
-length(unique(p_bmi$ID_)) #there are 667 unique subject IDs
-```
-
-    ## [1] 667
-
-``` r
-length(unique(p_bmi$AgeMos)) #there are 1951 unique time stamps
-```
-
-    ## [1] 1951
-
-``` r
-print(sum(is.na(p_bmi$ID_))) #0 no values are missing here
-```
-
-    ## [1] 0
-
-``` r
-print(sum(is.na(p_bmi$AgeMos))) #0 no values are missing here
-```
-
-    ## [1] 0
-
-Each subject has different time points. For subject 1, months may be 0, 0.5, 1.0 while subject 2 has months in 0, 0.7, 1.2 etc.
-
-This section explores the number of time intervals each subject has.
-
-``` r
-#This uses dplyr to group by each subject and count their instances. This effectively counts the number of time points each of them have.
 bmi_timed <- p_bmi %>% 
   group_by(ID_) %>%
   summarize(n = n()) 
-#print(bmi_timed)
-#alternatively, this tells you a lot:
-tt <- table(table(p_bmi$ID_))
-#print(tt)
-#or this:
-barplot(tt)
-```
-
-![](01a_Linear_Interpolation_files/figure-markdown_github/unnamed-chunk-5-1.png)
-
-Check the Minimum/Maximum number of time intervals. If you have only 1 time interval, we may have to apply **LOCF** and/or **LOCB** to interpolate across other time intervals.
-
-``` r
-min(bmi_timed$n) #at least 1 timepoint
-```
-
-    ## [1] 1
-
-``` r
-max(bmi_timed$n) #at most 39 timepoints
+print(max(bmi_timed$n))
 ```
 
     ## [1] 39
 
-At least 1 subject has only 1 time interval for BMI. These **singletons** will be applied **LOCF** or **LOCB**.
+``` r
+print(min(bmi_timed$n))
+```
+
+    ## [1] 1
 
 ##### Media exposure data set overview
 
-``` r
-head(p_media)
-```
+    ##    V1 ID_    AgeMos lnmediatimespent sqrtmediatimespent
+    ## 1   2   1  7.786448         5.463832          15.329710
+    ## 2   1   1 15.244353         4.948760          11.832160
+    ## 3   5   2  6.735113         4.330733           8.660254
+    ## 4   3   2 24.147844         4.795791          10.954452
+    ## 5   4   2 42.940453         3.433987           5.477226
+    ## 6   6   2 60.714581         4.795791          10.954452
+    ## 7   7   3  9.494866         5.888878          18.973665
+    ## 8   8   4  5.848049         3.433987           5.477226
+    ## 9   9   4 31.605749         4.110874           7.745967
+    ## 10 14   5  6.965092         4.510859           9.486833
+    ## 11 10   5 17.314169         5.198497          13.416408
+    ## 12 11   5 24.147844         5.602119          16.431677
+    ## 13 13   5 42.381931         5.484797          15.491934
+    ## 14 12   5 62.357288         4.510859           9.486833
+    ## 15 17   6  6.866530         5.017280          12.247449
 
-    ##   V1 ID_    AgeMos lnmediatimespent sqrtmediatimespent
-    ## 1  1   1 15.244353         4.948760          11.832160
-    ## 2  2   1  7.786448         5.463832          15.329710
-    ## 3  3   2 24.147844         4.795791          10.954452
-    ## 4  4   2 42.940453         3.433987           5.477226
-    ## 5  5   2  6.735113         4.330733           8.660254
-    ## 6  6   2 60.714581         4.795791          10.954452
+Like with the BMI data set before each Media data set subject has different time points. For subject 1, months are 7.786, 15.24 while subject 2 has months such as 6.73, 24.14 etc.
 
-``` r
-tail(p_media)
-```
+###### Missing data exploration
 
-    ##        V1   ID_   AgeMos lnmediatimespent sqrtmediatimespent
-    ## 1634 1634 90372 16.09856         5.602119          16.431677
-    ## 1635 1635 90406 50.43121         5.198497          13.416408
-    ## 1636 1636 90425 23.65503         3.433987           5.477226
-    ## 1637 1637 90448 36.66530         4.510859           9.486833
-    ## 1638 1638 90448 27.92608         4.110874           7.745967
-    ## 1639 1639 90448 59.79466         5.198497          13.416408
-
-``` r
-dim(p_media) #1639, 5
-```
-
-    ## [1] 1639    5
+As can be seen from the visuals below, the Media dataset by itself before joining across subjectID and time with the BMI dataset has no missing values.
 
 ``` r
-#check the number of unique subjects
-length(unique(p_media$ID_)) #542 
+mdf_media = missing_data.frame(p_media)
 ```
 
-    ## [1] 542
+    ## Warning in .local(.Object, ...): lnmediatimespent and sqrtmediatimespent have the same rank ordering.
+    ##  Please verify whether they are in fact distinct variables.
 
 ``` r
-length(unique(p_media$AgeMos)) #745
+image(mdf_media)
 ```
 
-    ## [1] 745
+![](01a_Linear_Interpolation_files/figure-markdown_github/unnamed-chunk-15-1.png)
 
-``` r
-print(sum(is.na(p_media$ID_))) #0
-```
+###### Distribution of the Media Variable
 
-    ## [1] 0
-
-``` r
-print(sum(is.na(p_media$AgeMos))) #0
-```
-
-    ## [1] 0
-
-Distribution of the Media Variable
+The Media exposure data set has two measures of media time spent for infants. One is log transformed and the other is square root transformed. A plot of both transformations is compared below.
 
 ``` r
 par(mfrow =c(1,2))
@@ -218,29 +182,21 @@ plot(density(p_media$sqrtmediatimespent), main = "Sqrt Media Time Spent")
 plot(density(p_media$lnmediatimespent), main = "Log Media Time Spent")
 ```
 
-![](01a_Linear_Interpolation_files/figure-markdown_github/unnamed-chunk-8-1.png)
+![](01a_Linear_Interpolation_files/figure-markdown_github/unnamed-chunk-16-1.png)
 
-Square root transformation looks more **normal** than log trasformation and we are going to utilize it in the rest of our research.
+The square root transformation looks more **normal** than log transformation. Subsequently, it is utilized in the rest of the code file.
 
-This is to explore the number of time intervals each subject has.
-
-``` r
-#This uses dplyr to group by each subject and count their instances. This effectively counts the number of time points each of them have.
-media_timed <- p_media %>% 
-  group_by(ID_) %>%
-  summarize(n = n()) 
-#print(media_timed)
-```
-
-Like the BMI from before, each subject has different count of time as well as time intervals where the data is collected.
+###### Distribution of Number of Time Intervals by Subject Count for Media Exposure
 
 ``` r
 #Using the table function and barplot to draw the distribution of time. 
-tt2 = table(table(p_bmi$ID_))
-barplot(tt2, main = "Media time distribution")
+media_tt = table(table(p_media$ID_))
+barplot(media_tt, main = "Number of Time Interval Distribution by Subject Count")
 ```
 
-![](01a_Linear_Interpolation_files/figure-markdown_github/unnamed-chunk-10-1.png)
+![](01a_Linear_Interpolation_files/figure-markdown_github/unnamed-chunk-17-1.png)
+
+The number of time points counted over the number of subject ID within each count of time points can be seen below. Unlike BMI data set, all the Media data set subjects have time points between 1 and 5 inclusive. It indicates that more time points are missing in Media data set compared to the BMI data set.
 
 #### III: Data Cleaning
 
@@ -340,11 +296,11 @@ head(m_media)
 ```
 
     ##   V1 ID_    AgeMos lnmediatimespent sqrtmediatimespent
-    ## 1  1   1 15.244353         4.948760          11.832160
-    ## 2  2   1  7.786448         5.463832          15.329710
-    ## 3  3   2 24.147844         4.795791          10.954452
-    ## 4  4   2 42.940453         3.433987           5.477226
-    ## 5  5   2  6.735113         4.330733           8.660254
+    ## 1  2   1  7.786448         5.463832          15.329710
+    ## 2  1   1 15.244353         4.948760          11.832160
+    ## 3  5   2  6.735113         4.330733           8.660254
+    ## 4  3   2 24.147844         4.795791          10.954452
+    ## 5  4   2 42.940453         3.433987           5.477226
     ## 6  6   2 60.714581         4.795791          10.954452
 
 **Step 3: Generating NAs for each of the data set**
@@ -373,11 +329,11 @@ head(m_media)
 ```
 
     ##   ID_    AgeMos lnmediatimespent sqrtmediatimespent NA
-    ## 1   1 15.244353         4.948760          11.832160 NA
-    ## 2   1  7.786448         5.463832          15.329710 NA
-    ## 3   2 24.147844         4.795791          10.954452 NA
-    ## 4   2 42.940453         3.433987           5.477226 NA
-    ## 5   2  6.735113         4.330733           8.660254 NA
+    ## 1   1  7.786448         5.463832          15.329710 NA
+    ## 2   1 15.244353         4.948760          11.832160 NA
+    ## 3   2  6.735113         4.330733           8.660254 NA
+    ## 4   2 24.147844         4.795791          10.954452 NA
+    ## 5   2 42.940453         3.433987           5.477226 NA
     ## 6   2 60.714581         4.795791          10.954452 NA
 
 ``` r
@@ -390,11 +346,11 @@ head(m_media)
 ```
 
     ##   ID_    AgeMos sqrtmediatimespent NA
-    ## 1   1 15.244353          11.832160 NA
-    ## 2   1  7.786448          15.329710 NA
-    ## 3   2 24.147844          10.954452 NA
-    ## 4   2 42.940453           5.477226 NA
-    ## 5   2  6.735113           8.660254 NA
+    ## 1   1  7.786448          15.329710 NA
+    ## 2   1 15.244353          11.832160 NA
+    ## 3   2  6.735113           8.660254 NA
+    ## 4   2 24.147844          10.954452 NA
+    ## 5   2 42.940453           5.477226 NA
     ## 6   2 60.714581          10.954452 NA
 
 ``` r
@@ -423,8 +379,6 @@ c_data$Months <- as.numeric(as.character(c_data$Months))
 #arrange it by Months
 c_data_arr<- c_data %>% arrange(ID,Months)
 ```
-
-    ## Warning: package 'bindrcpp' was built under R version 3.3.2
 
 **Step 6: Checking \# of duplicated values for each time value within each subject**
 

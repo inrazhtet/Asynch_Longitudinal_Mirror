@@ -1,20 +1,23 @@
 ---
-title: "01_Linear_Interpolation"
-author: "Zarni Htet (zh938@nyu.edu)"
+title: "Linear Interpolation"
+author: "Zarni Htet"
+email: "zh938@nyu.edu"
+affiliation: "New York University"
 date: March 15, 2018
 output: github_document
 ---
 
-### Imputation using Linear Interpolation
+### Introduction
 
-This Markdown is filling the missing data for **BMI** and **Media Exposure** data sets at asynchronous time points using linear interpolation. By missing data, we mean to link **subjects** across the **BMI** and **Media Exposure** data sets. For some **subjects** we may find that data has been collected for both BMI and Media Exposure all about at the same time points. On the other hand, some subjects may have BMI time points 1,2,3 but Media time points 3,5,6. We hope to have for the subject all the time points for both data sets at 1,2,3,5,6. 
+The goal of this code file is to generate an imputed data set of **BMI** and **Media Exposure** for young children from low income families. The existing raw data set has been linearly interpolated to fill in the missing values for **BMI** and **Media Exposure** at missing time points. A sample of the raw data set along with the existing issue and one proposed method for resolution is demonstrated in the objective section below.
 
 ### Admnistration
-The project is supervised by Professor Marc Scott and Professor Daphna Harel. The data is from the Belle Lab at the Bellevue Hospital. More details of the project scope is in the README of the primary repository folder.
+
+The project is supervised by Professor Marc Scott and Professor Daphna Harel. The data is from the Belle Lab at the Bellevue Hospital. Additional background on the project is in the *README* at the root directory of the Github repository associated with the project. 
 
 #### R Libraries
 
-This code block has all the needed R libraries to run this segment of the Markdown.
+This block has all the *required* libraries for this code file.
 
 ```{r, R.options=FALSE, warning=FALSE, message=FALSE}
 #For the dta raw files
@@ -31,13 +34,15 @@ library(tidyr)
 library(rmarkdown)
 #knitr library for rendering
 library(knitr)
+#for missing data
+library(mi)
 ```
 
 #### I: Uploading Raw data
 
-In this code chunk, we are uploading raw .dta data and converting to it a csv. This will then be saved to a processing data folder to protect the integrity of the raw data.
+In this code chunk, we are uploading raw .dta data files and converting to them a csv format. These will then be saved to a processing data folder to protect the integrity of the raw data.
 
-```{r, eval = FALSE}
+```{r, eval = FALSE, warning=FALSE}
 #The BMI data extract
 bmi <- read.dta("../../data/raw/MASextract1.dta")
 #The Media data extract
@@ -48,67 +53,104 @@ write.csv(bmi, "../../data/processing/bmi.csv")
 write.csv(media, "../../data/processing/media.csv")
 ```
 
-##### Loading the Data back from Processing Folder
+This code chunk is reloading and doing minor cleaning to the working version of the data to be used throughout the rest of the code file.
 
-This code chunk is loading the working version of the data extra to be used throughout the document.
+**Note to self**
+Insert a custom function to remove the V1 from the data set.
 
-```{r}
+```{r, echo=FALSE}
 #processing bmi data
 p_bmi <- import("../../data/processing/bmi.csv")
 p_media <- import("../../data/processing/media.csv")
 ```
 
 
+### Objective
+
+The overarching goal of the project is to assess whether infant media exposure is associated with weight/bmi trajectories during their infant to early childhood periods. In order to examine that association, media exposure data and weight/bmi data must be collected at the **same** time. As can be seen below in our short data snippet, media exposure and weight/bmi are collected at **asynchronous** time points. Our goal is to impute these missing data at missing time points via **linear interpolation**. For more on **linear interpolation**, please see the *Appendix* section.
+
+```{r, warning=FALSE, echo=FALSE}
+
+p_bmi_media_snippet <- p_bmi %>% full_join(p_media, by = c("ID_" = "ID_", "AgeMos" = "AgeMos")) 
+p_bmi_media_snippet <- p_bmi_media_snippet[,c("ID_", "AgeMos", "zBMI", "lnmediatimespent", "sqrtmediatimespent")]
+p_bmi_media_snippet <- p_bmi_media_snippet %>% arrange (ID_, AgeMos)
+print(p_bmi_media_snippet[c(7:9),])
+```
+
 #### II: Data Exploration
 
-This code chunk examines the two datasets. In particular, the focus here is on the key variables and the time intervals on which they are recorded. At the end of each block of code for each dataset, there is a short summary of what the data consists.
+This code chunk examines the two datasets. The focus here is to explore the distribution of BMI and Media Exposure as well as cases of missing data and distribution of time points for each data set.
 
 ##### The BMI data set overview
 
-```{r}
-head(p_bmi)
-tail(p_bmi)
+```{r,echo= FALSE}
+p_bmi[1:15,]
+#head(p_bmi)
+#tail(p_bmi)
+```
+
+Each subject has different time points. For subject 1, months may be 0, 0.13, 0.55 while subject 2 has months in 0, 1.5, 2.5 etc.
+
+```{r, echo=FALSE, results= "hide"}
 dim(p_bmi) #10326, 4
 #check the number of unique subjects
 length(unique(p_bmi$ID_)) #there are 667 unique subject IDs
 length(unique(p_bmi$AgeMos)) #there are 1951 unique time stamps
-print(sum(is.na(p_bmi$ID_))) #0 no values are missing here
-print(sum(is.na(p_bmi$AgeMos))) #0 no values are missing here
+sum(is.na(p_bmi$ID_)) #0 no ID values are missing here
+sum(is.na(p_bmi$AgeMos)) #0 no values are missing here
 ```
 
-Each subject has different time points. For subject 1, months may be 0, 0.5, 1.0 while subject 2 has months in 0, 0.7, 1.2 etc.
+###### Missing data exploration
 
+As can be seen from the visuals below, the BMI dataset by itself before joining across subjectID and time with the Media Exposure dataset has no missing values.
 
-This section explores the number of time intervals each subject has. 
+```{r, message=FALSE}
+mdf_bmi = missing_data.frame(p_bmi)
+```
 
 ```{r}
-#This uses dplyr to group by each subject and count their instances. This effectively counts the number of time points each of them have.
+image(mdf_bmi)
+```
+
+###### Distribution of BMI values
+
+The BMI values are more or less normalized as can be seen below.
+
+```{r}
+plot(density(p_bmi$zBMI), main = "Distrbution of BMI Values")
+```
+
+###### Distribution of Number of Time Intervals by Subject Count for BMI
+
+The number of time points counted over the number of subject ID within each count of time points can be seen below. The majority of the subjects appear to have between 11 and 23 time points.
+
+```{r, echo=FALSE}
+bmi_tt <- table(table(p_bmi$ID_)) 
+barplot(bmi_tt, main = "Number of Time Interval Distribution by Subject Count")
+```
+
+The count of time points per subject ID is also calculated. As shown below, at least one subject ID has only **1** timepoint and **39** timepoints respectively. This insight is useful in that the built-in linear interpolation cannot impute data with only one timepoint. Therefore, those cases will have to be handled separately.
+
+```{r}
 bmi_timed <- p_bmi %>% 
   group_by(ID_) %>%
   summarize(n = n()) 
-#print(bmi_timed)
-#alternatively, this tells you a lot:
-tt <- table(table(p_bmi$ID_))
-#print(tt)
-#or this:
-barplot(tt)
+print(max(bmi_timed$n))
+print(min(bmi_timed$n))
 ```
-
-Check the Minimum/Maximum number of time intervals. If you have only 1 time interval, we may have to apply **LOCF** and/or **LOCB** to interpolate across other time intervals. 
-
-```{r}
-min(bmi_timed$n) #at least 1 timepoint
-max(bmi_timed$n) #at most 39 timepoints
-```
-
-At least 1 subject has only 1 time interval for BMI. 
-These **singletons** will be applied **LOCF** or **LOCB**.
 
 ##### Media exposure data set overview
 
-```{r}
-head(p_media)
-tail(p_media)
+```{r, echo=FALSE}
+p_media <- p_media %>% arrange(ID_, AgeMos)
+p_media[1:15,]
+#head(p_media)
+#tail(p_media)
+```
+
+Like with the BMI data set before each Media data set subject has different time points. For subject 1, months are 7.786, 15.24 while subject 2 has months such as 6.73, 24.14 etc.
+
+```{r, echo = FALSE, results= "hide"}
 dim(p_media) #1639, 5
 #check the number of unique subjects
 length(unique(p_media$ID_)) #542 
@@ -117,8 +159,21 @@ print(sum(is.na(p_media$ID_))) #0
 print(sum(is.na(p_media$AgeMos))) #0
 ```
 
+###### Missing data exploration
 
-Distribution of the Media Variable
+As can be seen from the visuals below, the Media dataset by itself before joining across subjectID and time with the BMI dataset has no missing values.
+
+```{r, message=FALSE}
+mdf_media = missing_data.frame(p_media)
+```
+
+```{r}
+image(mdf_media)
+```
+
+###### Distribution of the Media Variable
+
+The Media exposure data set has two measures of media time spent for infants. One is log transformed and the other is square root transformed. A plot of both transformations is compared below.
 
 ```{r}
 par(mfrow =c(1,2))
@@ -126,24 +181,25 @@ plot(density(p_media$sqrtmediatimespent), main = "Sqrt Media Time Spent")
 plot(density(p_media$lnmediatimespent), main = "Log Media Time Spent")
 ```
 
-Square root transformation looks more **normal** than log trasformation and we are going to utilize it in the rest of our research.
+The square root transformation looks more **normal** than log transformation. Subsequently, it is utilized in the rest of the code file.
 
-This is to explore the number of time intervals each subject has. 
+###### Distribution of Number of Time Intervals by Subject Count for Media Exposure
 
 ```{r}
+#Using the table function and barplot to draw the distribution of time. 
+media_tt = table(table(p_media$ID_))
+barplot(media_tt, main = "Number of Time Interval Distribution by Subject Count")
+```
+
+The number of time points counted over the number of subject ID within each count of time points can be seen below. Unlike BMI data set, all the Media data set subjects have time points between 1 and 5 inclusive. It indicates that more time points are missing in Media data set compared to the BMI data set. 
+
+```{r, echo = FALSE, results="hide"}
 #This uses dplyr to group by each subject and count their instances. This effectively counts the number of time points each of them have.
 media_timed <- p_media %>% 
   group_by(ID_) %>%
   summarize(n = n()) 
-#print(media_timed)
-```
-
-Like the BMI from before, each subject has different count of time as well as time intervals where the data is collected.
-
-```{r}
-#Using the table function and barplot to draw the distribution of time. 
-tt2 = table(table(p_bmi$ID_))
-barplot(tt2, main = "Media time distribution")
+print(min(media_timed$n))
+print(max(media_timed$n))
 ```
 
 #### III: Data Cleaning
