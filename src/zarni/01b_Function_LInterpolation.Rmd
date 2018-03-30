@@ -186,8 +186,36 @@ d_replace <- function(df, robj, rcol){
 }
 ```
 
+Put this in a function later
+```{r}
+#BMI data table first!
+#First removing column V1 if it exists
+if("V1" %in% colnames(m_bmi)){
+  m_bmi <- m_bmi[,2:ncol(m_bmi)]
+}
+```
+
+Daphna's code is re-referenced here
 
 
+*This references Professor Harel's code under her src folder*
 
+```{r}
+#BMI data table first!
+#First removing column V1 if it exists
+if("V1" %in% colnames(m_bmi)){
+  m_bmi <- m_bmi[,2:ncol(m_bmi)]
+}
+#Adding NAs in the BMI table by expanding the column
+m_bmi <- cbind(m_bmi[,c(1,2)], NA, m_bmi[,3])
+colnames(m_bmi) <- c("ID_", "AgeMos", "NA", "zBMI")
 
+#MEDIA data table second!
+if("V1" %in% colnames(m_media)){
+ m_media <- m_media[,2:ncol(m_media)] 
+}
+#Adding NAs in the MEDIA table by expanding the column
+m_media <- cbind(m_media, NA)
+head(m_media)
+```
 

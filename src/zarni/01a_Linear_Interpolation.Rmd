@@ -36,6 +36,8 @@ library(rmarkdown)
 library(knitr)
 #for missing data
 library(mi)
+#Sourcing the code file
+source("../zarni/01b_Function_LInterpolation.R")
 ```
 
 #### I: Uploading Raw data
@@ -126,7 +128,7 @@ The number of time points counted over the number of subject ID within each coun
 
 ```{r, echo=FALSE}
 bmi_tt <- table(table(p_bmi$ID_)) 
-barplot(bmi_tt, main = "Number of Time Interval Distribution by Subject Count")
+barplot(bmi_tt, main = "Number of Time Points Distribution by Subject Count")
 ```
 
 The count of time points per subject ID is also calculated. As shown below, at least one subject ID has only **1** timepoint and **39** timepoints respectively. This insight is useful in that the built-in linear interpolation cannot impute data with only one timepoint. Therefore, those cases will have to be handled separately.
@@ -188,7 +190,7 @@ The square root transformation looks more **normal** than log transformation. Su
 ```{r}
 #Using the table function and barplot to draw the distribution of time. 
 media_tt = table(table(p_media$ID_))
-barplot(media_tt, main = "Number of Time Interval Distribution by Subject Count")
+barplot(media_tt, main = "Number of Time Points Distribution by Subject Count")
 ```
 
 The number of time points counted over the number of subject ID within each count of time points can be seen below. Unlike BMI data set, all the Media data set subjects have time points between **1** and **5** inclusive. It indicates that more time points are missing in Media data set compared to the BMI data set. 
@@ -254,182 +256,112 @@ print(p_bmi_media_snippet[p_bmi_media_snippet$ID_ == 626,])
 In this section, the end goal is to create a linearly interpolated data set while resolving scenario I to scenario III of interpolation from the above section. The section is subdivided into the following themes.
 
 * Subsetting both data sets via **common** subject IDs betwen the two data sets. This action takes care of scenario III.
-* Creating a combined from the two subsetted data sets above for interpolation
-* Applying custom last value carried forward and backward function to handle scenario II
-* Applying the built-in interpolation function to execute imputation for scenario I
+* Creating a combined from the two subsetted data sets above for interpolation.
+* Applying custom last value carried forward and backward function to handle scenario II.
+* Applying the built-in interpolation function to execute imputation for scenario I.
 
-**Step 1: Finding the Common ID**
+There themes are carried out in a total of **7** steps as demonstrated below.
 
-Finding the subject IDs that match
+###### Step 1: Finding the Common ID
 
-```{r}
+Finding the subject IDs that match across both data sets
+
+```{r, results= "hide"}
 common_ID <- intersect(p_bmi$ID_, p_media$ID_) # intersection works like in Set theory
 print(length(common_ID)) #537 common subject IDs
 ```
 
-**Step 2: Extracting BMI and Media Data set based on shared ID**
+###### Step 2: Subsetting BMI and Media Data set based on shared ID
 
 ```{r}
 #Matched BMI
 m_bmi <- p_bmi[(p_bmi$ID_ %in% common_ID), ]
 #Matched Media
 m_media <- p_media[(p_media$ID_ %in% common_ID),]
-head(m_media)
 ```
 
-**Step 3: Generating NAs for each of the data set**
-
-We are generating NA columns for each of the data set so that when we joined later, they can fill in for the missing timepoints.
-
-*This references Professor Harel's code under her src folder*
+###### Step 3: Combining both data sets for create missing time points in each data set
 
 ```{r}
-#BMI data table first!
-#First removing column V1 if it exists
-if("V1" %in% colnames(m_bmi)){
-  m_bmi <- m_bmi[,2:ncol(m_bmi)]
-}
-#Adding NAs in the BMI table by expanding the column
-m_bmi <- cbind(m_bmi[,c(1,2)], NA, m_bmi[,3])
-colnames(m_bmi) <- c("ID_", "AgeMos", "NA", "zBMI")
+#Merging both data sets by ID and Months  
+c_data <- m_bmi %>% full_join(m_media, by =c("ID_" = "ID_", "AgeMos" = "AgeMos"))
+#Extracting needed columns esp sqrtmediatimespent as it is more normal than the log transformation
+c_data <- c_data[,c("ID_", "AgeMos","sqrtmediatimespent", "zBMI")]
+#Renaming the variables
+colnames(c_data) <- c("ID", "Months", "Media", "zBMI")
 
-#MEDIA data table second!
-if("V1" %in% colnames(m_media)){
- m_media <- m_media[,2:ncol(m_media)] 
-}
-#Adding NAs in the MEDIA table by expanding the column
-m_media <- cbind(m_media, NA)
-head(m_media)
-```
+### Doing minor cleaning
 
-```{r}
-#dropping the log transformed media
-m_media <- m_media[, -3]
-```
-
-```{r}
-head(m_media)
-#transforming the square root media to square media for linear interpolation
-m_media$sqrtmediatimespent <- m_media$sqrtmediatimespent^2
-```
-
-**Step 4: Merging the two data sets together**
-
-```{r}
-#The Column Names have to match for the data set to match together
-colnames(m_bmi) <- c("ID", "Months", "Media", "zBMI")
-colnames(m_media) <- c("ID", "Months", "Media", "zBMI")
-#Combined Data Set
-c_data <- rbind(m_bmi, m_media)
-#Ordering the data set by subject ID
-c_data <- c_data[order(c_data[,1]),]
-#Convert all the time variables into numeric for later sorting
+#Converting Months into numeric for sorting later
 c_data$Months <- as.numeric(as.character(c_data$Months))
+#Converting the square root media value to square media for later linear interpolation
+c_data$Media <- c_data$Media^2
+#Rearrange the data by GroupID then within groups by Time
+c_data_arr <- c_data %>% arrange(ID, Months) 
 ```
 
-**Step 5: Arrange the data set of each SubjectID by Time**
+###### Missing Values Creation Confirmation
 
-```{r}
-#dplyr command that does the arrange by the Group ID then within the groups
-#arrange it by Months
-c_data_arr<- c_data %>% arrange(ID,Months)
+```{r, echo=FALSE, message=FALSE, results="hide"}
+mdf_combined <- missing_data.frame(c_data_arr)
 ```
 
-**Step 6: Checking # of duplicated values for each time value within each subject**
-
-This section checks if BMI and Media data has been recorded at the same time. The goal is to merge the two rows so that we will not be interpolating either BMI or Media data for the time stamps where original data already exists.
+As shown in the picture below, Media exposure missing values and BMI missing values at various time points are created. As to be expected from the data exploration before, there are more Media exposure missing values than that of BMI.
 
 ```{r}
+image(mdf_combined)
+```
+
+
+###### Step 4: Merging Duplicated Rows  
+
+This section checks if BMI and Media data has been recorded at the same time for the same subject ID. If those rows exist, the goal is to merge those same rows by the **average** values of both BMI and Media Exposure duplicated columns. A sample of what these duplicated rows looks like is show below.
+
+```{r}
+#Group by gets the same ID and Month and summarise checks the count
 dup_count <- c_data_arr %>% group_by(ID, Months) %>% summarise(n=n())
-#View a subset of all the duplicate rows
+#Capture the duplicate cases
 v_dup <- dup_count[dup_count$n >1,]
-#print(head(v_dup))
-print(dim(v_dup))
-
+#Save an id of a duplicate case
+id <- v_dup$ID[1]
+#Spit out a duplicate case
+print(c_data_arr[c_data_arr$ID == id,][3:6,])
 ```
 
-**Step 7: Merging duplicated row into 1 row**
-
-For merging rows, we are essentially saying between two values in both rows, do not pick NA, pick the value. Below is a custom-built function that achieves that. Said function will be applied to the dplyr summarize_each (which is essentially, apply this function to each row of each column).
-
-Custom Function
-```{r}
-#The ifelse commands literally says, if not all of the x vector is NA, pick the maximum after removing the NA. Otherwise, keep the NA.
-#Add an explanation to this more
-my.max <- function(x) ifelse(!all(is.na(x)),mean(x, na.rm = T), NA)
-```
+###### Custom Function applied to merge the duplicated rows
 
 ```{r}
-#If BMI and Media are recorded at the same time month, there should not be two separate rows for it.
 #Combined data that is arranged and merged.
-c_data_arr_mer <- c_data_arr %>% group_by(ID,Months) %>% summarise_all(funs(my.max))
-#This is merged and cleaned data with the NAs
+c_data_arr_mer <- c_data_arr %>% group_by(ID,Months) %>% summarise_all(funs(my.rowmerge))
+```
+
+```{r}
+#Saving the arranged and merged data set
 write.csv(c_data_arr_mer, "../../data/final/final_na_data.csv")
 ```
 
+###### Step 5: Handling data Scenario II from Section III   
 
-**Step 8: Extracting the Singleton Cases from the Data Set to be handled separately**
+As mentioned before, there are cases where there is only ** 1 ** single value of either BMI or Media Exposure data with the rest of the time points' values being missing. The built-in linear interpolation function cannot handle it.
+Therefore, last value carried forward/backward will be carried out with our own custom functions.
 
-To be applied to the Linear Interpolation, Approx function, the single rows of time stamped data with 1 value of either BMI or Media would not do. More details on the requirement of the Approx function are in the Appendix section. Step 8 and Step 9 handles this.
+###### Separate the data of those single time instance values and not
 
 ```{r}
-#Getting all the rows with the Singleton IDs
+#Getting all the rows with single value IDs
 singleton_data <- c_data_arr_mer [(c_data_arr_mer$ID %in% all_singletons$ID_),]
-#Getting all the rows with non Singleton IDs
+#Getting all the rows with non single value IDs
 non_singleton_data <- c_data_arr_mer[!(c_data_arr_mer$ID %in% all_singletons$ID_),]
 ```
 
-**Step 9: Handling Singleton Data**
+###### Applying custom function for last value carried forward/backward
 
-This section goes through bullet point **1** to bullet point **3** in the Singleton data scenario.
-The Singleton data will be combined back once the Singular NAs has been replaced appropriately with LOCF & LOCB which can then supplied into our approxfun as described in details in the Appendix.
+* Rewrite the custom function to only take in a single vector at a time
+* Check the appropriate apply to use this (we are essentially putting in the column)
+* So lapply of each column. Possibly sapply is the one to utilize.
 
-
-```{r}
-###Case I: Locating rows where there is only 1 time stamp for BMI and Media
-
-#Check if there are cases of row n = 1
-
-singleton_1 <- singleton_data %>% group_by(ID) %>%
-                                  summarise(n=n())
-nrow(singleton_1[singleton_1$n ==1,]) #0
-###Case I issues does not exist.
-```
 
 ```{r}
-### Case II: LOCF/LOBF for BMI Singleton Cases
-
-### Below function takes care of LOCF, LOBF for Singleton Cases of 1 unit value
-### across multiple time periods
-
-fill_NA <- function(df){
-  
-  #Saving the data frame in a local variable
-  x <- df
-  #total length of data frame
-  total <- nrow(df)
-  #total length of NA values in media
-  total_na_media <- sum(is.na(df$Media))
-  #total length of NA values in bmi
-  total_na_bmi <- sum(is.na(df$zBMI))
-  
-  #Replacing the Media NA values if there is only 1 singular non-NA
-  if (total-total_na_media == 1){
-    #Get the replace value which is from non-NA
-    replace_value <- df$Media[which(!is.na(df$Media))]
-    #Replace it to the rest of the vector
-    df$Media[which(is.na(df$Media))] <- replace_value
-  }
-  #Replacing the zBMI NA values if there is only 1 singular non-NA
-  if (total-total_na_bmi == 1){
-    #Get the replace value which is from non-NA
-    replace_value <- df$zBMI[which(!is.na(df$zBMI))]
-    #Replace it to the rest of the vector
-    df$zBMI[which(is.na(df$zBMI))] <- replace_value
-  }
-  return(df)
-}
-
 #Split by each groupID
 singleton_data_split <- split(singleton_data, singleton_data[,1])
 #Apply NA fixes to each of the data splits
