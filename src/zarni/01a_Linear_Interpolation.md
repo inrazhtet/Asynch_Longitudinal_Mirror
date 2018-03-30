@@ -341,360 +341,43 @@ c_data_arr_mer <- c_data_arr %>% group_by(ID,Months) %>% summarise_all(funs(my.r
 write.csv(c_data_arr_mer, "../../data/final/final_na_data.csv")
 ```
 
-**Step 8: Extracting the Singleton Cases from the Data Set to be handled separately**
+###### Step 5: Handling data Scenario II from Section III
 
-To be applied to the Linear Interpolation, Approx function, the single rows of time stamped data with 1 value of either BMI or Media would not do. More details on the requirement of the Approx function are in the Appendix section. Step 8 and Step 9 handles this.
+As mentioned before, there are cases where there is only \*\* 1 \*\* single value of either BMI or Media Exposure data with the rest of the time points' values being missing. The built-in linear interpolation function cannot handle it. Therefore, last value carried forward/backward will be carried out with our own custom functions.
+
+###### Separate the data of those single time instance values and not
 
 ``` r
-#Getting all the rows with the Singleton IDs
+#Getting all the rows with single value IDs
 singleton_data <- c_data_arr_mer [(c_data_arr_mer$ID %in% all_singletons$ID_),]
-#Getting all the rows with non Singleton IDs
+#Getting all the rows with non single value IDs
 non_singleton_data <- c_data_arr_mer[!(c_data_arr_mer$ID %in% all_singletons$ID_),]
 ```
 
-**Step 9: Handling Singleton Data**
+###### Applying custom function for last value carried forward/backward
 
-This section goes through bullet point **1** to bullet point **3** in the Singleton data scenario. The Singleton data will be combined back once the Singular NAs has been replaced appropriately with LOCF & LOCB which can then supplied into our approxfun as described in details in the Appendix.
+-   Rewrite the custom function to only take in a single vector at a time
+-   lapply would work for the vector too. If not, check sapply.
 
-``` r
-###Case I: Locating rows where there is only 1 time stamp for BMI and Media
-
-#Check if there are cases of row n = 1
-
-singleton_1 <- singleton_data %>% group_by(ID) %>%
-                                  summarise(n=n())
-nrow(singleton_1[singleton_1$n ==1,]) #0
-```
-
-    ## [1] 0
+#### QUESTIONS HERE!
 
 ``` r
-###Case I issues does not exist.
-```
-
-``` r
-### Case II: LOCF/LOBF for BMI Singleton Cases
-
-### Below function takes care of LOCF, LOBF for Singleton Cases of 1 unit value
-### across multiple time periods
-
-fill_NA <- function(df){
-  
-  #Saving the data frame in a local variable
-  x <- df
-  #total length of data frame
-  total <- nrow(df)
-  #total length of NA values in media
-  total_na_media <- sum(is.na(df$Media))
-  #total length of NA values in bmi
-  total_na_bmi <- sum(is.na(df$zBMI))
-  
-  #Replacing the Media NA values if there is only 1 singular non-NA
-  if (total-total_na_media == 1){
-    #Get the replace value which is from non-NA
-    replace_value <- df$Media[which(!is.na(df$Media))]
-    #Replace it to the rest of the vector
-    df$Media[which(is.na(df$Media))] <- replace_value
-  }
-  #Replacing the zBMI NA values if there is only 1 singular non-NA
-  if (total-total_na_bmi == 1){
-    #Get the replace value which is from non-NA
-    replace_value <- df$zBMI[which(!is.na(df$zBMI))]
-    #Replace it to the rest of the vector
-    df$zBMI[which(is.na(df$zBMI))] <- replace_value
-  }
-  return(df)
-}
-
-#Split by each groupID
+#Splitting the data frame by the subject ID
 singleton_data_split <- split(singleton_data, singleton_data[,1])
-#Apply NA fixes to each of the data splits
-singleton_NA_filled <- lapply(singleton_data_split, fill_NA)
-#Collapse the Split Data into a single data frame
-singleton_NA_filled <- bind_rows(singleton_NA_filled)
-write.csv(singleton_NA_filled, "../../data/Intermediate/singleton_NA_filled.csv")
+#Pulling the BMI column out. I am hardcoding the column? 
+bmi <- lapply(singleton_data_split, function(x) x$zBMI)
+#Plug it fill_NA (custom function) in the place of mean
+bmi_fill_NA <- lapply(bmi, function(x) mean(x))
 ```
 
-**Step 10: Recombine the Singleton and Non-Singleton Data Sets**
+###### Old code
 
 ``` r
-combined_data <- rbind(non_singleton_data, singleton_NA_filled)
-View(combined_data)
+# #Split by each groupID
+# singleton_data_split <- split(singleton_data, singleton_data[,1])
+# #Apply NA fixes to each of the data splits
+# singleton_NA_filled <- lapply(singleton_data_split, fill_NA)
+# #Collapse the Split Data into a single data frame
+# singleton_NA_filled <- bind_rows(singleton_NA_filled)
+# write.csv(singleton_NA_filled, "../../data/Intermediate/singleton_NA_filled.csv")
 ```
-
-**Step 11: Split the combined data set by the Subject ID**
-
-Here we are spliting the data set by subject ID so that we can apply the interpolation function to each of the Subject ID
-
-``` r
-#Split the data by subject ID
-combined_data_split <- split(combined_data, combined_data[,1])
-```
-
-**Step 12: Build Custom Function to Handle Interpolation**
-
-There are two custom functions in this section that allow us to use the approx function (details of the function are in the Appendix) for interpolation for our data set. A couple of steps are involved to prepare to apply the approx function. - Figuring out the Vectors and its corresponding indexes to interpolate - Defining the minimum and maximum values in existing data set to apply LOCF/LOCB to tail missing NAs - Using a secondary custom function to merge the outputs of Approxfunction from multiple vectors to a single data frame
-
-``` r
-#Wrapper! Passes to a function:
-#Use ... Need to write it out!
-#The function will take in a data frame as well as an input vector that specifies which column indexes of the data frame are of interest for the interpolation. The reason we have the input vector is that it give us a flexible to use single function which can deal with a large data frame where multiple columns may need interpolation.
-
-#df refers to the data frame of interest
-#par is a vector that specifies the TWO indexes: 1 being time in this case and the other being the missing column index
-mdz_interpolate <- function(df, par){
-  #Saving the data frame in a local variable
-  x <- df
-  #Pulling out the index for X vector (In our case Time)
-  x_1 <- par[1]
-  #Pulling out the index for Y Vector 1 (In our case BMI)
-  y_1 <- par[2]
-  #Pulling out the index for Y Vector 2 (In our case Media)
-  y_2 <- par[3]
-  #Pulling out x and y vectors for the interpolation
-  #They are in data frame format.You have to unlist and make it a numeric vector.
-  xx <- as.numeric(unlist(x[,x_1])) # X vector
-  yy_1 <- as.numeric(unlist(x[,y_1])) # Y vector 1
-  yy_2 <- as.numeric(unlist(x[,y_2])) # Y vector 2
-  #Specifying indexes where we had to fill with the missing NA for y Vector 1
-  xout_1 <- which(is.na(yy_1))
-  #specifying indexes where we had to fill with the missing NA for y Vector 2
-  xout_2 <- which(is.na(yy_2))
-  #Specifying the minimum and maximum values for Last Value Carried Backward/Forward
-  #Get the non-missing indexes first
-  y_nmis_1 <- which(!is.na(yy_1))
-  y_nmis_2 <- which(!is.na(yy_2))
-  #Get the value from the furthest left index of Y (LOCB)
-  y_min_1 <- yy_1[min(y_nmis_1)]
-  y_min_2 <- yy_2[min(y_nmis_2)]
-  #Get the value from the furthest right index of Y (LOCF)
-  y_max_1 <- yy_1[max(y_nmis_1)]
-  y_max_2 <- yy_2[max(y_nmis_2)]
-  #Apply this to the interpolation function (Explanations of the function are in Appendix section)
-  #The interpolation for the first vector
-  out_1 <- approx(xx, yy_1, xout = xout_1,  method = "linear", yleft = y_min_1, yright = y_max_1, rule = 2)
-  #The interpolation for the second vector
-  out_2 <- approx(xx, yy_2, xout = xout_2, method = "linear", yleft = y_min_2, yright = y_max_2, rule = 2)
-  #The missing values replaced data frame 1 of replaced Vector 1
-  outframe_1 <- d_replace(x, out_1, 3)
-  #The missing values replaced data frame 2 of replaced Vector 2
-  outframe_2 <- d_replace(x, out_2, 4)
-  outframe_1[,4] <- outframe_2[,4]
-  return(outframe_1)
-}
-```
-
-Helper Function that puts missing values back into the data frame.
-
-``` r
-#The function takes in an actual data frame (df), an Robject of the interpolation function which contains the index values that has been replaced under vector x and the values that has been imputed under vector y. Then, we specify the column to which those values are replaced with rcol
-d_replace <- function(df, robj, rcol){
-  
-  #saving the local data frame
-  df <- df
-  #saving the local robject
-  robj <- robj
-  #specifying the rows and the columns to replace the R values by
-  df[robj$x,rcol] <- robj$y 
-  return(df)
-}
-```
-
-**Step 13: Applies the Custom Interpolation Function to the Split data set**
-
-This section applies the **split** dataframe into the custom linear interpolation function from above. By split data, it means here that we are handling each subjectID spearately using lapply functions.
-
-``` r
-#The split data is put in and then, the time column: 2, the BMI column: 3 and the media column 4 are applied the interpolation function
-c_data_interp <- lapply(combined_data_split, mdz_interpolate, par=c(2,3,4))
-```
-
-**Step 14: Collapse the Split Data Into a Single Data Frame**
-
-``` r
-#Use dplyr bind_rows to recompose the split data together
-#http://dplyr.tidyverse.org/reference/bind.html
-c_data_interp_bind <- bind_rows(c_data_interp)
-```
-
-``` r
-head(c_data_interp_bind)
-```
-
-    ## # A tibble: 6 x 4
-    ## # Groups:   ID [1]
-    ##      ID Months Media   zBMI
-    ##   <int>  <dbl> <dbl>  <dbl>
-    ## 1     1  0.     235. -3.54 
-    ## 2     1  0.131  235. -3.19 
-    ## 3     1  0.559  235. -0.283
-    ## 4     1  1.54   235. -1.27 
-    ## 5     1  4.30   235. -1.18 
-    ## 6     1  6.37   235. -2.56
-
-``` r
-#Converting the squared transformation back to to square root transformation 
-c_data_interp_bind$Media <- sqrt(c_data_interp_bind$Media)
-head(c_data_interp_bind)
-```
-
-    ## # A tibble: 6 x 4
-    ## # Groups:   ID [1]
-    ##      ID Months Media   zBMI
-    ##   <int>  <dbl> <dbl>  <dbl>
-    ## 1     1  0.     15.3 -3.54 
-    ## 2     1  0.131  15.3 -3.19 
-    ## 3     1  0.559  15.3 -0.283
-    ## 4     1  1.54   15.3 -1.27 
-    ## 5     1  4.30   15.3 -1.18 
-    ## 6     1  6.37   15.3 -2.56
-
-``` r
-write.csv(c_data_interp_bind, "../../data/final/final_interp_data.csv")
-```
-
-### APPENDIX:
-
-#### Section I: Theorectical Explanation
-
-##### Base Linear Interpolation Function
-
-The linear interpolation equation to be used in the base function is below. The *y*<sub>0</sub> and *y*<sub>1</sub> would be either BMI or Media exposure variable. The *x*<sub>0</sub> and *x*<sub>1</sub> would be the time variable.
-
-The *y* variable is the missing value we are looking for at time *x*. For BMI variable, the *x* corresponds to time from Media exposure that is missing between the *x*<sub>0</sub> and the *x*<sub>1</sub> intervals. The converse can be said of the Media Exposure variable to BMI as well.
-
-Source: Linear Interpolation, Wikipedia
-$$
-y = y\_{0} + (x - x\_{0}) \\frac{y\_{1}- y\_{0}}{x\_{1} - x\_{0}}
-$$
-
-This section deals with testing out functions and other stuffs
-
-Use ApproxFun: <https://stat.ethz.ch/R-manual/R-devel/library/stats/html/approxfun.html>
-
-#### Section II: Testing the Approx Function
-
-##### START: Testing Out Linear Interpolation approx/approxfun
-
-Both approx and approxfun looks fairly similar. There are a couple of **key parameters** to consider \* x,y =&gt; input vectors \* xout =&gt; we specify which indexes we want to interpolate values for \* yleft =&gt; this is specifying the last value to be carried to the left or backward if x values are less than min(x)
-
--   yright =&gt; this is specifying the last value to be carried to the right or forward if x values are more than max(x)
-
--   rule =&gt; Two options. 1 is to get NA for yleft, yright case. 2 is to output yleft, yright cases
-
-###### Test Case 1
-
-This is a simple case of some missing Ys with X values. A manual calculation is done below to verify the answer.
-
-This helper function puts back the output to the actual data frame.
-
-Simulated data 1
-
-``` r
-x_1 <- c(1,2,3,4,5,6)
-y_1 <- c(3,NA,5,NA,NA,10)
-xout_1 <- which(is.na(y_1)) #which returns the indexes where y_1 vector has NA values
-```
-
-Specifying y\_left and y\_right
-
-This code chunk will tackle the case of last carried left/backward and last carried right/forward. The goal is to find the furthest left y index that is not NA and save the value. The same goes for the furthest right.
-
-``` r
-y_nmis_1 <- which(!is.na(y_1)) #indexes of non-missing y values
-y_min_1 <- y_1[min(y_nmis_1)] #get the value from the furtherest left index of y 
-y_max_1 <- y_1[max(y_nmis_1)] #get the value from the furthest right index of y
-```
-
-Applying the function
-
-This code chunk applies the function
-
-``` r
-out_1 <- approx(x_1, y_1, xout = xout_1,  method = "linear", yleft = y_min_1, yright = y_max_1, rule = 2)
-```
-
-Interpolated results
-
-``` r
-print(out_1$y)
-```
-
-    ## [1] 4.000000 6.666667 8.333333
-
-Manual calculation to confirm it.
-
-Notetoself: In the future, helper functions should be in a separate source file. Seek permission from MS/DH.
-
-Base interpolation helper function
-
-``` r
-#Note: Come back and write more comments later.
-
-#The function takes in two pairs of point and the point you want to interpolate
-lin_interpol <- function(y0,y1,x0,x1,x){
-  y <- y0 + (x-x0) * ((y1-y0)/(x1-x0))
-  return(y)
-}
-```
-
-Manually outputting the three NA values from above
-
-``` r
-res_1_1 <- lin_interpol(3,5,1,3,2)
-print(res_1_1)
-```
-
-    ## [1] 4
-
-``` r
-res_2_1 <- lin_interpol(5,10,3,6,4)
-print(res_2_1)
-```
-
-    ## [1] 6.666667
-
-``` r
-res_3_1 <- lin_interpol(5,10,3,6,5)
-print(res_3_1)
-```
-
-    ## [1] 8.333333
-
-All the results matches up. We only have a case of Last Value Carried forward and backward to test
-
-###### Test Case 2
-
-Simulated data 2
-
-We are testing the case of last value carried forward with 1 value missing on the left and 2 values missing on the right
-
-``` r
-x_2 <- c(1,2,3,4,5,6)
-y_2 <- c(NA,3,5,10,NA,NA)
-xout_2 <- which(is.na(y_2)) #which returns the indexes where y_1 vector has NA values
-```
-
-Same as above (Comments to merge or fill in later)
-
-``` r
-y_nmis_2 <- which(!is.na(y_2)) #indexes of non-missing y values
-y_min_2 <- y_2[min(y_nmis_2)] #get the value from the furtherest left index of y 
-y_max_2 <- y_2[max(y_nmis_2)] #get the value from the furthest right index of y
-```
-
-This code chunk applies the function
-
-``` r
-out_2 <- approx(x_2, y_2, xout = xout_2,  method = "linear", yleft = y_min_2, yright = y_max_2, rule = 2)
-```
-
-Interpolated results
-
-``` r
-print(out_2$y)
-```
-
-    ## [1]  3 10 10
-
-Perfect. Left value carried forward and right value carried forward works like a charm.

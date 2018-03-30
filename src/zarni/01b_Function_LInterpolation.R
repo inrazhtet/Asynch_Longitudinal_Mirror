@@ -46,13 +46,13 @@ my.rowmerge <- function(x) ifelse(!all(is.na(x)),mean(x, na.rm = T), NA)
 ## Last Value Carried Forward/ Last Value Carried Backward Custom Function ##
 #############################################################################
 
-fill_NA <- function(df){
+fill_NA <- function(vector){
   
   ## *Brief Description*
   ### Apply LOCF to fill NAs   
   
   ## *Arguments*
-  ### df - Takes in a data frame of each SubjectID with their corresponding vector of BMI and Media Exposure Values
+  ### vector - takes in a vector that needs to be filled 
   
   ## *Function Design*
   ### 1. We determine how many non-NAs are there in each vector of Media and BMI.
