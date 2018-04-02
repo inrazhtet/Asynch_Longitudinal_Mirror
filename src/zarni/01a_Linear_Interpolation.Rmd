@@ -4,12 +4,17 @@ author: "Zarni Htet "
 email: "zh938@nyu.edu"
 affiliation: "New York University"
 date: March 15, 2018
-output: github_document
+output: pdf_document
 ---
 
 ### Introduction
 
 The goal of this code file is to generate an imputed data set of **BMI** and **Media Exposure** for young children from low income families. The existing raw data set has been linearly interpolated to fill in the missing values for **BMI** and **Media Exposure** at missing time points. A sample of the raw data set along with the existing issue and one proposed method for resolution is demonstrated in the objective section below.
+
+### Datasets Involved
+
+Refer to the Belle Lab Power Point to add this portion
+
 
 ### Admnistration
 
