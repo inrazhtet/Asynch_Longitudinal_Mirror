@@ -74,7 +74,7 @@ p_media <- import("../../data/processing/media.csv")
 
 ### Objective
 
-The overarching goal of the project is to assess whether infant media exposure is associated with weight/bmi trajectories during their infant to early childhood periods. In order to examine that association, media exposure data and weight/bmi data must be collected at the **same** time. As can be seen below in our short data snippet, media exposure and weight/bmi are collected at **asynchronous** time points. Our goal is to impute these missing data at missing time points via **linear interpolation**. For more on **linear interpolation**, please see the *Appendix* section.
+The overarching goal of the project is to assess whether infant media exposure is associated with weight/bmi trajectories during their infant to early childhood periods. In order to examine that association, media exposure data and weight/bmi data need to be synchronized (exactly how the response will be modeled as a function of the predictors is to be determined, but a first step is examining aligned data).  As can be seen below in our short data snippet, media exposure and weight/bmi are collected at **asynchronous** time points. Our goal is to impute these missing data at missing time points via **linear interpolation**. For more on **linear interpolation**, please see the *Appendix* section.
 
 ```{r, warning=FALSE, echo=FALSE}
 #Joining the two data sets to capture the missing values in each data set by ID and time
@@ -91,8 +91,8 @@ This section examines the two datasets. The focus here is to explore the distrib
 ##### The BMI data set overview
 
 ```{r,echo= FALSE}
-p_bmi[1:15,]
-#head(p_bmi)
+#p_bmi[1:15,]
+head(p_bmi,15)
 #tail(p_bmi)
 ```
 
