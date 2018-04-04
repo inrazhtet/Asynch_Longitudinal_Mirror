@@ -55,34 +55,25 @@ fill_NA <- function(vector){
   ### vector - takes in a vector that needs to be filled 
   
   ## *Function Design*
-  ### 1. We determine how many non-NAs are there in each vector of Media and BMI.
+  ### 1. We determine how many non-NAs are there in each vector
   ### 2. If there is only 1 non-NA, it fits our case. 
   ### 3. Therefore, we replace the non-NA value to all other indexes where there are NAs.
   
   #Saving the data frame in a local variable
-  x <- df
-  #total length of data frame
-  total <- nrow(df)
+  x <- vector
+  #total length of vector
+  total <- length(df)
   #total length of NA values in media
-  total_na_media <- sum(is.na(df$Media))
-  #total length of NA values in bmi
-  total_na_bmi <- sum(is.na(df$zBMI))
+  total_na_vector <- sum(is.na(x))
   
   #Replacing the Media NA values if there is only 1 singular non-NA
-  if (total-total_na_media == 1){
+  if (total-total_na_vector == 1){
     #Get the replace value which is from non-NA
-    replace_value <- df$Media[which(!is.na(df$Media))]
+    replace_value <- x[which(!is.na(x))]
     #Replace it to the rest of the vector
-    df$Media[which(is.na(df$Media))] <- replace_value
+    x[which(is.na(x))] <- replace_value
   }
-  #Replacing the zBMI NA values if there is only 1 singular non-NA
-  if (total-total_na_bmi == 1){
-    #Get the replace value which is from non-NA
-    replace_value <- df$zBMI[which(!is.na(df$zBMI))]
-    #Replace it to the rest of the vector
-    df$zBMI[which(is.na(df$zBMI))] <- replace_value
-  }
-  return(df)
+  return(x)
 }
 
 

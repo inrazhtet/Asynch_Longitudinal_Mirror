@@ -360,28 +360,32 @@ non_singleton_data <- c_data_arr_mer[!(c_data_arr_mer$ID %in% all_singletons$ID_
 
 ###### Applying custom function for last value carried forward/backward
 
--   Rewrite the custom function to only take in a single vector at a time
--   lapply would work for the vector too. If not, check sapply.
-
-#### QUESTIONS HERE!
-
 ``` r
-#Splitting the data frame by the subject ID
-singleton_data_split <- split(singleton_data, singleton_data[,1])
-#Pulling the BMI column out. I am hardcoding the column? 
-bmi <- lapply(singleton_data_split, function(x) x$zBMI)
-#Plug it fill_NA (custom function) in the place of mean
-bmi_fill_NA <- lapply(bmi, function(x) mean(x))
+#Using tapply to each of the IDs with the custom LOCF/LOCB function for BMI and Media
+singleton_bmi <- tapply(singleton_data$zBMI, singleton_data$ID, function (x) {fill_NA(x)})
+singleton_media <- tapply(singleton_data$Media, singleton_data$ID, function (x) {fill_NA(x)})
 ```
 
-###### Old code
+###### Attaching the LOCF/LOCB values back to data frame
 
 ``` r
-# #Split by each groupID
-# singleton_data_split <- split(singleton_data, singleton_data[,1])
-# #Apply NA fixes to each of the data splits
-# singleton_NA_filled <- lapply(singleton_data_split, fill_NA)
-# #Collapse the Split Data into a single data frame
-# singleton_NA_filled <- bind_rows(singleton_NA_filled)
-# write.csv(singleton_NA_filled, "../../data/Intermediate/singleton_NA_filled.csv")
+#Must combine the list of vectors by ID back into a single vector
+singleton_bmi <- combine(singleton_bmi)
+singleton_media <- combine(singleton_media)
+#Put them back into the data frame
+singleton_data$zBMI <- singleton_bmi
+singleton_data$Media <- singleton_media
 ```
+
+``` r
+#Saving the NA filled data for data integrity
+write.csv(singleton_data, "../../data/Intermediate/singleton_NA_filled.csv")
+```
+
+``` r
+#Combinig the singleton and non-singleton data back
+combined_data <- rbind(singleton_data, non_singleton_data)
+combined_data <- combined_data %>% arrange(ID, Months)
+```
+
+###### Step 6: Applying the Linear Interpolation Function for Scenario I
