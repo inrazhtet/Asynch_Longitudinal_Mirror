@@ -7,6 +7,10 @@ March 15, 2018
 
 The goal of this code file is to generate an imputed data set of **BMI** and **Media Exposure** for young children from low income families. The existing raw data set has been linearly interpolated to fill in the missing values for **BMI** and **Media Exposure** at missing time points. A sample of the raw data set along with the existing issue and one proposed method for resolution is demonstrated in the objective section below.
 
+### Datasets Involved
+
+Refer to the Belle Lab Power Point to add this portion
+
 ### Admnistration
 
 The project is supervised by Professor Marc Scott and Professor Daphna Harel. The data is from the Belle Lab at the Bellevue Hospital. Additional background on the project is in the *README* at the root directory of the Github repository associated with the project.
@@ -57,7 +61,7 @@ This code chunk is reloading and doing minor cleaning to the working version of 
 
 ### Objective
 
-The overarching goal of the project is to assess whether infant media exposure is associated with weight/bmi trajectories during their infant to early childhood periods. In order to examine that association, media exposure data and weight/bmi data must be collected at the **same** time. As can be seen below in our short data snippet, media exposure and weight/bmi are collected at **asynchronous** time points. Our goal is to impute these missing data at missing time points via **linear interpolation**. For more on **linear interpolation**, please see the *Appendix* section.
+The overarching goal of the project is to assess whether infant media exposure is associated with weight/bmi trajectories during their infant to early childhood periods. In order to examine that association, media exposure data and weight/bmi data need to be synchronized (exactly how the response will be modeled as a function of the predictors is to be determined, but a first step is examining aligned data). As can be seen below in our short data snippet, media exposure and weight/bmi are collected at **asynchronous** time points. Our goal is to impute these missing data at missing time points via **linear interpolation**. For more on **linear interpolation**, please see the *Appendix* section.
 
     ##   ID_    AgeMos     zBMI lnmediatimespent sqrtmediatimespent
     ## 7   1  7.786448       NA         5.463832           15.32971
@@ -343,7 +347,7 @@ write.csv(c_data_arr_mer, "../../data/final/final_na_data.csv")
 
 ###### Step 5: Handling data Scenario II from Section III
 
-As mentioned before, there are cases where there is only \*\* 1 \*\* single value of either BMI or Media Exposure data with the rest of the time points' values being missing. The built-in linear interpolation function cannot handle it. Therefore, last value carried forward/backward will be carried out with our own custom functions.
+As mentioned before, there are cases where there is only **1** single value of either BMI or Media Exposure data with the rest of the time points' values being missing. The built-in linear interpolation function cannot handle it. Therefore, last value carried forward/backward will be carried out with our own custom functions.
 
 ###### Separate the data of those single time instance values and not
 
