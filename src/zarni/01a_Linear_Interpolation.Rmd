@@ -401,12 +401,12 @@ Notes to be written in paragraph form later.
 #tapply would not split the rest of the arguments that I need to put in. What would be a better design?
 
 #Split the one of the columns we are not interpolating by ID
-media <- split(combined_data$Media, combined_data$ID)
+#media <- split(combined_data$Media, combined_data$ID)
 #Things still needed
 # 1) The indexes of where the replacement needs to be done
 # 2) The min and max value at each ID for the vector we are interpolating for LOCB, LOCF
 
-interpolate_bmi <- tapply(combined_data$zBMI, combined_data$ID, function(x){approx(x, y =)})
+#interpolate_bmi <- tapply(combined_data$zBMI, combined_data$ID, function(x){approx(x, y =)})
 ```
 
 
