@@ -60,14 +60,13 @@ fill_NA <- function(vector){
   ### 2. If there is only 1 non-NA, it fits our case. 
   ### 3. Therefore, we replace the non-NA value to all other indexes where there are NAs.
   
-  
   #Saving the data frame in a local variable
   x <- vector
   #total length of vector
-  total <- length(df)
+  total <- length(x)
   #total length of NA values in media
   total_na_vector <- sum(is.na(x))
-  
+
   #Replacing the Media NA values if there is only 1 singular non-NA
   if (total-total_na_vector == 1){
     #Get the replace value which is from non-NA
@@ -83,7 +82,7 @@ fill_NA <- function(vector){
 ## Wrapper around approx() Linear Interpolation built-in function ##
 ####################################################################
 
-mdz_interpolate <- function(df,coordinatecolunn, missingcolumn, method, rule){
+mdz_interpolate <- function(df,coordinatecolumn, missingcolumn, method, rule){
   
   ## *Brief description* 
   ### The purpose of this wrapper is prepare the data column to 
@@ -109,7 +108,6 @@ mdz_interpolate <- function(df,coordinatecolunn, missingcolumn, method, rule){
   ### 4. We apply the proccessed parameters to the built-in approx function
   ### 5. We use a helper function to transform the return robject of approx function back to a dataframe
   
-  
   #Pulling out the columns from the data frame 
   x <- as.numeric(unlist(df[,coordinatecolumn]))
   y <- as.numeric(unlist(df[,missingcolumn]))
@@ -117,15 +115,13 @@ mdz_interpolate <- function(df,coordinatecolunn, missingcolumn, method, rule){
   x_out <- which(is.na(y))
   #Specifying the minimum and maximum values for last value carried backward/forward
   ##Getting the min index first
-  y_min_index <- which(!is.na(y))
+  y_index <- which(!is.na(y))
   ##Getting the min value
-  y_min_value <- y[y_min_index]
-  ##Getting the max index first
-  y_max_index <- which(!is.na(y))
+  y_min_value <- y[min(y_index)]
   ##Getting the max value
-  y_max_value <- y[y_max_index]
+  y_max_value <- y[max(y_index)]
   #Putting together into the interpolation function
-  fillobj <- approx(x, y, xout = xout,  method = metgid, yleft = y_min_value, yright = y_max_value, rule = rule)
+  fillobj <- approx(x, y, xout = x_out,  method = method, yleft = y_min_value, yright = y_max_value, rule = rule)
   #Using the helper function to put this into a data frame
   df <- df_return(df, fillobj, missingcolumn)
   return(df)
