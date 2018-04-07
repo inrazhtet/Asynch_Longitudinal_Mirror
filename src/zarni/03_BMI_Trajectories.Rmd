@@ -111,25 +111,24 @@ baseline_6_media_nonNA <- baseline_6_media_nonNA[baseline_6_media_nonNA$non_na_c
 baseline_6months <- baseline_6months %>% inner_join(baseline_6_media_nonNA, by = c("ID" = "ID"))
 ```
 
-#FIX STUFFS HERE! No Square Transform!
-As can be seen below, the Media Exposure times are square transformed. The goal is to use quantiles of the Media to divide it up into 4 categories. Then, those categories will map to 0,1,2,3 hours respectively to follow as closely as possible to the preliminary trajectories visualized by the research doctors at the Belle Lab.
+As can be seen below, the Media Exposure times appear to be in minutes intead of hours by comparing the time distribution with the visuals provided by the research doctor from the Belle Lab. These hours are converted into minutes further below.
 
 ```{r, warning=FALSE}
 plot(density(baseline_6months$Media,  na.rm = TRUE),main = "Media Exposure Distribution at 6 months")
 ```
 
-```{r}
-#Establishing labels
-labels <- c("0hrs", "1hrs", "2hrs", "3hrs")
-baseline_6months$MediaCategory <- cut(baseline_6months$Media, breaks = quantile(baseline_6months$Media, na.rm = TRUE), labels = labels, include.lowest = TRUE, right = FALSE) #include.lowest, True to be inclusive of left hand-side and exclusive of right hand side.
+```{r, warning = FALSE}
+baseline_6months$Media_Minutes <- baseline_6months$Media/60
 ```
 
-```{r}
-#Daphna's suggestion on minutes
-labels <- c("0hrs", "1hrs", "2hrs", "3hrs")
-baseline_6months$MediaCategory <- cut(baseline_6months$Media, breaks = c(0,60,120,180,240), labels = labels, include.lowest = TRUE, right = FALSE) #include.lowest, True to be inclusive of left hand-side and exclusive of right hand side.
-```
+Below, Media exposure time is cut into 0,1,2,3 hours as a way to match the visuals by the Research doctors at the Belle Lab.
 
+```{r}
+#Cutting the data set by
+labels <- c("0hrs", "1hrs", "2hrs", "3hrs")
+#The breaks are hours of 0-1, 1-2, 2-3,3-4
+baseline_6months$MediaCategory <- cut(baseline_6months$Media_Minutes, breaks = c(0,1,2,3,4), labels = labels, include.lowest = TRUE, right = FALSE) #include.lowest, True to be inclusive of left hand-side and exclusive of right hand side.
+```
 
 ##### Step 4: Mapping Baseline to Raw Data
 
@@ -147,7 +146,7 @@ From the initial 520, there are only 368 subject IDs left that has media exposur
 
 ```{r}
 #Current number of subjectIDs for trajectory plotting
-print(length(unique(baseline_cat$ID))/520) #368
+print(length(unique(baseline_cat$ID))/520) #307
 ```
 
 The next step is to bin the rest of the time points into 6 months interval centered at 13.5, 21, 28.5 and 36 months.
@@ -174,7 +173,7 @@ print(length(unique(baseline_cat_months$ID))/length(unique(baseline_cat$ID)))
 
 ```{r}
 #Saving the media exposure categories and year(month) intermediate data set
-write.csv(baseline_cat_months, "../../data/Intermediate/baseline_media_months_raw.csv")
+write.csv(baseline_cat_months, "../../data/Intermediate/baseline_media_months_raw.csv", row.names = F)
 ```
 
 ##### Step 5: Importing Mapped Raw Data Set for matrix calculation
@@ -225,6 +224,11 @@ In this section, like the section before zBMI is plotted over multiple time poin
 print(head(bmi_media))
 ```
 
+```{r}
+#Converting the Media Exposure minutes to hours as with the raw interpolation above.
+bmi_media$Media_Minutes <- bmi_media$Media/60
+```
+
 ##### Step 1: Establishing the Baseline at 6 months
 
 ```{r}
@@ -237,7 +241,8 @@ baseline <- bmi_media[bmi_media$Months >=5.5 & bmi_media$Months <= 6.5,]
 ```{r}
 #Establishing labels
 labels <- c("0hrs", "1hrs", "2hrs", "3hrs")
-baseline$MediaCategory <- cut(baseline$Media, breaks = quantile(baseline$Media, na.rm = TRUE), labels = labels, include.lowest = TRUE, right = FALSE)
+#The breaks are hours of 0-1, 1-2, 2-3,3-4
+baseline$MediaCategory <- cut(baseline$Media_Minutes, breaks = c(0,1,2,3,4), labels = labels, include.lowest = TRUE, right = FALSE)
 #include.lowest, True to be inclusive of left hand-side and exclusive of right hand side.
 ```
 
@@ -304,7 +309,7 @@ colnames(baseline_media_months_int) <- c("Months", "0hrs", "1hrs", "2hrs", "3hrs
 ###### Plotting the zBMI across 4 Media Exposure categories across time
 
 ```{r}
-plot(baseline_media_months_int$Months, baseline_media_months_int$`0hrs`, type = "l", xaxt = "n", main = "4 Bucket BMI Trajectory with Interpolated Data", xlab = "Months", ylab = "zBMI", ylim = c(-0.4, 1.2),  col = "green")
+plot(baseline_media_months_int$Months, baseline_media_months_int$`0hrs`, type = "l", xaxt = "n", main = "4 Bucket BMI Trajectory with Interpolated Data", xlab = "Months", ylab = "zBMI", ylim = c(-0.4, 2),  col = "green")
 axis(1, at = baseline_media_months_int$Months)
 lines(baseline_media_months_int$Months,baseline_media_months_int$`1hrs`, col = "yellow")
 lines(baseline_media_months_int$Months,baseline_media_months_int$`2hrs`, col = "red")

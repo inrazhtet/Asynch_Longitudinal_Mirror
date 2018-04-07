@@ -132,7 +132,7 @@ baseline_6_media_nonNA <- baseline_6_media_nonNA[baseline_6_media_nonNA$non_na_c
 baseline_6months <- baseline_6months %>% inner_join(baseline_6_media_nonNA, by = c("ID" = "ID"))
 ```
 
-As can be seen below, the Media Exposure times are square transformed. The goal is to use quantiles of the Media to divide it up into 4 categories. Then, those categories will map to 0,1,2,3 hours respectively to follow as closely as possible to the preliminary trajectories visualized by the research doctors at the Belle Lab.
+As can be seen below, the Media Exposure times appear to be in minutes intead of hours by comparing the time distribution with the visuals provided by the research doctor from the Belle Lab. These hours are converted into minutes further below.
 
 ``` r
 plot(density(baseline_6months$Media,  na.rm = TRUE),main = "Media Exposure Distribution at 6 months")
@@ -141,9 +141,16 @@ plot(density(baseline_6months$Media,  na.rm = TRUE),main = "Media Exposure Distr
 ![](03_BMI_Trajectories_files/figure-markdown_github/unnamed-chunk-11-1.png)
 
 ``` r
-#Establishing labels
+baseline_6months$Media_Minutes <- baseline_6months$Media/60
+```
+
+Below, Media exposure time is cut into 0,1,2,3 hours as a way to match the visuals by the Research doctors at the Belle Lab.
+
+``` r
+#Cutting the data set by
 labels <- c("0hrs", "1hrs", "2hrs", "3hrs")
-baseline_6months$MediaCategory <- cut(baseline_6months$Media, breaks = quantile(baseline_6months$Media, na.rm = TRUE), labels = labels, include.lowest = TRUE, right = FALSE) #include.lowest, True to be inclusive of left hand-side and exclusive of right hand side.
+#The breaks are hours of 0-1, 1-2, 2-3,3-4
+baseline_6months$MediaCategory <- cut(baseline_6months$Media_Minutes, breaks = c(0,1,2,3,4), labels = labels, include.lowest = TRUE, right = FALSE) #include.lowest, True to be inclusive of left hand-side and exclusive of right hand side.
 ```
 
 ##### Step 4: Mapping Baseline to Raw Data
@@ -163,10 +170,10 @@ From the initial 520, there are only 368 subject IDs left that has media exposur
 
 ``` r
 #Current number of subjectIDs for trajectory plotting
-print(length(unique(baseline_cat$ID))/520) #368
+print(length(unique(baseline_cat$ID))/520) #307
 ```
 
-    ## [1] 0.7153846
+    ## [1] 0.5903846
 
 The next step is to bin the rest of the time points into 6 months interval centered at 13.5, 21, 28.5 and 36 months.
 
@@ -202,7 +209,7 @@ print(length(unique(baseline_cat_months$ID))/length(unique(baseline_cat$ID)))
 
 ``` r
 #Saving the media exposure categories and year(month) intermediate data set
-write.csv(baseline_cat_months, "../../data/Intermediate/baseline_media_months_raw.csv")
+write.csv(baseline_cat_months, "../../data/Intermediate/baseline_media_months_raw.csv", row.names = F)
 ```
 
 ##### Step 5: Importing Mapped Raw Data Set for matrix calculation
@@ -221,11 +228,11 @@ print(head(baseline_media_months_final))
 ```
 
     ##           0hrs       1hrs      2hrs      3hrs
-    ## 6    0.5550487 0.27483255 0.3745449 0.4196311
-    ## 13.5 0.2782522 0.01792882 0.3343689 0.2525913
-    ## 21   0.7831918 0.20337318 0.5121336 0.6006685
-    ## 28.5 0.7643058 0.33490434 0.5326615 0.5783209
-    ## 36   0.7714520 0.58317597 0.7619591 0.7765702
+    ## 6    0.5550487 0.27483255 0.3275633 0.2779702
+    ## 13.5 0.2782522 0.01792882 0.1936640 0.5901695
+    ## 21   0.7831918 0.20337318 0.4875012 0.4696199
+    ## 28.5 0.7643058 0.33490434 0.5083198 0.5848009
+    ## 36   0.7714520 0.58317597 0.7653695 0.5824168
 
 ``` r
 #Saving the Matrix calculated
@@ -251,7 +258,7 @@ lines(baseline_media_months$Mo,baseline_media_months$`3hrs`, col = "blue")
 legend("topleft", legend = c("0-hrs", "1-hrs" ,"2-hrs", "3-hrs"), col = c("green", "yellow", "red","blue"), lty = 1, cex = 0.8)
 ```
 
-![](03_BMI_Trajectories_files/figure-markdown_github/unnamed-chunk-23-1.png)
+![](03_BMI_Trajectories_files/figure-markdown_github/unnamed-chunk-24-1.png)
 
 #### III: Trajectory of zBMI using the linearly interpolated data set
 
@@ -261,13 +268,18 @@ In this section, like the section before zBMI is plotted over multiple time poin
 print(head(bmi_media))
 ```
 
-    ##   ID    Months    Media       zBMI
-    ## 1  1 0.0000000 15.32971 -3.5407891
-    ## 2  1 0.1314168 15.32971 -3.1878707
-    ## 3  1 0.5585216 15.32971 -0.2831618
-    ## 4  1 1.5441478 15.32971 -1.2716171
-    ## 5  1 4.3039017 15.32971 -1.1837007
-    ## 6  1 6.3737168 15.32971 -2.5585830
+    ##   ID    Months Media       zBMI
+    ## 1  1 0.0000000   235 -3.5407891
+    ## 2  1 0.1314168   235 -3.1878707
+    ## 3  1 0.5585216   235 -0.2831618
+    ## 4  1 1.5441478   235 -1.2716171
+    ## 5  1 4.3039017   235 -1.1837007
+    ## 6  1 6.3737168   235 -2.5585830
+
+``` r
+#Converting the Media Exposure minutes to hours as with the raw interpolation above.
+bmi_media$Media_Minutes <- bmi_media$Media/60
+```
 
 ##### Step 1: Establishing the Baseline at 6 months
 
@@ -281,7 +293,8 @@ baseline <- bmi_media[bmi_media$Months >=5.5 & bmi_media$Months <= 6.5,]
 ``` r
 #Establishing labels
 labels <- c("0hrs", "1hrs", "2hrs", "3hrs")
-baseline$MediaCategory <- cut(baseline$Media, breaks = quantile(baseline$Media, na.rm = TRUE), labels = labels, include.lowest = TRUE, right = FALSE)
+#The breaks are hours of 0-1, 1-2, 2-3,3-4
+baseline$MediaCategory <- cut(baseline$Media_Minutes, breaks = c(0,1,2,3,4), labels = labels, include.lowest = TRUE, right = FALSE)
 #include.lowest, True to be inclusive of left hand-side and exclusive of right hand side.
 ```
 
@@ -333,12 +346,12 @@ baseline_media_months_final_int <- tapply(baseline_cat_all$zBMI, list(baseline_c
 print(head(baseline_media_months_final_int))
 ```
 
-    ##           0hrs       1hrs      2hrs      3hrs
-    ## 6    0.4821746 0.38613960 0.3643823 0.4447418
-    ## 13.5 0.4792404 0.01083544 0.4731820 0.4624395
-    ## 21   0.7287052 0.09623133 0.5100066 0.6797114
-    ## 28.5 0.5416588 0.44416867 0.6606757 0.8197242
-    ## 36   0.3650614 0.44892778 0.6969442 1.0004512
+    ##           0hrs        1hrs      2hrs        3hrs
+    ## 6    0.5390161 0.343181680 0.4230832 -0.05164143
+    ## 13.5 0.5353038 0.004137515 0.4645012  0.88500003
+    ## 21   0.8855976 0.096231326 0.5852941  0.80193540
+    ## 28.5 0.5183991 0.383231848 0.7440194  1.68653375
+    ## 36   0.7257038 0.663268911 1.0246831  1.18255624
 
 ``` r
 #Saving the Matrix calculated
@@ -355,7 +368,7 @@ colnames(baseline_media_months_int) <- c("Months", "0hrs", "1hrs", "2hrs", "3hrs
 ###### Plotting the zBMI across 4 Media Exposure categories across time
 
 ``` r
-plot(baseline_media_months_int$Months, baseline_media_months_int$`0hrs`, type = "l", xaxt = "n", main = "4 Bucket BMI Trajectory with Interpolated Data", xlab = "Months", ylab = "zBMI", ylim = c(-0.4, 1.2),  col = "green")
+plot(baseline_media_months_int$Months, baseline_media_months_int$`0hrs`, type = "l", xaxt = "n", main = "4 Bucket BMI Trajectory with Interpolated Data", xlab = "Months", ylab = "zBMI", ylim = c(-0.4, 2),  col = "green")
 axis(1, at = baseline_media_months_int$Months)
 lines(baseline_media_months_int$Months,baseline_media_months_int$`1hrs`, col = "yellow")
 lines(baseline_media_months_int$Months,baseline_media_months_int$`2hrs`, col = "red")
@@ -363,4 +376,4 @@ lines(baseline_media_months_int$Months,baseline_media_months_int$`3hrs`, col = "
 legend("topleft", legend = c("0-hrs", "1-hrs" ,"2-hrs", "3-hrs"), col = c("green", "yellow", "red","blue"), lty = 1, cex = 0.8)
 ```
 
-![](03_BMI_Trajectories_files/figure-markdown_github/unnamed-chunk-35-1.png)
+![](03_BMI_Trajectories_files/figure-markdown_github/unnamed-chunk-37-1.png)
