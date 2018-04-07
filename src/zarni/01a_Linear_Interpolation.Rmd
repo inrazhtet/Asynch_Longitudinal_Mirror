@@ -391,9 +391,7 @@ combined_data <- combined_data %>% arrange(ID, Months)
 
 ###### Step 6: Applying the Linear Interpolation Function for Scenario I  
 
-Notes to be written in paragraph form later.
-* Refer to Appendix for approx breakdown
-* Brief summary of the **important** parts of the function
+After processing Scenario II - IV of missing data, the processed data passes through the wrapper **mdz_interpolate**. The wrapper readies the data for the built-in **approx** function which linear interpolates the missing values. Details on linear interpolation and the **approx** function are in the **Appendix** section. Details of the **mdz_interpolate** are in the **01_b_FunctionLInterpolation.R** from where the wrapper is sourced. At the end of Step 6, the data will be fully imputed. 
 
 ```{r}
 #Split the data by ID column
@@ -403,6 +401,8 @@ combined_data_interpolated <- lapply(combined_data_split, function(x) mdz_interp
 ```
 
 ###### Step 7: Combining the interpolated data set and saving it
+
+The imputed but split data is combined back to into a single data frame and saved as a data set as the final step.
 
 ```{r}
 combined_data_final <- bind_rows(combined_data_interpolated)
