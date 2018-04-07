@@ -111,6 +111,7 @@ baseline_6_media_nonNA <- baseline_6_media_nonNA[baseline_6_media_nonNA$non_na_c
 baseline_6months <- baseline_6months %>% inner_join(baseline_6_media_nonNA, by = c("ID" = "ID"))
 ```
 
+#FIX STUFFS HERE! No Square Transform!
 As can be seen below, the Media Exposure times are square transformed. The goal is to use quantiles of the Media to divide it up into 4 categories. Then, those categories will map to 0,1,2,3 hours respectively to follow as closely as possible to the preliminary trajectories visualized by the research doctors at the Belle Lab.
 
 ```{r, warning=FALSE}
@@ -123,11 +124,16 @@ labels <- c("0hrs", "1hrs", "2hrs", "3hrs")
 baseline_6months$MediaCategory <- cut(baseline_6months$Media, breaks = quantile(baseline_6months$Media, na.rm = TRUE), labels = labels, include.lowest = TRUE, right = FALSE) #include.lowest, True to be inclusive of left hand-side and exclusive of right hand side.
 ```
 
+```{r}
+#Daphna's suggestion on minutes
+labels <- c("0hrs", "1hrs", "2hrs", "3hrs")
+baseline_6months$MediaCategory <- cut(baseline_6months$Media, breaks = c(0,60,120,180,240), labels = labels, include.lowest = TRUE, right = FALSE) #include.lowest, True to be inclusive of left hand-side and exclusive of right hand side.
+```
+
 
 ##### Step 4: Mapping Baseline to Raw Data
 
 To plot the trajectory of the BMI measures for up to 36 months, the 6-month baseline data must be mapped back to the raw data with the appropriate Media Exposure categories.
-
 ```{r}
 baseline_6_media_nonNA <- baseline_6months[!is.na(baseline_6months$MediaCategory),]
 #subsetting the data set further to the ID and the Media Category we want to attach to the raw data set
@@ -185,6 +191,7 @@ At each time interval for each media exposure category, what is the average **BM
 baseline_media_months_final <- tapply(baseline_cat_months$zBMI, list(baseline_cat_months$Months, baseline_cat_months$MediaCategory), mean, na.rm = TRUE)
 print(head(baseline_media_months_final))
 ```
+
 
 ```{r}
 #Saving the Matrix calculated
