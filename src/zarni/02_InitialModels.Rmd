@@ -6,7 +6,7 @@ output: github_document
 ---
 ### Introduction
 
-The goal of this code file is to explore whether infant media exposure is associated with weight/bmi trajectories during their infant to early childhood periods. We explore a simple linear regression model and a multi level regression model in the code file.
+The goal of this code file is to explore whether infant media exposure is associated with weight/bmi trajectories during their infant to early childhood periods. We explore a simple linear regression model and a multilevel regression model in the code file.
 
 ### Datasets Involved
 
