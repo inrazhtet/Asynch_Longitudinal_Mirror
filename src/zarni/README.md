@@ -4,7 +4,9 @@
 * Who are involved? 
 * What are we trying to achieve?
 
+*Comments*: 
 I can synthesize the couple of slides of the Bellvue Tomopoulos_Suzy power point deck.
+Insert Yoav's three key questions
 
 ### Data 
 
@@ -26,13 +28,13 @@ We have two raw data set collected by the Bellvue Hospital's Belle Lab. <br />
 
 * Where the files are?
 * What does each file do? How are they linked?
+* What are the important highlight files?
 
 ### References
 
 * Bellvue's Powerpoint Deck?
 
-
-###### Below text to be edited.
+###### Below text to be edited. PLEASE IGNORE!
 1. **01_Linear_Interpolation**: This code file contains start to end process of converting Raw Media Exposure and BMI data to *linearly interpolated data* by linking the two data sets by SubjectID and filling in the missing corresponding time stamps at each data set.
 
 2. **02_InitialModels**: The initial modeling file contains fitting models for the Linear interpolated data set with simple linear regression and a multi-level model.

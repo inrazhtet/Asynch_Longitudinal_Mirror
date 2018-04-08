@@ -165,9 +165,6 @@ As can be seen from the visuals below, the Media dataset by itself before joinin
 mdf_media = missing_data.frame(p_media)
 ```
 
-    ## Warning in .local(.Object, ...): lnmediatimespent and sqrtmediatimespent have the same rank ordering.
-    ##  Please verify whether they are in fact distinct variables.
-
 ``` r
 image(mdf_media)
 ```
@@ -338,7 +335,7 @@ c_data_arr_mer <- c_data_arr %>% group_by(ID,Months) %>% summarise_all(funs(my.r
 
 ``` r
 #Saving the arranged and merged data set
-write.csv(c_data_arr_mer, "../../data/final/final_na_data.csv")
+write.csv(c_data_arr_mer, "../../data/final/final_na_data.csv", row.names = F)
 ```
 
 ###### Step 5: Handling data Scenario II from Section III
@@ -375,7 +372,7 @@ singleton_data$Media <- singleton_media
 
 ``` r
 #Saving the NA filled data for data integrity
-write.csv(singleton_data, "../../data/Intermediate/singleton_NA_filled.csv")
+write.csv(singleton_data, "../../data/Intermediate/singleton_NA_filled.csv", row.names = F)
 ```
 
 ``` r
@@ -401,7 +398,7 @@ The imputed but split data is combined back to into a single data frame and save
 
 ``` r
 combined_data_final <- bind_rows(combined_data_interpolated)
-write.csv(combined_data_final, "../../data/final/final_interp_data.csv")
+write.csv(combined_data_final, "../../data/final/final_interp_data.csv", row.names = F)
 ```
 
 ### APPENDIX:

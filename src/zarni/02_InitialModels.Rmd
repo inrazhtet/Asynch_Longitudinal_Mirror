@@ -4,21 +4,24 @@ author: "Zarni Htet"
 date: "March 7, 2018"
 output: github_document
 ---
+### Introduction
 
-### Libraries for the lm and lmer packages
-```{r}
+The goal of this code file is to explore whether infant media exposure is associated with weight/bmi trajectories during their infant to early childhood periods. We explore a simple linear regression model and a multi level regression model in the code file.
+
+#### Libraries for the lm and lmer packages
+
+This block has all the *required* libraries for this code file.
+
+```{r, R.options=FALSE, warning=FALSE, message=FALSE}
 library(lme4) # For lmer function
 library(lmerTest)
 library(rio) # For importing data frames
 ```
 
-### Importing the data frames to be used
+#### Importing the data frames to be used
 ```{r}
 bmi_media <- import("../../data/final/final_interp_data.csv")
-bmi_media <- bmi_media[,-1]
 ```
-
-
 
 ### Functional Form
 

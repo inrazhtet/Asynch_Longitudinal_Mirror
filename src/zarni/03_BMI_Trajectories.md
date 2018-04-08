@@ -29,16 +29,13 @@ library (reshape) # For converting data to long format
 #### I: Uploading Raw & Linearly Interpolated Data
 
 ``` r
-#raw data
+#uploading raw data
 bmi_media_raw <- import("../../data/final/final_na_data.csv")
-bmi_media_raw <- bmi_media_raw[,-1]
 ```
 
 ``` r
 #uploading interpolated data
 bmi_media <- import("../../data/final/final_interp_data.csv")
-#Use the Custom Function here Later on
-bmi_media <- bmi_media[,-1]
 ```
 
 #### II: Trajectory of zBMI using the raw non-imputed data set
