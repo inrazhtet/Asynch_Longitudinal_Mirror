@@ -40,6 +40,7 @@ print(summary(fit))
 On average, a unit increase in media is associated with a 0.02868 increase in BMI. 
 
 #### Multi Level Regression 
+
 ##### Varying Intercept Model with individual predictor
 
 $$

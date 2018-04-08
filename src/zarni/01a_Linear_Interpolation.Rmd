@@ -163,7 +163,7 @@ print(sum(is.na(p_media$AgeMos))) #0
 
 As can be seen from the visuals below, the Media dataset by itself before joining across subjectID and time with the BMI dataset has no missing values.
 
-```{r, message=FALSE}
+```{r, message=FALSE, warning=FALSE}
 mdf_media = missing_data.frame(p_media)
 ```
 
