@@ -108,7 +108,6 @@ Printing out summary numbers
 print(length(media_diff$bmi_nonmatches)) #0 nonmatches
 ```
 
-In conclusion, everything in *Media* matches everything in BMI until Singletons have been removed. To doubly check:
 
 
 
