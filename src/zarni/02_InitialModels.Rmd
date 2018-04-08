@@ -8,7 +8,15 @@ output: github_document
 
 The goal of this code file is to explore whether infant media exposure is associated with weight/bmi trajectories during their infant to early childhood periods. We explore a simple linear regression model and a multi level regression model in the code file.
 
-#### Libraries for the lm and lmer packages
+### Datasets Involved
+
+The linearly interpolated final data set generated from *01a_Linear_Interpolation* is used here.
+
+### Admnistration
+
+Professor Marc Scott and Professor Daphna Harel are the supervisors of this project. The data is from the Belle Lab at the Bellevue Hospital. Additional background on the project is in the *README* at the root directory of the Github repository associated with the project.
+
+#### R Libraries
 
 This block has all the *required* libraries for this code file.
 
@@ -49,11 +57,8 @@ On average, a unit increase in media is associated with a 0.02868 increase in BM
 $$
 BMI_{ti} = b_{0} + b_{1}Media_{ti} + b_{2}Months_{ti} + \zeta_{i} + \epsilon_{ti}
 $$
-
-*Note to self: Need to write the distribution of Zeta and its error distribution*
-
-Lmer Code
 ```{r}
+#lmer code
 M1 = lmer(zBMI~Media + Months + (1|ID), data = bmi_media)
 print(summary(M1))
 ```
@@ -65,7 +70,7 @@ Controlling for differences between subjects, the effect of one unit change in M
 #### Likelihood ratio test
 
 ```{r}
-rand(M1)
+print(rand(M1))
 ```
 
 
