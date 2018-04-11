@@ -389,16 +389,19 @@ After processing Scenario II - IV of missing data, the processed data passes thr
 ```{r}
 #Split the data by ID column
 combined_data_split <- split(combined_data, combined_data$ID)
-#apply the linear interpolation through the wrapper mdz_interpolate which utilizes approx function
-combined_data_interpolated <- lapply(combined_data_split, function(x) mdz_interpolate(x,"Months","Media","linear",2)) 
+#apply the linear interpolation through the wrapper mdz_interpolate which utilizes approx function for Media and zBMI
+combined_data_interpolated_media <- lapply(combined_data_split, function(x) mdz_interpolate(x,"Months","Media","linear",2)) 
+combined_data_interpolated_bmi <- lapply(combined_data_split, function(x) mdz_interpolate(x,"Months","zBMI","linear",2)) 
 ```
 
 ###### Step 7: Combining the interpolated data set and saving it
 
-The imputed but split data is combined back to into a single data frame and saved as a data set as the final step.
+The imputed but split data is combined back to into a single data frame. The two imputed datasets of media and bmi are then merged together and saved as a final interpolated dataset.
 
 ```{r}
-combined_data_final <- bind_rows(combined_data_interpolated)
+combined_data_intermediate <- bind_rows(combined_data_interpolated_media)
+combined_data_final <- bind_rows(combined_data_interpolated_bmi)
+combined_data_final$Media <- combined_data_intermediate$Media
 write.csv(combined_data_final, "../../data/final/final_interp_data.csv", row.names = F)
 ```
 
