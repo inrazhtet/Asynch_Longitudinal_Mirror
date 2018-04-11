@@ -384,7 +384,7 @@ combined_data <- combined_data %>% arrange(ID, Months)
 
 ###### Step 6: Applying the Linear Interpolation Function for Scenario I  
 
-After processing Scenario II - IV of missing data, the processed data passes through the wrapper **mdz_interpolate**. The wrapper readies the data for the built-in **approx** function which linearly interpolates the missing values. Details on linear interpolation and the **approx** function are in the **Appendix** section. Details of the **mdz_interpolate** are in the **01_b_FunctionLInterpolation.R** from where the wrapper is sourced. At the end of Step 6, the data will be fully imputed. 
+After processing Scenario II - IV of missing data, the processed data passes through the wrapper **mdz_interpolate**. The wrapper readies the data for the built-in **approx** function which linearly interpolates the missing values. Details on linear interpolation and the **approx** function are in the **Appendix** section. Details of the **mdz_interpolate** are in the **01_b_FunctionLInterpolation.R** from where the wrapper is sourced. At the end of Step 6, Media Exposure and zBMI will be fully imputed into separate split datasets. 
 
 ```{r}
 #Split the data by ID column
@@ -396,15 +396,14 @@ combined_data_interpolated_bmi <- lapply(combined_data_split, function(x) mdz_in
 
 ###### Step 7: Combining the interpolated data set and saving it
 
-The imputed but split data is combined back to into a single data frame. The two imputed datasets of media and bmi are then merged together and saved as a final interpolated dataset.
+The two imputed but split data is merged back into their respective single data frames. Then, the two imputed datasets of media and bmi are then merged together and saved as a final single interpolated dataset.
 
 ```{r}
-combined_data_intermediate <- bind_rows(combined_data_interpolated_media)
-combined_data_final <- bind_rows(combined_data_interpolated_bmi)
-combined_data_final$Media <- combined_data_intermediate$Media
+combined_data_intermediate <- bind_rows(combined_data_interpolated_media) #binding rows for media
+combined_data_final <- bind_rows(combined_data_interpolated_bmi) # binding rows for bmi
+combined_data_final$Media <- combined_data_intermediate$Media # getting the imputed media into the bmi to get final dataset
 write.csv(combined_data_final, "../../data/final/final_interp_data.csv", row.names = F)
 ```
-
 
 ### APPENDIX:
 

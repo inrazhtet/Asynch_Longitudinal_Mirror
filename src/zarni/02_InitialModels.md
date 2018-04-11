@@ -5,7 +5,7 @@ March 7, 2018
 
 ### Introduction
 
-The goal of this code file is to explore whether infant media exposure is associated with weight/bmi trajectories during their infant to early childhood periods. We explore a simple linear regression model and a multi level regression model in the code file.
+The goal of this code file is to explore whether infant media exposure is associated with weight/bmi trajectories during their infant to early childhood periods. We explore a simple linear regression model and a multilevel regression model in the code file.
 
 ### Datasets Involved
 
@@ -50,20 +50,19 @@ print(summary(fit))
     ## 
     ## Residuals:
     ##     Min      1Q  Median      3Q     Max 
-    ## -5.7036 -0.7318 -0.0229  0.7468  4.4148 
+    ## -5.6007 -0.7349 -0.0215  0.7390  4.4395 
     ## 
     ## Coefficients:
     ##              Estimate Std. Error t value Pr(>|t|)    
-    ## (Intercept) 0.0238824  0.0235880   1.012 0.311335    
-    ## Media       0.0004199  0.0001129   3.720 0.000201 ***
-    ## Months      0.0181910  0.0006329  28.741  < 2e-16 ***
+    ## (Intercept) 0.0416871  0.0224304   1.859   0.0631 .  
+    ## Media       0.0004144  0.0001059   3.912 9.22e-05 ***
+    ## Months      0.0163335  0.0005890  27.731  < 2e-16 ***
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## 
-    ## Residual standard error: 1.127 on 8880 degrees of freedom
-    ##   (1287 observations deleted due to missingness)
-    ## Multiple R-squared:  0.08553,    Adjusted R-squared:  0.08532 
-    ## F-statistic: 415.3 on 2 and 8880 DF,  p-value: < 2.2e-16
+    ## Residual standard error: 1.126 on 10167 degrees of freedom
+    ## Multiple R-squared:  0.07078,    Adjusted R-squared:  0.0706 
+    ## F-statistic: 387.2 on 2 and 10167 DF,  p-value: < 2.2e-16
 
 #### Simple Linear Regression Interpretation
 
@@ -86,30 +85,30 @@ print(summary(M1))
     ## Formula: zBMI ~ Media + Months + (1 | ID)
     ##    Data: bmi_media
     ## 
-    ## REML criterion at convergence: 23152.2
+    ## REML criterion at convergence: 25912.1
     ## 
     ## Scaled residuals: 
     ##     Min      1Q  Median      3Q     Max 
-    ## -7.1154 -0.5394  0.0327  0.5868  4.5009 
+    ## -7.1848 -0.5325  0.0346  0.5870  4.6660 
     ## 
     ## Random effects:
     ##  Groups   Name        Variance Std.Dev.
-    ##  ID       (Intercept) 0.5621   0.7497  
-    ##  Residual             0.6758   0.8221  
-    ## Number of obs: 8883, groups:  ID, 537
+    ##  ID       (Intercept) 0.5950   0.7714  
+    ##  Residual             0.6422   0.8014  
+    ## Number of obs: 10170, groups:  ID, 537
     ## 
     ## Fixed effects:
     ##              Estimate Std. Error        df t value Pr(>|t|)    
-    ## (Intercept) 2.975e-02  4.281e-02 1.033e+03   0.695   0.4872    
-    ## Media       3.890e-04  1.730e-04 4.732e+03   2.248   0.0246 *  
-    ## Months      1.766e-02  4.973e-04 8.574e+03  35.514   <2e-16 ***
+    ## (Intercept) 8.080e-02  4.073e-02 9.440e+02   1.984   0.0476 *  
+    ## Media       1.434e-04  1.401e-04 8.363e+03   1.024   0.3061    
+    ## Months      1.530e-02  4.445e-04 9.790e+03  34.410   <2e-16 ***
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## 
     ## Correlation of Fixed Effects:
     ##        (Intr) Media 
-    ## Media  -0.580       
-    ## Months -0.242  0.079
+    ## Media  -0.493       
+    ## Months -0.241  0.075
 
 #### Model Interpretation
 
@@ -123,6 +122,6 @@ print(rand(M1))
 
     ## Analysis of Random effects Table:
     ##    Chi.sq Chi.DF p.value    
-    ## ID   4216      1  <2e-16 ***
+    ## ID   5389      1  <2e-16 ***
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
