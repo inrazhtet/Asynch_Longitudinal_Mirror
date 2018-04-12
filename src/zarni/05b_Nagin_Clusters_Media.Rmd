@@ -1,0 +1,187 @@
+---
+title: "05b_Nagin_Clusters_Media"
+author: "Zarni Htet"
+date : April 11, 2018
+output: github_document
+---
+### Introduction
+
+The goal of this code file to use a model based clustering method (Nagin clustering) that allows for longitudinal data to figure out underlying groups of subjects in Media.
+
+### Datasets Involved
+
+The non-imputed dataset filled with NAs from *01a_Linear_Interpolation* is used here. Nagin clustering can handle unbalanced design.
+
+### Admnistration
+
+Professor Marc Scott and Professor Daphna Harel are the supervisors of this project. The data is from the Belle Lab at the Bellevue Hospital. Additional background on the project is in the *README* at the root directory of the Github repository associated with the project.
+
+#### R Libraries
+
+This block has all the *required* libraries for this code file.
+
+```{r, R.options=FALSE, warning=FALSE,message=FALSE}
+library(rio) #For importing datasets
+library(lcmm) #For nagin clustering
+library(ggplot2) # For visualization
+library(gridExtra) #For arranging grids for visualization
+library(dplyr) #For joining datasets
+```
+
+#### Importing dataset 
+
+```{r}
+#uploading raw data
+bmi_media_na <- import("../../data/final/final_na_data.csv")
+```
+
+### Clustering
+
+#### Linear Term and Random Intercept for Media
+
+In the section below, Media data is clustered initially with a random intercept and linear term. The number clusters that are considered are 2,3,4,5. BIC is used to identify the optimal cluster. Afterwards, the Media values of each subject is smoothened and plotted by the optimal cluster grouping.
+
+##### 2 Clusters for Media
+
+```{r, eval = FALSE}
+medialinear2 <- lcmm(Media ~ Months, random = ~Months, subject = "ID", mixture = ~Months, ng = 2, data = bmi_media_na)
+print(summary(medialinear2))
+```
+##### 3 Clusters for Media
+
+```{r}
+medialinear3 <- lcmm(Media ~ Months, random = ~Months, subject = "ID", mixture = ~Months, ng = 3, data = bmi_media_na)
+print(summary(medialinear3))
+```
+
+##### 4 Clusters for Media
+
+```{r, eval = FALSE}
+medialinear4 <- lcmm(Media ~ Months, random = ~Months, subject = "ID", mixture = ~Months, ng = 4, data = bmi_media_na)
+print(summary(medialinear4))
+```
+
+##### 5 Clusters for Media
+
+```{r, eval = FALSE}
+medialinear5 <- lcmm(Media ~ Months, random = ~Months, subject = "ID", mixture = ~Months, ng = 5, data = bmi_media_na)
+print(summary(medialinear5))
+```
+
+#### Picking the Optimal Cluster
+
+```{r, eval = FALSE}
+size <- which.min(c(medialinear2$BIC, medialinear3$BIC, medialinear4$BIC, medialinear5$BIC))
+opt.size <- size + 1
+print(opt.size)
+```
+
+##### BIC value
+
+```{r}
+print(medialinear3_bic <- medialinear3$BIC)
+```
+
+##### Grabbing the Clustering Classes 
+
+```{r}
+#the first two columns are ID and class
+mediaclass <- medialinear3$pprob[,c(1:2)] 
+#Joining the class back to the raw dataset
+bmi_media_na_class_lin <- bmi_media_na %>% left_join(mediaclass, by = c("ID", "ID"))
+bmi_media_na_class_lin$class <- as.factor(bmi_media_na_class_lin$class)
+```
+
+##### Plotting Subjects by Clusters
+
+```{r}
+p1 <- ggplot(bmi_media_na_class_lin, aes(Months, Media, group = ID, colour = class)) +
+      geom_line() + 
+      geom_smooth(aes(group = class), method = "loess", size = 2, se = T) + scale_color_manual(values = c("#6699CC","#332288","#88CCEE"))
+      labs(x = "Months", y = "Media", colour = "3 Media Clusters", title = "Raw Individuals with Smooth Group" )
+```
+
+```{r}
+grid.arrange(p1, ncol = 1, top = "3 Media Clusters")
+```
+
+#### Quadratic Term and Random Intercept for Media
+
+In the section below, Media data is clustered initially with a random intercept and quadratic term. The number clusters that are considered are 2,3,4,5. BIC is used to identify the optimal cluster. Afterwards, the Media values of each subject is smoothened and plotted by the optimal cluster grouping.
+
+##### 2 Clusters for Media
+
+```{r, eval = FALSE}
+mediaquadratic2 <- lcmm(Media ~ Months + I(Months^2), random = ~Months, subject = "ID", mixture = ~Months + I(Months^2), ng = 2, data = bmi_media_na)
+#print(summary(mediaquadratic2))
+```
+##### 3 Clusters for Media
+
+```{r, eval = FALSE}
+mediaquadratic3 <- lcmm(Media ~ Months + I(Months^2), random = ~Months, subject = "ID", mixture = ~Months + I(Months^2), ng = 3, data = bmi_media_na)
+#print(summary(mediaquadratic3))
+```
+
+##### 4 Clusters for Media
+
+```{r}
+mediaquadratic4 <- lcmm(Media ~ Months + I(Months^2), random = ~Months, subject = "ID", mixture = ~Months + I(Months^2), ng = 4, data = bmi_media_na)
+#print(summary(mediaquadratic4))
+```
+
+##### 5 Clusters for Media
+
+```{r, eval = FALSE}
+mediaquadratic5 <- lcmm(Media ~ Months + I(Months^2), random = ~Months, subject = "ID", mixture = ~Months + I(Months^2), ng = 5, data = bmi_media_na)
+#print(summary(mediaquadratic5))
+```
+
+#### Picking the Optimal Cluster
+
+```{r, eval=FALSE}
+size <- which.min(c(mediaquadratic2$BIC, mediaquadratic3$BIC, mediaquadratic4$BIC, mediaquadratic5$BIC))
+opt.size <- size + 1
+print(opt.size)
+```
+
+##### BIC value
+
+```{r}
+print(mediaquadratic4_bic <- mediaquadratic4$BIC)
+```
+
+##### Grabbing the Clustering Classes 
+
+```{r}
+#the first two columns are ID and class
+mediaclass <- mediaquadratic4$pprob[,c(1:2)] 
+#Joining the class back to the raw dataset
+bmi_media_na_class_quad <- bmi_media_na %>% left_join(mediaclass, by = c("ID", "ID"))
+bmi_media_na_class_quad$class <- as.factor(bmi_media_na_class_quad$class)
+```
+
+##### Plotting Subjects by Clusters
+
+```{r}
+p1 <- ggplot(bmi_media_na_class_quad, aes(Months, Media, group = ID, colour = class)) +
+      geom_line() + 
+      geom_smooth(aes(group = class), method = "loess", size = 2, se = T) + scale_color_manual(values = c("#332288", "#6699CC", "#88CCEE", "#44AA99"))
+      labs(x = "Months", y = "zMedia", colour = "4 Media Clusters", title = "Raw Individuals with Smooth Group" )
+```
+
+```{r}
+grid.arrange(p1, ncol = 1, top = "4 Media Clusters")
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
