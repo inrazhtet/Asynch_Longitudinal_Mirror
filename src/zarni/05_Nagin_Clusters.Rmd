@@ -1,0 +1,187 @@
+---
+title: "05_Nagin_Clusters"
+author: "Zarni Htet"
+date : April 11, 2018
+output: github_document
+---
+### Introduction
+
+The goal of this code file to use a model based clustering method (Nagin clustering) that allows for longitudinal data to figure out underlying groups of subjects in BMI and Media respectively.
+
+### Datasets Involved
+
+The non-imputed dataset filled with NAs from *01a_Linear_Interpolation* is used here. Nagin clustering can handle unbalanced design.
+
+### Admnistration
+
+Professor Marc Scott and Professor Daphna Harel are the supervisors of this project. The data is from the Belle Lab at the Bellevue Hospital. Additional background on the project is in the *README* at the root directory of the Github repository associated with the project.
+
+#### R Libraries
+
+This block has all the *required* libraries for this code file.
+
+```{r, R.options=FALSE, warning=FALSE,message=FALSE}
+library(rio) #For importing datasets
+library(lcmm) #For nagin clustering
+library(ggplot2) # For visualization
+library(gridExtra) #For arranging grids for visualization
+library(dplyr) #For joining datasets
+```
+
+#### Importing dataset 
+
+```{r}
+#uploading raw data
+bmi_media_na <- import("../../data/final/final_na_data.csv")
+```
+
+### Clustering
+
+#### Linear Term and Random Intercept for BMI
+
+In the section below, BMI data is clustered initially with a random intercept and linear term. The number clusters that are considered are 2,3,4,5. BIC is used to identify the optimal cluster. Afterwards, the BMI values of each subject is smoothened and plotted by the optimal cluster grouping.
+
+##### 2 Clusters for BMI
+
+```{r}
+bmilinear2 <- lcmm(zBMI ~ Months, random = ~Months, subject = "ID", mixture = ~Months, ng = 2, data = bmi_media_na)
+print(summary(bmilinear2))
+```
+##### 3 Clusters for BMI
+
+```{r, eval = FALSE}
+bmilinear3 <- lcmm(zBMI ~ Months, random = ~Months, subject = "ID", mixture = ~Months, ng = 3, data = bmi_media_na)
+print(summary(bmilinear3))
+```
+
+##### 4 Clusters for BMI
+
+```{r, eval = FALSE}
+bmilinear4 <- lcmm(zBMI ~ Months, random = ~Months, subject = "ID", mixture = ~Months, ng = 4, data = bmi_media_na)
+print(summary(bmilinear4))
+```
+
+##### 5 Clusters for BMI
+
+```{r, eval = FALSE}
+bmilinear5 <- lcmm(zBMI ~ Months, random = ~Months, subject = "ID", mixture = ~Months, ng = 5, data = bmi_media_na)
+print(summary(bmilinear5))
+```
+
+#### Picking the Optimal Cluster
+
+```{r, eval = FALSE}
+size <- which.min(c(bmilinear2$BIC, bmilinear3$BIC, bmilinear4$BIC, bmilinear5$BIC))
+opt.size <- size + 1
+print(opt.size)
+```
+
+##### BIC value
+
+```{r}
+print(bmilinear2_bic <- bmilinear2$BIC)
+```
+
+##### Grabbing the Clustering Classes 
+
+```{r}
+#the first two columns are ID and class
+bmiclass <- bmilinear2$pprob[,c(1:2)] 
+#Joining the class back to the raw dataset
+bmi_media_na_class_lin <- bmi_media_na %>% left_join(bmiclass, by = c("ID", "ID"))
+bmi_media_na_class_lin$class <- as.factor(bmi_media_na_class_lin$class)
+```
+
+##### Plotting Subjects by Clusters
+
+```{r}
+p1 <- ggplot(bmi_media_na_class_lin, aes(Months, zBMI, group = ID, colour = class)) +
+      geom_line() + 
+      geom_smooth(aes(group = class), method = "loess", size = 2, se = T) + scale_color_manual(values = c("#6699CC","#332288"))
+      labs(x = "Months", y = "zBMI", colour = "2 BMI Clusters", title = "Raw Individuals with Smooth Group" )
+```
+
+```{r}
+grid.arrange(p1, ncol = 1, top = "2 BMI Clusters")
+```
+
+#### Quadratic Term and Random Intercept for BMI
+
+In the section below, BMI data is clustered initially with a random intercept and quadratic term. The number clusters that are considered are 2,3,4,5. BIC is used to identify the optimal cluster. Afterwards, the BMI values of each subject is smoothened and plotted by the optimal cluster grouping.
+
+##### 2 Clusters for BMI
+
+```{r, eval = FALSE}
+bmiquadratic2 <- lcmm(zBMI ~ Months + I(Months^2), random = ~Months, subject = "ID", mixture = ~Months + I(Months^2), ng = 2, data = bmi_media_na)
+print(summary(bmiquadratic2))
+```
+##### 3 Clusters for BMI
+
+```{r, eval = FALSE}
+bmiquadratic3 <- lcmm(zBMI ~ Months + I(Months^2), random = ~Months, subject = "ID", mixture = ~Months + I(Months^2), ng = 3, data = bmi_media_na)
+print(summary(bmiquadratic3))
+```
+
+##### 4 Clusters for BMI
+
+```{r, eval = FALSE}
+bmiquadratic4 <- lcmm(zBMI ~ Months + I(Months^2), random = ~Months, subject = "ID", mixture = ~Months + I(Months^2), ng = 4, data = bmi_media_na)
+print(summary(bmiquadratic4))
+```
+
+##### 5 Clusters for BMI
+
+```{r}
+bmiquadratic5 <- lcmm(zBMI ~ Months + I(Months^2), random = ~Months, subject = "ID", mixture = ~Months + I(Months^2), ng = 5, data = bmi_media_na)
+print(summary(bmiquadratic5))
+```
+
+#### Picking the Optimal Cluster
+
+```{r, eval=FALSE}
+size <- which.min(c(bmiquadratic2$BIC, bmiquadratic3$BIC, bmiquadratic4$BIC, bmiquadratic5$BIC))
+opt.size <- size + 1
+print(opt.size)
+```
+
+##### BIC value
+
+```{r}
+print(bmiquadratic5_bic <- bmiquadratic5$BIC)
+```
+
+##### Grabbing the Clustering Classes 
+
+```{r}
+#the first two columns are ID and class
+bmiclass <- bmiquadratic5$pprob[,c(1:2)] 
+#Joining the class back to the raw dataset
+bmi_media_na_class_quad <- bmi_media_na %>% left_join(bmiclass, by = c("ID", "ID"))
+bmi_media_na_class_quad$class <- as.factor(bmi_media_na_class_quad$class)
+```
+
+##### Plotting Subjects by Clusters
+
+```{r}
+p1 <- ggplot(bmi_media_na_class_quad, aes(Months, zBMI, group = ID, colour = class)) +
+      geom_line() + 
+      geom_smooth(aes(group = class), method = "loess", size = 2, se = T) + scale_color_manual(values = c("#332288", "#6699CC", "#88CCEE", "#44AA99", "#117733"))
+      labs(x = "Months", y = "zBMI", colour = "5 BMI Clusters", title = "Raw Individuals with Smooth Group" )
+```
+
+```{r}
+grid.arrange(p1, ncol = 1, top = "5 BMI Clusters")
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
