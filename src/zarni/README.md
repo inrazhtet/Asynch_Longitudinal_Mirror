@@ -32,35 +32,37 @@ The data is from a larger study carried out under the Bellevue Project for Early
 * Successful implementation of linear interpolation on the asynchronous datasets of BMI and Media Exposure  
 * Initial modeling on the Linearly interpolated data for statistically significant relationship
 * BMI trajectory exploration of different Media Exposure categories over time for both raw and linearly interpolated data to replicate the work done by the research doctors
-* Correlation plots of BMI and Media Exposure on random subject draws to explore underlying functional relationship
+* Correlation plots of BMI and Media Exposure on random subject draws to explore underlying functional relationships
 
 ### Ongoing Tasks
 
-* Deploying Nagin 
+* Deploying Nagin Clustering on raw BIM and Media exposure data to discover underlying different subject groups
 
 ### Directory Structure
 
-* Where the files are?
-* What does each file do? How are they linked?
-* What are the important files?
+* data *unavailable for public viewing*
+* src *code files*
+  * daphna - Professor Daphna Harel's code files
+  * marc - Professor Marc Scott's code files
+  * zarni - my code files
+      * 01a_Linear_Interpolation.md : This code file contains start to end process of converting Raw Media Exposure and BMI data to   *linearly interpolated data* by linking the two data sets by SubjectID and filling in the missing corresponding time stamps at each data set.
+      * 01b_Function_Linterpolation.R : This code file contains helper functions and wrapper written for 01a_Linear_interpolation.Rmd.
+      * 02_InitialModels.md : This code file contains initial linear regression and multi-level models.
+      * 03_BMI_Trajectories.md : This code file contains BMI trajectories over time across different Media Exposure categories for both raw and interpolated data.
+      * 04_CorrelationPlots.md : This code file contains correlation plots between BMI and Media Exposure of randomly drawn subjects.
+      * 05_a_Nagin_Clusters_BMI.md : This code file contains initial nagin clustering of the raw BMI data.
+      * 05_a_Nagin_Clusters_Media.md : This code file contains initial nagin clustering of the raw Media Exposure data.
 
-#### How to best read through the materials
 
-* Ask the reader to open the markdown files for overview
-* Can skim RMarkdown code details
+### How to best access the material
+
+
 
 
 ### References
 
 * Bellvue's Powerpoint Deck?
 
-#### PLEASE IGNORE TEXT BELOW. Boilerplate to be modified.
-
-1. **01_Linear_Interpolation**: This code file contains start to end process of converting Raw Media Exposure and BMI data to *linearly interpolated data* by linking the two data sets by SubjectID and filling in the missing corresponding time stamps at each data set.
-
-2. **02_InitialModels**: The initial modeling file contains fitting models for the Linear interpolated data set with simple linear regression and a multi-level model.
-
-3. **03_Loess_Smoothing**: <FILL IN LATER once you re-run the file>
   
 
 
