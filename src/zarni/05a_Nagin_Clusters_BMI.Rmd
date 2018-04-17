@@ -94,6 +94,8 @@ bmi_media_na_class_lin$class <- as.factor(bmi_media_na_class_lin$class)
 
 ##### Plotting Subjects by Clusters
 
+se =F
+
 ```{r}
 p1 <- ggplot(bmi_media_na_class_lin, aes(Months, zBMI, group = ID, colour = class)) +
       geom_line() + 
