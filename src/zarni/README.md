@@ -54,14 +54,13 @@ The data is from a larger study carried out under the Bellevue Project for Early
       * **05_a_Nagin_Clusters_Media.md** : This code file contains initial nagin clustering of the raw Media Exposure data.
 
 
-### How to best access the material
+### How to best review and access the material
 
-
-
+The **markdown** files contain both the most crucial code snippets as well as outputs of those results. For more details, looking the RMarkdown files would be the option. As the data is not accessible to the public, one would not be able to run the file. If there are any points for clarification, please feel free to create a github issue or contact me at zh938@nyu.edu.
 
 ### References
 
-* Bellvue's Powerpoint Deck?
+* Infant Media Exposure and Longitudinal Weight Status Trajectories in Low Income Young Children by Tomopoulous S, Weisleder A, Cates CB, Scott MA, Dreyer BP, Messito M, Kim A & Mendelsohn AL
 
   
 
