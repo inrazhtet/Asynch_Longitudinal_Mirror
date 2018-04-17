@@ -119,14 +119,15 @@ mediaquadratic2 <- lcmm(Media ~ Months + I(Months^2), random = ~Months, subject 
 
 ```{r, eval = FALSE}
 mediaquadratic3 <- lcmm(Media ~ Months + I(Months^2), random = ~Months, subject = "ID", mixture = ~Months + I(Months^2), ng = 3, data = bmi_media_na)
-#print(summary(mediaquadratic3))
+
+print(summary(mediaquadratic3))
 ```
 
 ##### 4 Clusters for Media
 
 ```{r}
 mediaquadratic4 <- lcmm(Media ~ Months + I(Months^2), random = ~Months, subject = "ID", mixture = ~Months + I(Months^2), ng = 4, data = bmi_media_na)
-#print(summary(mediaquadratic4))
+print(summary(mediaquadratic4))
 ```
 
 ##### 5 Clusters for Media
