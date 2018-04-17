@@ -13,15 +13,19 @@ In order to examine that association, media exposure data and weight/bmi data ne
 ## Data 
 
 The data is from a larger study carried out under the Bellevue Project for Early Language, Literacy and Education Success. It is a longitudinal analysis of interventions related to child development in low income families. The criteria for entry into the program is as below.
-**Mother**
+
+#### Mother 
+
 * English or Spanish speaking
 * 18 years and above
-**Child**
+
+#### Child
+
 * Full term gestation, normal birth weight
 * No significant medical complications
 * Planned follow up in the host institution of the study
 
-*The data is under strict confidentiality agreements and thus, no available for public disclosure. Only results are viewable on markdown files as stated below*
+*The data is under strict confidentiality agreements and thus, not available for public disclosure. Only results are viewable on markdown files as stated below.*
 
 ### Current Project Status
 
