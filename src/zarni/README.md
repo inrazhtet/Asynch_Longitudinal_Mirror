@@ -27,13 +27,16 @@ The data is from a larger study carried out under the Bellevue Project for Early
 
 *The data is under strict confidentiality agreements and thus, not available for public disclosure. Only results are viewable on markdown files as stated below.*
 
-### Current Project Status
+### Finished Tasks
 
-* What we have finished so far?
+* Successful implementation of linear interpolation on the asynchronous datasets of BMI and Media Exposure  
+* Initial modeling on the Linearly interpolated data for statistically significant relationship
+* BMI trajectory exploration of different Media Exposure categories over time for both raw and linearly interpolated data to replicate the work done by the research doctors
+* Correlation plots of BMI and Media Exposure on random subject draws to explore underlying functional relationship
 
-### Future Tasks
+### Ongoing Tasks
 
-* Description of the immediate next tasks for the week
+* Deploying Nagin 
 
 ### Directory Structure
 
