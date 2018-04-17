@@ -40,18 +40,18 @@ The data is from a larger study carried out under the Bellevue Project for Early
 
 ### Directory Structure
 
-* data *unavailable for public viewing*
-* src *code files*
-  * daphna - Professor Daphna Harel's code files
-  * marc - Professor Marc Scott's code files
-  * zarni - my code files
-      * 01a_Linear_Interpolation.md : This code file contains start to end process of converting Raw Media Exposure and BMI data to   *linearly interpolated data* by linking the two data sets by SubjectID and filling in the missing corresponding time stamps at each data set.
-      * 01b_Function_Linterpolation.R : This code file contains helper functions and wrapper written for 01a_Linear_interpolation.Rmd.
-      * 02_InitialModels.md : This code file contains initial linear regression and multi-level models.
-      * 03_BMI_Trajectories.md : This code file contains BMI trajectories over time across different Media Exposure categories for both raw and interpolated data.
-      * 04_CorrelationPlots.md : This code file contains correlation plots between BMI and Media Exposure of randomly drawn subjects.
-      * 05_a_Nagin_Clusters_BMI.md : This code file contains initial nagin clustering of the raw BMI data.
-      * 05_a_Nagin_Clusters_Media.md : This code file contains initial nagin clustering of the raw Media Exposure data.
+* **data** *unavailable for public viewing*
+* **src** *code files*
+  * **daphna** - Professor Daphna Harel's code files
+  * **marc** - Professor Marc Scott's code files
+  * **zarni** - my code files
+      * **01a_Linear_Interpolation.md** : This code file contains start to end process of converting Raw Media Exposure and BMI data to   *linearly interpolated data* by linking the two data sets by SubjectID and filling in the missing corresponding time stamps at each data set.
+      * **01b_Function_Linterpolation.R** : This code file contains helper functions and wrapper written for 01a_Linear_interpolation.Rmd.
+      * **02_InitialModels.md** : This code file contains initial linear regression and multi-level models.
+      * **03_BMI_Trajectories.md** : This code file contains BMI trajectories over time across different Media Exposure categories for both raw and interpolated data.
+      * **04_CorrelationPlots.md** : This code file contains correlation plots between BMI and Media Exposure of randomly drawn subjects.
+      * **05_a_Nagin_Clusters_BMI.md** : This code file contains initial nagin clustering of the raw BMI data.
+      * **05_a_Nagin_Clusters_Media.md** : This code file contains initial nagin clustering of the raw Media Exposure data.
 
 
 ### How to best access the material
