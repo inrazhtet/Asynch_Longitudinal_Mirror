@@ -1,15 +1,18 @@
 ## Overview
 
-**Adapting Yoav Bergner's three famous questions**
+The overarching goal of the project is to assess whether infant media exposure is associated with weight/bmi trajectories during their infant to early childhood periods. As there are documented negative effects of foreground media exposure for toodlers and infants, the study will assist in determining possible cause for intervention. Some of the negative effects are
+* Decreased energy expenditure 
+* Incresed caloric intake
+* Decreased sleep duration 
+These effects lead to obesity. 
 
-* What this is project about? 
 * Who are involved? 
 * What are we trying to achieve?
-* Why does it matter?
 
-**PLACEHOLDER BELOW**
 
-The overarching goal of the project is to assess whether infant media exposure is associated with weight/bmi trajectories during their infant to early childhood periods. In order to examine that association, media exposure data and weight/bmi data need to be synchronized (exactly how the response will be modeled as a function of the predictors is to be determined, but a first step is examining aligned data).  As can be seen below in our short data snippet, media exposure and weight/bmi are collected at **asynchronous** time points. Our goal is to impute these missing data (eventually multiply impute) at missing time points via different techniques, beginning with **linear interpolation**. For more on **linear interpolation**, please see the *Appendix* section.
+
+
+In order to examine that association, media exposure data and weight/bmi data need to be synchronized (exactly how the response will be modeled as a function of the predictors is to be determined, but a first step is examining aligned data). 
 
 ### Data 
 
