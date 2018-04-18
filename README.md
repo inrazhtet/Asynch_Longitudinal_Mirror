@@ -1,6 +1,6 @@
 ## Overview
 
-The overarching goal of the project is to assess whether infant media exposure is associated with weight/bmi trajectories during their infant to early childhood periods. The study will assist in determining a possible cause for intervention. 
+The overarching goal of the project is to assess whether infant media exposure is associated with weight/bmi trajectories during their infant to early childhood periods. The study will assist in assessing and improving potential pediatric interventions. 
 
 ## People Involved
 
@@ -8,7 +8,7 @@ Researchers from the NYU School of Medicine, the Bellevue Hospital Center are in
 
 ## Our Goals
 
-To examine the association between media exposure and bmi, media exposure data and weight/bmi data need to be synchronized (exactly how the response will be modeled as a function of the predictors is to be determined, but a first step is examining aligned data). 
+To examine the association between media exposure and bmi, media exposure data and weight/bmi data need to be synchronized (exactly how the response will be modeled as a function of the predictors is to be determined, but a first step is examining aligned data, and this requires imputation). 
 
 ## Data 
 
@@ -30,13 +30,13 @@ The data is from a larger study carried out under the Bellevue Project for Early
 ## Finished Tasks
 
 * Successful implementation of linear interpolation on the asynchronous datasets of BMI and Media Exposure  
-* Initial modeling on the Linearly interpolated data for determining any statistically significant relationship
-* BMI trajectory exploration of different Media Exposure categories over time for both raw and linearly interpolated data to replicate the work done by the research doctors
+* Initial modeling on the linearly interpolated data for determining any statistically significant relationship
+* BMI trajectory exploration of different Media Exposure categories over time for both raw and linearly interpolated data to replicate the work done by the researchers
 * Correlation plots of BMI and Media Exposure on random subject draws to explore underlying functional relationships
 
 ## Ongoing Tasks
 
-* Deploying Nagin Clustering on raw BIM and Media exposure data to discover underlying different subject groups
+* Deploying Nagin Clustering on raw BMI and Media exposure data to discover underlying different types of trajectories
 
 ## Directory Structure
 
