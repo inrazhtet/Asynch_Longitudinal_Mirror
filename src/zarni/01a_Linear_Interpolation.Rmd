@@ -13,7 +13,20 @@ The goal of this code file is to generate an imputed data set of **BMI** and **M
 
 ### Datasets Involved
 
-Refer to the Belle Lab Powerpoint to add this portion.
+The data is from a larger study carried out under the Bellevue Project for Early Language, Literacy and Education Success. It is a longitudinal analysis of interventions related to child development in low-income families. The criteria for entry into the program is as below.
+
+#### Mother 
+
+* English or Spanish speaking
+* 18 years and above
+
+#### Child
+
+* Full-term gestation, normal birth weight
+* No significant medical complications
+* Planned to follow up in the host institution of the study
+
+*The data is under strict confidentiality agreements and thus, not available for public disclosure.*
 
 ### Admnistration
 
@@ -260,7 +273,7 @@ In this section, the end goal is to create a linearly interpolated data set whil
 
 These themes are carried out in a total of **7** steps as demonstrated below.
 
-###### Step 1: Finding the Common ID
+##### Step 1: Finding the Common ID
 
 Finding the subject IDs that match across both data sets
 
@@ -269,7 +282,7 @@ common_ID <- intersect(p_bmi$ID_, p_media$ID_) # intersection works like in Set 
 print(length(common_ID)) #537 common subject IDs
 ```
 
-###### Step 2: Subsetting BMI and Media Data set based on shared ID
+##### Step 2: Subsetting BMI and Media Data set based on shared ID
 
 ```{r}
 #Matched BMI
@@ -278,7 +291,7 @@ m_bmi <- p_bmi[(p_bmi$ID_ %in% common_ID), ]
 m_media <- p_media[(p_media$ID_ %in% common_ID),]
 ```
 
-###### Step 3: Combining both data sets for create missing time points in each data set
+##### Step 3: Combining both data sets for create missing time points in each data set
 
 ```{r}
 #Merging both data sets by ID and Months  
@@ -311,7 +324,7 @@ image(mdf_combined)
 ```
 
 
-###### Step 4: Merging Duplicated Rows  
+##### Step 4: Merging Duplicated Rows  
 
 This section checks if BMI and Media data has been recorded at the same time for the same subject ID. If those rows exist, the goal is to merge those same rows by the **average** values of both BMI and Media Exposure duplicated columns. A sample of what these duplicated rows look like is shown below.
 
@@ -338,7 +351,7 @@ c_data_arr_mer <- c_data_arr %>% group_by(ID,Months) %>% summarise_all(funs(my.r
 write.csv(c_data_arr_mer, "../../data/final/final_na_data.csv", row.names = F)
 ```
 
-###### Step 5: Handling data Scenario II from Section III   
+##### Step 5: Handling data Scenario II from Section III   
 
 As mentioned before, there are cases where there is only **1** single value of either BMI or Media Exposure data with the rest of the time points' values being missing. The built-in linear interpolation function cannot handle it.
 Therefore, last value carried forward/backward will be carried out with our custom functions.
@@ -382,26 +395,30 @@ combined_data <- rbind(singleton_data, non_singleton_data)
 combined_data <- combined_data %>% arrange(ID, Months)
 ```
 
-###### Step 6: Applying the Linear Interpolation Function for Scenario I  
+##### Step 6: Applying the Linear Interpolation Function for Scenario I  
 
 After processing Scenario II - IV of missing data, the processed data passes through the wrapper **mdz_interpolate**. The wrapper readies the data for the built-in **approx** function which linearly interpolates the missing values. Details on linear interpolation and the **approx** function are in the **Appendix** section. Details of the **mdz_interpolate** are in the **01_b_FunctionLInterpolation.R** from where the wrapper is sourced. At the end of Step 6, Media Exposure and zBMI will be fully imputed into separate split datasets. 
 
 ```{r}
 #Split the data by ID column
 combined_data_split <- split(combined_data, combined_data$ID)
-#apply the linear interpolation through the wrapper mdz_interpolate which utilizes approx function for Media and zBMI
-combined_data_interpolated_media <- lapply(combined_data_split, function(x) mdz_interpolate(x,"Months","Media","linear",2)) 
-combined_data_interpolated_bmi <- lapply(combined_data_split, function(x) mdz_interpolate(x,"Months","zBMI","linear",2)) 
+#apply the linear interpolation through the wrapper mdz_interpolate 
+#which utilizes approx function for Media and zBMI
+combined_data_interpolated_media <- lapply(combined_data_split, function(x) 
+  mdz_interpolate(x,"Months","Media","linear",2)) 
+combined_data_interpolated_bmi <- lapply(combined_data_split, function(x) 
+  mdz_interpolate(x,"Months","zBMI","linear",2)) 
 ```
 
-###### Step 7: Combining the interpolated data set and saving it
+##### Step 7: Combining the interpolated data set and saving it
 
 The two imputed but split data is merged back into their respective single data frames. Then, the two imputed datasets of media and bmi are then merged together and saved as a final single interpolated dataset.
 
 ```{r}
 combined_data_intermediate <- bind_rows(combined_data_interpolated_media) #binding rows for media
 combined_data_final <- bind_rows(combined_data_interpolated_bmi) # binding rows for bmi
-combined_data_final$Media <- combined_data_intermediate$Media # getting the imputed media into the bmi to get final dataset
+combined_data_final$Media <- combined_data_intermediate$Media # getting the imputed media into 
+#the bmi to get final dataset
 write.csv(combined_data_final, "../../data/final/final_interp_data.csv", row.names = F)
 ```
 
@@ -508,7 +525,8 @@ y_max_2 <- y_2[max(y_nmis_2)] #get the value from the furthest right index of y
 
 This code chunk applies the approx function and specifying rule = 2 to test the case LOCF, LOCB.
 ```{r}
-testresults <- approx(x_2, y_2, xout = xout_2,  method = "linear", yleft = y_min_2, yright = y_max_2, rule = 2)
+testresults <- approx(x_2, y_2, xout = xout_2,  method = "linear", yleft = y_min_2, 
+                      yright = y_max_2, rule = 2)
 ```
 
 From the y_2 data set above, we expect to see the return results to be 3, 10, 10 if LOCF and LOCB is applied correctly.
