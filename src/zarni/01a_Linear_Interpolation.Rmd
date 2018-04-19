@@ -4,7 +4,7 @@ author: "Zarni Htet "
 email: "zh938@nyu.edu"
 affiliation: "New York University"
 date: March 15, 2018
-output: pdf_document
+output: github_document
 ---
 
 ### Introduction
